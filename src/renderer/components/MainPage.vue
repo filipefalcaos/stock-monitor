@@ -75,9 +75,19 @@
   export default {
     name: 'landing-page',
     
-    created () {
+    created() {
       this.get_stock_prices();
       this.update_stock_prices();
+    },
+
+    computed: {
+      stock_data_buy() {
+        return this.stock_data.filter(stock => { return stock.buy });
+      },
+
+      stock_data_sell() {
+        return this.stock_data.filter(stock => { return !stock.buy });
+      }
     },
     
     data() {
@@ -86,35 +96,25 @@
         full_value: 100000,
         final_result: 3055.6,
         percent_result: 3.06,
-        stock_data_buy: [
-          { 'stock': 'AZUL4', 'uol_code': 1881, 'first_price': 16.96, 'amount': 600, 'current_price': 15.99 },
-          { 'stock': 'RAPT4', 'uol_code': 522, 'first_price': 6.08, 'amount': 1700, 'current_price': 6.35 },
-          { 'stock': 'IRBR3', 'uol_code': 1914, 'first_price': 10.66, 'amount': 1000, 'current_price': 10.68 },
-          { 'stock': 'CEAB3', 'uol_code': 2395, 'first_price': 7.82, 'amount': 1300, 'current_price': 8.26 },
-          { 'stock': 'UGPA3', 'uol_code': 674, 'first_price': 13.58, 'amount': 700, 'current_price': 13.18 },
-          { 'stock': 'VIVA3', 'uol_code': 2388, 'first_price': 15.55, 'amount': 700, 'current_price': 15.49 },
-          { 'stock': 'ALSO3', 'uol_code': 2329, 'first_price': 26.71, 'amount': 400, 'current_price': 26.42 },
-          { 'stock': 'LINX3', 'uol_code': 1404, 'first_price': 20.29, 'amount': 500, 'current_price': 20.29 },
-          { 'stock': 'MRVE3', 'uol_code': 451, 'first_price': 13.12, 'amount': 700, 'current_price': 12.69 },
-          { 'stock': 'YDUQ3', 'uol_code': 2324, 'first_price': 26.10, 'amount': 400, 'current_price': 26.91 }
-        ],
-        stock_data_sell: [
-          { 'stock': 'BOVA11', 'uol_code': 1027, 'first_price': 75.75, 'amount': 1340, 'current_price': 73.51 }
+        stock_data: [
+          { 'stock': 'AZUL4', 'uol_code': 1881, 'first_price': 16.96, 'amount': 600, 'current_price': 15.99, 'buy': true },
+          { 'stock': 'RAPT4', 'uol_code': 522, 'first_price': 6.08, 'amount': 1700, 'current_price': 6.35, 'buy': true },
+          { 'stock': 'IRBR3', 'uol_code': 1914, 'first_price': 10.66, 'amount': 1000, 'current_price': 10.68, 'buy': true },
+          { 'stock': 'CEAB3', 'uol_code': 2395, 'first_price': 7.82, 'amount': 1300, 'current_price': 8.26, 'buy': true },
+          { 'stock': 'UGPA3', 'uol_code': 674, 'first_price': 13.58, 'amount': 700, 'current_price': 13.18, 'buy': true },
+          { 'stock': 'VIVA3', 'uol_code': 2388, 'first_price': 15.55, 'amount': 700, 'current_price': 15.49, 'buy': true },
+          { 'stock': 'ALSO3', 'uol_code': 2329, 'first_price': 26.71, 'amount': 400, 'current_price': 26.42, 'buy': true },
+          { 'stock': 'LINX3', 'uol_code': 1404, 'first_price': 20.29, 'amount': 500, 'current_price': 20.29, 'buy': true },
+          { 'stock': 'MRVE3', 'uol_code': 451, 'first_price': 13.12, 'amount': 700, 'current_price': 12.69, 'buy': true },
+          { 'stock': 'YDUQ3', 'uol_code': 2324, 'first_price': 26.10, 'amount': 400, 'current_price': 26.91, 'buy': true },
+          { 'stock': 'BOVA11', 'uol_code': 1027, 'first_price': 75.75, 'amount': 1340, 'current_price': 73.51, 'buy': false }
         ]
       }
     },
     
     methods: {
       get_stock_prices() {
-        this.stock_data_buy.forEach(stock => {
-          this.$http
-            .get('http://cotacoes.economia.uol.com.br/ws/asset/' + stock.uol_code + '/intraday?size=1')
-            .then(response => {
-              stock.current_price = response.data.data[0].price;
-            });
-        });
-
-        this.stock_data_sell.forEach(stock => {
+        this.stock_data.forEach(stock => {
           this.$http
             .get('http://cotacoes.economia.uol.com.br/ws/asset/' + stock.uol_code + '/intraday?size=1')
             .then(response => {
@@ -129,13 +129,9 @@
       update_stock_prices() {
         let sum = 0;
 
-        this.stock_data_buy.forEach(stock => {
-          stock.result = ((stock.current_price - stock.first_price) * stock.amount).toFixed(2);
-          sum += parseFloat(stock.result);
-        });
-
-        this.stock_data_sell.forEach(stock => {
-          stock.result = ((stock.first_price - stock.current_price) * stock.amount).toFixed(2);
+        this.stock_data.forEach(stock => {
+          if (stock.buy) stock.result = ((stock.current_price - stock.first_price) * stock.amount).toFixed(2);
+          else stock.result = ((stock.first_price - stock.current_price) * stock.amount).toFixed(2);
           sum += parseFloat(stock.result);
         });
 
