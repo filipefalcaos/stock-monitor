@@ -2,9 +2,13 @@
 <template>
   <section class="section">
     <div class="columns">
-      <div class="column is-two-thirds">
-        <h1 class="title is-4">Compras</h1>
-        <b-table :data="stock_data_buy" :striped="true" :hoverable="true" :mobile-cards="true">
+      <div class="column is-four-fifths">
+        <h1 class="title title-text">
+          Compras
+        </h1>
+        
+        <!-- Table of the stocks where the bet was on going up -->
+        <b-table class="base-text" :data="stock_data_buy" :striped="true" :hoverable="true" :mobile-cards="true">
           <template slot-scope="props">
             <b-table-column field="stock" label="Ação">
               {{ props.row.stock }}
@@ -18,7 +22,12 @@
             <b-table-column :class="{ 'green-success': new_data }" field="current_price" label="Preço Atual" :numeric="true">
               R$ {{ props.row.current_price }}
             </b-table-column>
-            <b-table-column field="result" label="Resultado" :numeric="true">
+            <b-table-column :class="{ 'green-success': new_data }" field="var" label="Variação" :numeric="true">
+              R$ {{ props.row.var }} ({{ props.row.varpct}}%)
+              <span v-if="props.row.var > 0">📈</span>
+              <span v-else-if="props.row.var < 0">📉</span>
+            </b-table-column>
+            <b-table-column :class="{ 'green-success': new_data }" field="result" label="Resultado" :numeric="true">
               R$ {{ props.row.result }}
               <span v-if="props.row.result > 0">😀</span>
               <span v-else-if="props.row.result == 0">😐</span>
@@ -28,22 +37,34 @@
         </b-table>
       </div>
 
+      <!-- Overall stats -->
       <div class="column" style="margin-top: 3.75rem; margin-left: 1.5rem;">
-        <h1 class="title is-5" style="margin-bottom: 0.5rem;">Valor Feito = R$ {{ full_value.toFixed(2) }} </h1>
-        <h1 class="title is-5" style="margin-bottom: 0.5rem;">Resultado Total = R$ {{ final_result }} </h1>
-        <h1 class="title is-5">Resultado Percentual = {{ percent_result.toFixed(2) }}% </h1>
+        <h1 class="title base-text" style="margin-bottom: 0.5rem;">
+          Valor Feito = R$ {{ full_value.toFixed(2) }}
+        </h1>
+        <h1 class="title base-text" style="margin-bottom: 0.5rem;">
+          Resultado = R$ {{ final_result }} ({{ percent_result.toFixed(2) }}%)
+        </h1>
 
-        <div class="buttons">
-          <b-button @click="get_stock_prices" type="is-info" expanded>Atualizar</b-button>
-          <b-button type="is-success" expanded>Salvar Excel</b-button>
+        <div class="buttons" style="margin-top: 2rem;">
+          <b-button @click="get_stock_prices" type="is-info" expanded>
+            Atualizar
+          </b-button>
+          <b-button type="is-success" expanded>
+            Salvar Excel
+          </b-button>
         </div>
       </div>
     </div>
 
     <div class="columns">
-      <div class="column is-two-thirds">
-        <h1 class="title is-4">Vendas</h1>
-        <b-table :data="stock_data_sell" :striped="true" :hoverable="true" :mobile-cards="true">
+      <div class="column is-four-fifths">
+        <h1 class="title title-text">
+          Vendas
+        </h1>
+        
+        <!-- Table of the stocks where the bet was on going down -->
+        <b-table class="base-text" :data="stock_data_sell" :striped="true" :hoverable="true" :mobile-cards="true">
           <template slot-scope="props">
             <b-table-column field="stock" label="Ação">
               {{ props.row.stock }}
@@ -57,7 +78,12 @@
             <b-table-column :class="{ 'green-success': new_data }" field="current_price" label="Preço Atual" :numeric="true">
               R$ {{ props.row.current_price }}
             </b-table-column>
-            <b-table-column field="result" label="Resultado" :numeric="true">
+            <b-table-column :class="{ 'green-success': new_data }" field="var" label="Variação" :numeric="true">
+              R$ {{ props.row.var }} ({{ props.row.varpct}}%)
+              <span v-if="props.row.var > 0">📈</span>
+              <span v-else-if="props.row.var < 0">📉</span>
+            </b-table-column>
+            <b-table-column :class="{ 'green-success': new_data }" field="result" label="Resultado" :numeric="true">
               R$ {{ props.row.result }}
               <span v-if="props.row.result > 0">😀</span>
               <span v-else-if="props.row.result == 0">😐</span>
@@ -102,17 +128,17 @@
         final_result: 3055.6,
         percent_result: 3.06,
         stock_data: [
-          { 'stock': 'AZUL4', 'uol_code': 1881, 'first_price': 16.96, 'amount': 600, 'current_price': 15.99, 'aux_price': 0, 'buy': true },
-          { 'stock': 'RAPT4', 'uol_code': 522, 'first_price': 6.08, 'amount': 1700, 'current_price': 6.35, 'aux_price': 0, 'buy': true },
-          { 'stock': 'IRBR3', 'uol_code': 1914, 'first_price': 10.66, 'amount': 1000, 'current_price': 10.68, 'aux_price': 0, 'buy': true },
-          { 'stock': 'CEAB3', 'uol_code': 2395, 'first_price': 7.82, 'amount': 1300, 'current_price': 8.26, 'aux_price': 0, 'buy': true },
-          { 'stock': 'UGPA3', 'uol_code': 674, 'first_price': 13.58, 'amount': 700, 'current_price': 13.18, 'aux_price': 0, 'buy': true },
-          { 'stock': 'VIVA3', 'uol_code': 2388, 'first_price': 15.55, 'amount': 700, 'current_price': 15.49, 'aux_price': 0, 'buy': true },
-          { 'stock': 'ALSO3', 'uol_code': 2329, 'first_price': 26.71, 'amount': 400, 'current_price': 26.42, 'aux_price': 0, 'buy': true },
-          { 'stock': 'LINX3', 'uol_code': 1404, 'first_price': 20.29, 'amount': 500, 'current_price': 20.29, 'aux_price': 0, 'buy': true },
-          { 'stock': 'MRVE3', 'uol_code': 451, 'first_price': 13.12, 'amount': 700, 'current_price': 12.69, 'aux_price': 0, 'buy': true },
-          { 'stock': 'YDUQ3', 'uol_code': 2324, 'first_price': 26.10, 'amount': 400, 'current_price': 26.91, 'aux_price': 0, 'buy': true },
-          { 'stock': 'BOVA11', 'uol_code': 1027, 'first_price': 75.75, 'amount': 1340, 'current_price': 73.51, 'aux_price': 0, 'buy': false }
+          { 'stock': 'AZUL4', 'uol_code': 1881, 'first_price': 16.96, 'amount': 600, 'buy': true },
+          { 'stock': 'RAPT4', 'uol_code': 522, 'first_price': 6.08, 'amount': 1700, 'buy': true },
+          { 'stock': 'IRBR3', 'uol_code': 1914, 'first_price': 10.66, 'amount': 1000, 'buy': true },
+          { 'stock': 'CEAB3', 'uol_code': 2395, 'first_price': 7.82, 'amount': 1300, 'buy': true },
+          { 'stock': 'UGPA3', 'uol_code': 674, 'first_price': 13.58, 'amount': 700, 'buy': true },
+          { 'stock': 'VIVA3', 'uol_code': 2388, 'first_price': 15.55, 'amount': 700, 'buy': true },
+          { 'stock': 'ALSO3', 'uol_code': 2329, 'first_price': 26.71, 'amount': 400, 'buy': true },
+          { 'stock': 'LINX3', 'uol_code': 1404, 'first_price': 20.29, 'amount': 500, 'buy': true },
+          { 'stock': 'MRVE3', 'uol_code': 451, 'first_price': 13.12, 'amount': 700, 'buy': true },
+          { 'stock': 'YDUQ3', 'uol_code': 2324, 'first_price': 26.10, 'amount': 400, 'buy': true },
+          { 'stock': 'BOVA11', 'uol_code': 1027, 'first_price': 75.75, 'amount': 1340, 'buy': false }
         ]
       }
     },
@@ -129,13 +155,20 @@
           promises.push(
             this.$http.get('http://cotacoes.economia.uol.com.br/ws/asset/' + stock.uol_code + '/intraday?size=1').then(response => {
               stock.aux_price = response.data.data[0].price;
+              stock.aux_var = response.data.data[0].var;
+              stock.aux_varpct = response.data.data[0].varpct;
             })
           );
         });
 
         // After all prices are collected, update the UI
         Promise.all(promises).then(() => {
-          this.stock_data.forEach(stock => { stock.current_price = stock.aux_price; });
+          this.stock_data.forEach(stock => {
+            stock.current_price = stock.aux_price;
+            stock.var = stock.aux_var;
+            stock.varpct = stock.aux_varpct;
+          });
+
           this.update_stock_prices();
           this.new_data = true;
           setTimeout(() => { this.new_data = false; }, 2000);
@@ -174,6 +207,14 @@
 
   .section {
     padding: 2rem 2rem!important;
+  }
+
+  .title-text {
+    font-size: 24px!important;
+  }
+
+  .base-text {
+    font-size: 16px!important;
   }
 
   .green-success {
