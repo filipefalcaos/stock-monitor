@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require('path');
 
 /**
  * `electron-packager` options
@@ -13,4 +13,4 @@ module.exports = {
   out: path.join(__dirname, '../build'),
   overwrite: true,
   platform: process.env.BUILD_TARGET || 'all'
-}
+};
