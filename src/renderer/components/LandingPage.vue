@@ -54,7 +54,7 @@
             <b-table-column field="amount" label="Quantidade" :numeric="true">
               {{ props.row.amount }}
             </b-table-column>
-            <b-table-column field="current_price" label="Preço Atual" :numeric="true">
+            <b-table-column :class="{ 'green-success': new_data }" field="current_price" label="Preço Atual" :numeric="true">
               R$ {{ props.row.current_price }}
             </b-table-column>
             <b-table-column field="result" label="Resultado" :numeric="true">
