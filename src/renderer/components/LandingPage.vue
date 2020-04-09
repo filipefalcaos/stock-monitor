@@ -31,7 +31,7 @@
       <div class="column" style="margin-top: 3.75rem; margin-left: 1.5rem;">
         <h1 class="title is-5" style="margin-bottom: 0.5rem;">Valor Feito = R$ {{ full_value.toFixed(2) }} </h1>
         <h1 class="title is-5" style="margin-bottom: 0.5rem;">Resultado Total = R$ {{ final_result }} </h1>
-        <h1 class="title is-5">Resultado Percentual = {{ percent_result }}% </h1>
+        <h1 class="title is-5">Resultado Percentual = {{ percent_result.toFixed(2) }}% </h1>
 
         <div class="buttons">
           <b-button @click="get_stock_prices" type="is-info" expanded>Atualizar</b-button>
@@ -76,31 +76,15 @@
     name: 'landing-page',
     
     created () {
-      this.stock_data_buy.forEach(stock => {
-        stock.result = ((stock.current_price - stock.first_price) * stock.amount).toFixed(2)
-      });
-
-      this.stock_data_sell.forEach(stock => {
-        stock.result = ((stock.first_price - stock.current_price) * stock.amount).toFixed(2)
-      });
+      this.update_stock_prices();
     },
     
-    computed: {
-      final_result() {
-        let sum = 0;
-        this.stock_data_buy.forEach(stock => { sum += parseFloat(stock.result); });
-        return (sum + parseFloat(this.stock_data_sell[0].result)).toFixed(2);
-      },
-
-      percent_result() {
-        return (this.final_result / this.full_value * 100).toFixed(2);
-      }
-    },
-    
-    data () {
+    data() {
       return {
-        full_value: 100000,
         new_data: false,
+        full_value: 100000,
+        final_result: 3055.6,
+        percent_result: 3.06,
         stock_data_buy: [
           { 'stock': 'AZUL4', 'uol_code': 1881, 'first_price': 16.96, 'amount': 600, 'current_price': 15.99 },
           { 'stock': 'RAPT4', 'uol_code': 522, 'first_price': 6.08, 'amount': 1700, 'current_price': 6.35 },
@@ -124,7 +108,9 @@
         this.stock_data_buy.forEach(stock => {
           this.$http
             .get('http://cotacoes.economia.uol.com.br/ws/asset/' + stock.uol_code + '/intraday?size=1')
-            .then(response => (stock.current_price = response.data.data[0].price))
+            .then(response => {
+              stock.current_price = response.data.data[0].price;
+            });
         });
 
         this.stock_data_sell.forEach(stock => {
@@ -132,10 +118,28 @@
             .get('http://cotacoes.economia.uol.com.br/ws/asset/' + stock.uol_code + '/intraday?size=1')
             .then(response => {
               stock.current_price = response.data.data[0].price;
+              this.update_stock_prices();
               this.new_data = true;
               setTimeout(() => { this.new_data = false; }, 2000);
             });
         });
+      },
+
+      update_stock_prices() {
+        let sum = 0;
+
+        this.stock_data_buy.forEach(stock => {
+          stock.result = ((stock.current_price - stock.first_price) * stock.amount).toFixed(2);
+          sum += parseFloat(stock.result);
+        });
+
+        this.stock_data_sell.forEach(stock => {
+          stock.result = ((stock.first_price - stock.current_price) * stock.amount).toFixed(2);
+          sum += parseFloat(stock.result);
+        });
+
+        this.final_result = parseFloat(sum).toFixed(2);
+        this.percent_result = sum / this.full_value;
       }
     }
   }

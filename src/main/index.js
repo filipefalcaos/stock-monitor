@@ -16,6 +16,7 @@ const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` 
 // Creates a new Electron window
 function createWindow() {
   mainWindow = new BrowserWindow({ height: 800, width: 1500 });
+  mainWindow.webContents.openDevTools();
   mainWindow.loadURL(winURL);
   mainWindow.on('closed', () => { mainWindow = null });
 }
