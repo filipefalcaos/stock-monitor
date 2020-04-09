@@ -76,6 +76,7 @@
     name: 'landing-page',
     
     created () {
+      this.get_stock_prices();
       this.update_stock_prices();
     },
     
@@ -139,7 +140,7 @@
         });
 
         this.final_result = parseFloat(sum).toFixed(2);
-        this.percent_result = sum / this.full_value;
+        this.percent_result = (sum / this.full_value) * 100;
       }
     }
   }
