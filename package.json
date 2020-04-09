@@ -21,7 +21,6 @@
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
-    "ajv": "^6.5.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -35,7 +34,6 @@
     "cross-env": "^5.1.6",
     "css-loader": "^0.28.11",
     "del": "^3.0.0",
-    "devtron": "^1.4.0",
     "electron": "^2.0.4",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
