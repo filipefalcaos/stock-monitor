@@ -1,40 +1,53 @@
+<!-- Template -->
 <template>
   <div id="wrapper">
-    <img id="logo" src="~@/assets/logo.png" alt="electron-vue">
-    <main>
-      <div class="left-side">
-        <span class="title">
-          Welcome to your new project!
-        </span>
-        <system-information></system-information>
-      </div>
-
-      <div class="right-side">
-        <div class="doc">
-          <div class="title">Getting Started</div>
-          <p>
-            electron-vue comes packed with detailed documentation that covers everything from
-            internal configurations, using the project structure, building your application,
-            and so much more.
-          </p>
-          <button @click="open('https://simulatedgreg.gitbooks.io/electron-vue/content/')">Read the Docs</button><br><br>
-        </div>
-        <div class="doc">
-          <div class="title alt">Other Documentation</div>
-          <button class="alt" @click="open('https://electron.atom.io/docs/')">Electron</button>
-          <button class="alt" @click="open('https://vuejs.org/v2/guide/')">Vue.js</button>
-        </div>
-      </div>
-    </main>
+    <b-table :data="stock_data" :striped="true" :hoverable="true" :mobile-cards="true">
+      <template slot-scope="props">
+        <b-table-column field="stock" label="Ação">
+          {{ props.row.stock }}
+        </b-table-column>
+        <b-table-column field="first_price" label="Preço Comprado" :numeric="true">
+          R$ {{ props.row.first_price }}
+        </b-table-column>
+        <b-table-column field="amount" label="Quantidade" :numeric="true">
+          {{ props.row.amount }}
+        </b-table-column>
+        <b-table-column field="current_price" label="Preço Atual" :numeric="true">
+          R$ {{ props.row.current_price }}
+        </b-table-column>
+        <b-table-column field="result" label="Resultado" :numeric="true">
+          R$ {{ props.row.result }}
+        </b-table-column>
+      </template>
+    </b-table>
   </div>
 </template>
 
+<!-- Script -->
 <script>
-  import SystemInformation from './LandingPage/SystemInformation'
-
   export default {
     name: 'landing-page',
-    components: { SystemInformation },
+    created () {
+      this.stock_data.forEach(stock => {
+        stock.result = ((stock.current_price - stock.first_price) * stock.amount).toFixed(2)
+      })
+    },
+    data () {
+      return {
+        stock_data: [
+          { 'stock': 'AZUL4', 'first_price': 16.96, 'amount': 600, 'current_price': 15.99 },
+          { 'stock': 'RAPT4', 'first_price': 6.08, 'amount': 1700, 'current_price': 6.35 },
+          { 'stock': 'IRBR3', 'first_price': 10.66, 'amount': 1000, 'current_price': 10.68 },
+          { 'stock': 'CEAB3', 'first_price': 7.82, 'amount': 1300, 'current_price': 8.26 },
+          { 'stock': 'UGPA3', 'first_price': 13.58, 'amount': 700, 'current_price': 13.18 },
+          { 'stock': 'VIVA3', 'first_price': 15.55, 'amount': 700, 'current_price': 15.49 },
+          { 'stock': 'ALSO3', 'first_price': 26.71, 'amount': 400, 'current_price': 26.42 },
+          { 'stock': 'LINX3', 'first_price': 20.29, 'amount': 500, 'current_price': 20.29 },
+          { 'stock': 'MRVE3', 'first_price': 13.12, 'amount': 700, 'current_price': 12.69 },
+          { 'stock': 'YDUQ3', 'first_price': 26.10, 'amount': 400, 'current_price': 26.91 }
+        ]
+      }
+    },
     methods: {
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -43,6 +56,7 @@
   }
 </script>
 
+<!-- Styles -->
 <style>
   @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 
@@ -62,67 +76,7 @@
         rgba(229, 229, 229, .9) 100%
       );
     height: 100vh;
-    padding: 60px 80px;
+    padding: 40px 60px;
     width: 100vw;
-  }
-
-  #logo {
-    height: auto;
-    margin-bottom: 20px;
-    width: 420px;
-  }
-
-  main {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  main > div { flex-basis: 50%; }
-
-  .left-side {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .welcome {
-    color: #555;
-    font-size: 23px;
-    margin-bottom: 10px;
-  }
-
-  .title {
-    color: #2c3e50;
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 6px;
-  }
-
-  .title.alt {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
-
-  .doc p {
-    color: black;
-    margin-bottom: 10px;
-  }
-
-  .doc button {
-    font-size: .8em;
-    cursor: pointer;
-    outline: none;
-    padding: 0.75em 2em;
-    border-radius: 2em;
-    display: inline-block;
-    color: #fff;
-    background-color: #4fc08d;
-    transition: all 0.15s ease;
-    box-sizing: border-box;
-    border: 1px solid #4fc08d;
-  }
-
-  .doc button.alt {
-    color: #42b983;
-    background-color: transparent;
   }
 </style>
