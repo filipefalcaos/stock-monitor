@@ -1,6 +1,6 @@
 # stock-monitor
 
-> A stock monitor
+> A stock monitor for my needs
 
 #### Build Setup
 
@@ -13,11 +13,6 @@ npm run dev
 
 # build electron application for production
 npm run build
-
-
-# lint all JS/Vue component files in `src/`
-npm run lint
-
 ```
 
 ---
