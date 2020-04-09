@@ -21,7 +21,7 @@
         </h1>
 
         <div class="buttons" style="margin-top: 2rem;">
-          <b-button @click="get_stock_prices" type="is-info" expanded>
+          <b-button @click="get_stock_prices" :disabled="is_processing_aux" type="is-info" expanded>
             Atualizar
           </b-button>
           <b-button type="is-success" expanded>
@@ -75,6 +75,7 @@
       return {
         new_data: false,
         is_processing: false,
+        has_error: false,
         full_value: 100000,
         final_result: 3055.6,
         percent_result: 3.06,
@@ -100,13 +101,19 @@
       // data accordingly
       get_stock_prices() {
         let promises = [];
+        let base_url = 'http://cotacoes.economia.uol.com.br/ws/asset/';
         this.is_processing_aux = true;
-        setTimeout(() => { if (this.is_processing_aux) this.is_processing = true; }, 500);
+        this.has_error = false;
+        
+        // Only sets processing state if not in error state - waits 500ms
+        setTimeout(() => {
+          if (this.is_processing_aux && !this.has_error) this.is_processing = true; 
+        }, 500);
 
         // Gets the most recent price of each stock
         this.stock_data.forEach(stock => {
           promises.push(
-            this.$http.get('http://cotacoes.economia.uol.com.br/ws/asset/' + stock.uol_code + '/intraday?size=1').then(response => {
+            this.$http.get(base_url + stock.uol_code + '/intraday?size=1').then(response => {
               stock.aux_price = response.data.data[0].price;
               stock.aux_var = response.data.data[0].var;
               stock.aux_varpct = response.data.data[0].varpct;
@@ -125,6 +132,21 @@
           this.update_stock_prices();
           this.new_data = true;
           setTimeout(() => { this.new_data = false; }, 2000);
+        }).catch(error => {
+          this.has_error = true;
+          if (this.is_processing) {
+            this.is_processing = false;
+            this.is_processing_aux = false; 
+          }
+
+          // Display an error message
+          const notification = this.$buefy.notification.open({
+              duration: 5000,
+              message: 'Falha ao se conectar ao servidor. Por favor, cheque sua conexão.',
+              position: 'is-bottom-right',
+              type: 'is-danger',
+              queue: false
+          });
         });
       },
 
