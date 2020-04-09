@@ -8,7 +8,7 @@
         </h1>
         
         <!-- Table of the stocks where the bet was on going up -->
-        <stock-table :stock-data="stock_data_buy" :is-processing="is_processing" :new-data="new_data"/>  
+        <stock-table :stock-data="stock_data_buy" :is-processing="is_processing" :new-data="new_data"/>
       </div>
 
       <!-- Overall stats -->

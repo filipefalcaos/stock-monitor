@@ -52,7 +52,6 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({ height: 800, width: 1500 });
   mainWindow.title = "stock-monitor";
   mainWindow.loadURL(winURL);
-  mainWindow.openDevTools();
   createMenu(mainWindow);
   mainWindow.on('closed', () => { mainWindow = null });
 }
