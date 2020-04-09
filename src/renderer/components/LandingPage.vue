@@ -1,40 +1,106 @@
 <!-- Template -->
 <template>
-  <div id="wrapper">
-    <b-table :data="stock_data" :striped="true" :hoverable="true" :mobile-cards="true">
-      <template slot-scope="props">
-        <b-table-column field="stock" label="Ação">
-          {{ props.row.stock }}
-        </b-table-column>
-        <b-table-column field="first_price" label="Preço Comprado" :numeric="true">
-          R$ {{ props.row.first_price }}
-        </b-table-column>
-        <b-table-column field="amount" label="Quantidade" :numeric="true">
-          {{ props.row.amount }}
-        </b-table-column>
-        <b-table-column field="current_price" label="Preço Atual" :numeric="true">
-          R$ {{ props.row.current_price }}
-        </b-table-column>
-        <b-table-column field="result" label="Resultado" :numeric="true">
-          R$ {{ props.row.result }}
-        </b-table-column>
-      </template>
-    </b-table>
-  </div>
+  <section class="section">
+    <div class="columns">
+      <div class="column is-two-thirds">
+        <h1 class="title is-4">Compras</h1>
+        <b-table :data="stock_data_buy" :striped="true" :hoverable="true" :mobile-cards="true">
+          <template slot-scope="props">
+            <b-table-column field="stock" label="Ação">
+              {{ props.row.stock }}
+            </b-table-column>
+            <b-table-column field="first_price" label="Preço Comprado" :numeric="true">
+              R$ {{ props.row.first_price }}
+            </b-table-column>
+            <b-table-column field="amount" label="Quantidade" :numeric="true">
+              {{ props.row.amount }}
+            </b-table-column>
+            <b-table-column field="current_price" label="Preço Atual" :numeric="true">
+              R$ {{ props.row.current_price }}
+            </b-table-column>
+            <b-table-column field="result" label="Resultado" :numeric="true">
+              R$ {{ props.row.result }}
+              <span v-if="props.row.result > 0">😀</span>
+              <span v-else-if="props.row.result == 0">😐</span>
+              <span v-else>😢</span>
+            </b-table-column>
+          </template>
+        </b-table>
+      </div>
+
+      <div class="column" style="margin-top: 3.75rem; margin-left: 1.5rem;">
+        <h1 class="title is-5" style="margin-bottom: 0.5rem;">Valor Feito = R$ {{ full_value.toFixed(2) }} </h1>
+        <h1 class="title is-5" style="margin-bottom: 0.5rem;">Resultado Total = R$ {{ final_result }} </h1>
+        <h1 class="title is-5">Resultado Percentual = {{ percent_result }}% </h1>
+
+        <div class="buttons">
+          <b-button type="is-info" expanded>Atualizar</b-button>
+          <b-button type="is-success" expanded>Salvar Excel</b-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column is-two-thirds">
+        <h1 class="title is-4">Vendas</h1>
+        <b-table :data="stock_data_sell" :striped="true" :hoverable="true" :mobile-cards="true">
+          <template slot-scope="props">
+            <b-table-column field="stock" label="Ação">
+              {{ props.row.stock }}
+            </b-table-column>
+            <b-table-column field="first_price" label="Preço Comprado" :numeric="true">
+              R$ {{ props.row.first_price }}
+            </b-table-column>
+            <b-table-column field="amount" label="Quantidade" :numeric="true">
+              {{ props.row.amount }}
+            </b-table-column>
+            <b-table-column field="current_price" label="Preço Atual" :numeric="true">
+              R$ {{ props.row.current_price }}
+            </b-table-column>
+            <b-table-column field="result" label="Resultado" :numeric="true">
+              R$ {{ props.row.result }}
+              <span v-if="props.row.result > 0">😀</span>
+              <span v-else-if="props.row.result == 0">😐</span>
+              <span v-else>😢</span>
+            </b-table-column>
+          </template>
+        </b-table>
+      </div>
+    </div>
+  </section>
 </template>
 
 <!-- Script -->
 <script>
   export default {
     name: 'landing-page',
+    
     created () {
-      this.stock_data.forEach(stock => {
+      this.stock_data_buy.forEach(stock => {
         stock.result = ((stock.current_price - stock.first_price) * stock.amount).toFixed(2)
-      })
+      });
+
+      this.stock_data_sell.forEach(stock => {
+        stock.result = ((stock.first_price - stock.current_price) * stock.amount).toFixed(2)
+      });
     },
+    
+    computed: {
+      final_result() {
+        let sum = 0;
+        this.stock_data_buy.forEach(stock => { sum += parseFloat(stock.result); });
+        return (sum + parseFloat(this.stock_data_sell[0].result)).toFixed(2);
+      },
+
+      percent_result() {
+        return (this.final_result / this.full_value * 100).toFixed(2);
+      }
+    },
+    
     data () {
       return {
-        stock_data: [
+        full_value: 100000,
+        stock_data_buy: [
           { 'stock': 'AZUL4', 'first_price': 16.96, 'amount': 600, 'current_price': 15.99 },
           { 'stock': 'RAPT4', 'first_price': 6.08, 'amount': 1700, 'current_price': 6.35 },
           { 'stock': 'IRBR3', 'first_price': 10.66, 'amount': 1000, 'current_price': 10.68 },
@@ -45,9 +111,13 @@
           { 'stock': 'LINX3', 'first_price': 20.29, 'amount': 500, 'current_price': 20.29 },
           { 'stock': 'MRVE3', 'first_price': 13.12, 'amount': 700, 'current_price': 12.69 },
           { 'stock': 'YDUQ3', 'first_price': 26.10, 'amount': 400, 'current_price': 26.91 }
+        ],
+        stock_data_sell: [
+          { 'stock': 'BOVA11', 'first_price': 75.75, 'amount': 1340, 'current_price': 73.51 }
         ]
       }
     },
+    
     methods: {
       open (link) {
         this.$electron.shell.openExternal(link)
@@ -68,15 +138,7 @@
 
   body { font-family: 'Source Sans Pro', sans-serif; }
 
-  #wrapper {
-    background:
-      radial-gradient(
-        ellipse at top left,
-        rgba(255, 255, 255, 1) 40%,
-        rgba(229, 229, 229, .9) 100%
-      );
-    height: 100vh;
-    padding: 40px 60px;
-    width: 100vw;
+  .section {
+    padding: 1.5rem 1.5rem!important;
   }
 </style>

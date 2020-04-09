@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import axios from 'axios'
-import { Table } from 'buefy'
+import { Table, Button } from 'buefy'
 import 'buefy/dist/buefy.css'
 
 import App from './App'
 import router from './router'
 
 Vue.use(Table);
+Vue.use(Button);
 Vue.http = Vue.prototype.$http = axios;
 Vue.config.productionTip = false;
 
