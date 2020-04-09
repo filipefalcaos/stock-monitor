@@ -8,7 +8,7 @@
         </h1>
         
         <!-- Table of the stocks where the bet was on going up -->
-        <b-table class="base-text" :data="stock_data_buy" :striped="true" :hoverable="true" :mobile-cards="true">
+        <b-table class="base-text" :data="stock_data_buy" :loading="is_processing" :striped="true" :hoverable="true" :mobile-cards="true">
           <template slot-scope="props">
             <b-table-column field="stock" label="Ação">
               {{ props.row.stock }}
@@ -64,7 +64,7 @@
         </h1>
         
         <!-- Table of the stocks where the bet was on going down -->
-        <b-table class="base-text" :data="stock_data_sell" :striped="true" :hoverable="true" :mobile-cards="true">
+        <b-table class="base-text" :data="stock_data_sell" :loading="is_processing" :striped="true" :hoverable="true" :mobile-cards="true">
           <template slot-scope="props">
             <b-table-column field="stock" label="Ação">
               {{ props.row.stock }}
@@ -104,7 +104,6 @@
     // Gets the current state of the stocks when the component is created
     created() {
       this.get_stock_prices();
-      this.update_stock_prices();
     },
 
     computed: {
@@ -124,6 +123,7 @@
     data() {
       return {
         new_data: false,
+        is_processing: false,
         full_value: 100000,
         final_result: 3055.6,
         percent_result: 3.06,
@@ -149,6 +149,8 @@
       // data accordingly
       get_stock_prices() {
         let promises = [];
+        this.is_processing_aux = true;
+        setTimeout(() => { if (this.is_processing_aux) this.is_processing = true; }, 500);
 
         // Gets the most recent price of each stock
         this.stock_data.forEach(stock => {
@@ -187,6 +189,7 @@
 
         this.final_result = parseFloat(sum).toFixed(2);
         this.percent_result = (sum / this.full_value) * 100;
+        this.is_processing = this.is_processing_aux = false;
       }
 
     }
