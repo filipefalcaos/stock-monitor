@@ -8,11 +8,11 @@
         </h1>
         
         <!-- Table of the stocks where the bet was on going up -->
-        <stock-table :stock-data="stock_data_buy" :is-processing="is_processing" :new-data="new_data"/>
+        <stock-table :stock-data="stock_data_buy" :is-processing="is_processing" :new-data="new_data"></stock-table>
       </div>
 
       <!-- Overall stats -->
-      <div class="column" style="margin-top: 3.75rem; margin-left: 1.5rem;">
+      <div class="column" style="margin-top: 3.15rem; margin-left: 1.5rem;">
         <h1 class="title base-text" style="margin-bottom: 0.5rem;">
           Valor Feito = R$ {{ full_value.toFixed(2) }}
         </h1>
@@ -38,7 +38,7 @@
         </h1>
         
         <!-- Table of the stocks where the bet was on going down -->
-        <stock-table :stock-data="stock_data_sell" :is-processing="is_processing" :new-data="new_data"/>
+        <stock-table :stock-data="stock_data_sell" :is-processing="is_processing" :new-data="new_data"></stock-table>
       </div>
     </div>
   </section>
@@ -182,15 +182,15 @@
   body { font-family: 'Source Sans Pro', sans-serif; }
 
   .section {
-    padding: 2rem 2rem!important;
+    padding: 20px!important;
   }
 
   .title-text {
-    font-size: 24px!important;
+    font-size: 18px!important;
   }
 
   .base-text {
-    font-size: 16px!important;
+    font-size: 14px!important;
   }
 
   .green-success {

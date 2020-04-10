@@ -49,10 +49,11 @@ const createMenu = (window) => {
 
 // Creates a new Electron window
 const createWindow = () => {
-  mainWindow = new BrowserWindow({ height: 800, width: 1500 });
+  mainWindow = new BrowserWindow({ height: 1000, width: 2000 });
   mainWindow.title = "stock-monitor";
   mainWindow.loadURL(winURL);
   createMenu(mainWindow);
+  mainWindow.maximize();
   mainWindow.on('closed', () => { mainWindow = null });
 }
 

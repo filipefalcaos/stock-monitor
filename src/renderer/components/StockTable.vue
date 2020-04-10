@@ -1,6 +1,6 @@
 <!-- Template -->
 <template>
-  <b-table class="base-text" :data="stockData" :loading="isProcessing" :striped="true" :hoverable="true" :mobile-cards="true">
+  <b-table class="base-text" :data="stockData" :loading="isProcessing" :striped="true" :narrowed="true" :hoverable="true" :mobile-cards="true">
     <template slot-scope="props">
       <b-table-column field="stock" label="Ação">
         {{ props.row.stock }}
