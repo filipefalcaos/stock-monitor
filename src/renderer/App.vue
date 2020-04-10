@@ -7,7 +7,7 @@
 
 <!-- Entry script -->
 <script>
-  export default {
-    name: 'stock-monitor'
-  }
+export default {
+  name: "stock-monitor"
+};
 </script>

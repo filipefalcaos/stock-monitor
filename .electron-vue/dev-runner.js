@@ -126,7 +126,7 @@ function startElectron() {
   }
 
   electronProcess = spawn(electron, args);
-  
+
   electronProcess.stdout.on('data', data => {
     electronLog(data, 'blue');
   });
@@ -145,7 +145,7 @@ function electronLog(data, color) {
   data.forEach(line => {
     log += `  ${line}\n`;
   });
-  
+
   if (/[0-9A-z]+/.test(log)) {
     console.log(
       chalk[color].bold('┏ Electron -------------------') +
