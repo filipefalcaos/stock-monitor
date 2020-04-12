@@ -3,7 +3,6 @@
   <b-table
     :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
     :data="stockData"
-    :loading="isProcessing"
     :striped="true"
     :hoverable="true"
     :mobile-cards="true"
@@ -51,7 +50,7 @@
 <script>
 export default {
   name: "stock-table",
-  props: ["stockData", "isProcessing", "newData"],
+  props: ["stockData", "newData"],
   data() {
     return {
       process: process

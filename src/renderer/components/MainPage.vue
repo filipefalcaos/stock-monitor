@@ -11,7 +11,6 @@
         <!-- Table of the stocks where the bet was on going up -->
         <stock-table
           :stock-data="stock_data_buy"
-          :is-processing="is_processing"
           :new-data="new_data"
         ></stock-table>
       </div>
@@ -36,7 +35,7 @@
         <div class="buttons" style="margin-top: 2rem;">
           <b-button
             @click="get_stock_prices"
-            :disabled="is_processing_aux"
+            :loading="is_processing"
             type="is-info"
             expanded
           >Atualizar</b-button>
@@ -54,7 +53,6 @@
         <!-- Table of the stocks where the bet was on going down -->
         <stock-table
           :stock-data="stock_data_sell"
-          :is-processing="is_processing"
           :new-data="new_data"
         ></stock-table>
       </div>
@@ -96,7 +94,6 @@ export default {
       process: process,
       new_data: false,
       is_processing: false,
-      is_processing_aux: false,
       has_error: false,
       full_value: 100000,
       final_result: 3055.6,
@@ -189,14 +186,8 @@ export default {
     get_stock_prices() {
       let promises = [];
       let base_url = "http://cotacoes.economia.uol.com.br/ws/asset/";
-      this.is_processing_aux = true;
+      this.is_processing = true;
       this.has_error = false;
-
-      // Only sets processing state if not in error state - waits 500ms
-      setTimeout(() => {
-        if (this.is_processing_aux && !this.has_error)
-          this.is_processing = true;
-      }, 500);
 
       // Gets the most recent price of each stock
       this.stock_data.forEach(stock => {
@@ -222,16 +213,12 @@ export default {
 
           this.update_stock_prices();
           this.new_data = true;
-          setTimeout(() => {
-            this.new_data = false;
-          }, 2000);
+          this.is_processing = false;
+          setTimeout(() => { this.new_data = false; }, 2000);
         })
         .catch(error => {
           this.has_error = true;
-          if (this.is_processing_aux) {
-            this.is_processing = false;
-            this.is_processing_aux = false;
-          }
+          if (this.is_processing) this.is_processing = false;
 
           // Display an error message
           const notification = this.$buefy.notification.open({
@@ -249,22 +236,23 @@ export default {
       let sum = 0;
 
       this.stock_data.forEach(stock => {
-        if (stock.buy)
+        if (stock.buy) {
           stock.result = (
             (stock.current_price - stock.first_price) *
             stock.amount
           ).toFixed(2);
-        else
+        } else {
           stock.result = (
             (stock.first_price - stock.current_price) *
             stock.amount
           ).toFixed(2);
+        }
+
         sum += parseFloat(stock.result);
       });
 
       this.final_result = parseFloat(sum).toFixed(2);
       this.percent_result = (sum / this.full_value) * 100;
-      this.is_processing = this.is_processing_aux = false;
     }
   }
 };
