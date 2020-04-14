@@ -2,12 +2,17 @@
 <template>
   <section class="section" :class="process.platform === 'win32' ? 'section-win' : 'section'">
     <div class="columns">
-      <div class="column is-four-fifths">
+      <div class="column is-full">
         <h1
           class="title"
           :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
-        >Compras</h1>
+        >Posição: Comprado</h1>
+      </div>
+    </div>
 
+    <div class="columns">
+      <div class="column is-four-fifths">
+        
         <!-- Table of the stocks where the bet was on going up -->
         <stock-table
           :stock-data="stock_data_buy"
@@ -19,20 +24,8 @@
       <div
         class="column"
         style="margin-left: 1.5rem;"
-        :style="process.platform === 'win32' ? 'margin-top: 3.15rem' : 'margin-top: 3.75rem'"
       >
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-          style="margin-bottom: 0.5rem;"
-        >Valor Feito = R$ {{ full_value.toFixed(2) }}</h1>
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-          style="margin-bottom: 0.5rem;"
-        >Resultado = R$ {{ final_result }} ({{ percent_result.toFixed(2) }}%)</h1>
-
-        <div class="buttons" style="margin-top: 2rem;">
+        <div class="buttons" style="margin-top: 0.3rem;">
           <b-button
             @click="get_stock_prices"
             :loading="is_processing"
@@ -40,15 +33,32 @@
             expanded
           >Atualizar</b-button>
         </div>
+        
+        <h1
+          class="title"
+          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
+          style="margin-bottom: 0.5rem;"
+        >Valor Feito = R$ {{ full_value.toFixed(2) }}</h1>
+        
+        <h1
+          class="title"
+          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
+          style="margin-bottom: 0.5rem;"
+        >Resultado = R$ {{ final_result }} ({{ percent_result.toFixed(2) }}%)</h1>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column is-full">
+        <h1
+          class="title title-text"
+          :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
+        >Posição: Vendido</h1>
       </div>
     </div>
 
     <div class="columns">
       <div class="column is-four-fifths">
-        <h1
-          class="title title-text"
-          :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
-        >Vendas</h1>
 
         <!-- Table of the stocks where the bet was on going down -->
         <stock-table
