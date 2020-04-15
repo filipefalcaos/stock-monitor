@@ -19,14 +19,20 @@
         <b-select
           @input="load_portfolio"
           v-model="selected_portfolio"
-          style="margin-bottom: 1rem;"
-          placeholder="Selecione um portfólio"
+          style="margin-bottom: 1.5rem;"
+          placeholder="Selecione uma carteira"
           expanded
         >
-          <option v-for="option in portfolios" :value="option.id" :key="option.id">{{ option.name }}</option>
+          <option
+            v-for="option in portfolio_data.portfolios"
+            :value="option.id"
+            :key="option.id"
+          >{{ option.name }}</option>
         </b-select>
 
         <div class="buttons">
+          <b-button @click="add_portfolio_dialog" type="is-success" expanded>Adicionar Carteira</b-button>
+
           <b-button
             @click="get_stock_prices"
             :loading="is_processing"
@@ -102,6 +108,7 @@ export default {
       final_result: 0,
       percent_result: 0,
       selected_portfolio: 1,
+      portfolio_data: PortfolioData,
       portfolios: [],
       stock_data: [],
       available_stocks: []
@@ -129,11 +136,10 @@ export default {
     },
 
     get_portfolios_data() {
-      this.portfolios = PortfolioData.portfolios;
-      this.selected_portfolio = PortfolioData.last_portfolio;
+      this.selected_portfolio = this.portfolio_data.last_portfolio;
 
       // Gets the stocks from the last portfolio used
-      let lastPortfolio = this.portfolios.find(portfolio => {
+      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
         return portfolio.id == this.selected_portfolio;
       });
 
@@ -141,13 +147,43 @@ export default {
     },
 
     load_portfolio() {
-      let newPotfolio = this.portfolios.find(portfolio => {
+      let newPotfolio = this.portfolio_data.portfolios.find(portfolio => {
         return portfolio.id == this.selected_portfolio;
       });
 
       // Updates the stocks data
       this.update_selected_data(newPotfolio);
       this.get_stock_prices();
+    },
+
+    create_portfolio(portfolio_name) {
+      let newId = this.portfolio_data.id_count + 1;
+      let newPortfolio = {
+        name: portfolio_name,
+        id: newId,
+        investment: 0,
+        stocks: []
+      };
+
+      // Adds an empty portfolio with the given name
+      this.portfolio_data.portfolios.push(newPortfolio);
+      this.selected_portfolio = this.portfolio_data.last_portfolio = newId;
+      this.update_selected_data(newPortfolio);
+    },
+
+    add_portfolio_dialog() {
+      this.$buefy.dialog.prompt({
+        message: "Insira um nome para a nova carteira.",
+        inputAttrs: {
+          placeholder: "Portfólio",
+          maxlength: 30
+        },
+        confirmText: "Adicionar",
+        cancelText: "Cancelar",
+        trapFocus: true,
+        type: "is-info",
+        onConfirm: value => this.create_portfolio(value)
+      });
     },
 
     get_stock_prices() {
