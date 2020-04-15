@@ -89,6 +89,7 @@ export default {
   created() {
     this.get_portfolios_data();
     this.get_stock_prices();
+    this.get_available_stocks();
   },
 
   data() {
@@ -102,7 +103,8 @@ export default {
       percent_result: 0,
       selected_portfolio: 1,
       portfolios: [],
-      stock_data: []
+      stock_data: [],
+      available_stocks: []
     };
   },
 
@@ -188,7 +190,7 @@ export default {
           if (this.is_processing) this.is_processing = false;
 
           // Display an error message
-          const notification = this.$buefy.notification.open({
+          this.$buefy.notification.open({
             duration: 5000,
             message:
               "Falha ao se conectar ao servidor. Por favor, cheque sua conexão.",
@@ -219,6 +221,24 @@ export default {
 
       this.final_result = parseFloat(sum).toFixed(2);
       this.percent_result = (sum / this.full_value) * 100;
+    },
+
+    get_available_stocks() {
+      let base_url = "http://cotacoes.economia.uol.com.br/ws/asset/";
+      this.$http
+        .get(base_url + "stock/list?size=10000")
+        .then(response => {
+          this.available_stocks = response.data.data;
+        })
+        .catch(error => {
+          this.$buefy.notification.open({
+            duration: 5000,
+            message:
+              "Não foi possível obter a lista de ações. Por favor, cheque sua conexão.",
+            position: "is-bottom-right",
+            type: "is-danger"
+          });
+        });
     }
   }
 };
