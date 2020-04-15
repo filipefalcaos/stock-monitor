@@ -15,8 +15,18 @@
         <stock-table :stock-data="stock_data_buy" :new-data="new_data"></stock-table>
       </div>
 
-      <div class="column" style="margin-left: 1.5rem;">
-        <div class="buttons" style="margin-top: 0.3rem;">
+      <div class="column" style="margin-left: 1.5rem; margin-top: 0.3rem;">
+        <b-select
+          @input="load_portfolio"
+          v-model="selected_portfolio"
+          style="margin-bottom: 1rem;"
+          placeholder="Selecione um portfólio"
+          expanded
+        >
+          <option v-for="option in portfolios" :value="option.id" :key="option.id">{{ option.name }}</option>
+        </b-select>
+
+        <div class="buttons">
           <b-button
             @click="get_stock_prices"
             :loading="is_processing"
@@ -77,8 +87,23 @@ export default {
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
   created() {
-    this.get_portfolio_data();
+    this.get_portfolios_data();
     this.get_stock_prices();
+  },
+
+  data() {
+    return {
+      process: process,
+      new_data: false,
+      is_processing: false,
+      has_error: false,
+      full_value: 0,
+      final_result: 0,
+      percent_result: 0,
+      selected_portfolio: 1,
+      portfolios: [],
+      stock_data: []
+    };
   },
 
   computed: {
@@ -95,26 +120,32 @@ export default {
     }
   },
 
-  data() {
-    return {
-      process: process,
-      new_data: false,
-      is_processing: false,
-      has_error: false,
-      full_value: 0,
-      final_result: 0,
-      percent_result: 0,
-      stock_data: []
-    };
-  },
-
   methods: {
-    get_portfolio_data() {
-      let lastPortfolio = PortfolioData.portfolios.find(
-        portfolio => portfolio.id == PortfolioData.last_portfolio
-      );
-      this.stock_data = lastPortfolio.stocks;
-      this.full_value = lastPortfolio.investment;
+    update_selected_data(portfolio) {
+      this.stock_data = portfolio.stocks;
+      this.full_value = portfolio.investment;
+    },
+
+    get_portfolios_data() {
+      this.portfolios = PortfolioData.portfolios;
+      this.selected_portfolio = PortfolioData.last_portfolio;
+
+      // Gets the stocks from the last portfolio used
+      let lastPortfolio = this.portfolios.find(portfolio => {
+        return portfolio.id == this.selected_portfolio;
+      });
+
+      this.update_selected_data(lastPortfolio);
+    },
+
+    load_portfolio() {
+      let newPotfolio = this.portfolios.find(portfolio => {
+        return portfolio.id == this.selected_portfolio;
+      });
+
+      // Updates the stocks data
+      this.update_selected_data(newPotfolio);
+      this.get_stock_prices();
     },
 
     get_stock_prices() {
