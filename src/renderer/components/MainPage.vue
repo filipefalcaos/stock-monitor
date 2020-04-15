@@ -84,7 +84,6 @@
 <!-- Script -->
 <script>
 import StockTable from "./StockTable";
-import PortfolioData from "../assets/portfolio-data.json";
 
 export default {
   name: "main-page",
@@ -93,6 +92,10 @@ export default {
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
   created() {
+    const fs = require('fs');
+    this.portfolio_data = JSON.parse(fs.readFileSync(__static + "/portfolio-data.json"));
+
+    // Starts the UI state
     this.get_portfolios_data();
     this.get_stock_prices();
     this.get_available_stocks();
@@ -108,8 +111,7 @@ export default {
       final_result: 0,
       percent_result: 0,
       selected_portfolio: 1,
-      portfolio_data: PortfolioData,
-      portfolios: [],
+      portfolio_data: {},
       stock_data: [],
       available_stocks: []
     };

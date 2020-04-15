@@ -1,5 +1,5 @@
 {
-  "id_count": 2,
+  "id_count": 1,
   "last_portfolio": 1,
   "portfolios": [
     {
@@ -83,20 +83,6 @@
           "first_price": 75.75,
           "amount": 1340,
           "buy": false
-        }
-      ]
-    },
-    {
-      "name": "PETR4",
-      "id": 2,
-      "investment": 14299.65,
-      "stocks": [
-        {
-          "stock": "PETR4",
-          "uol_code": 484,
-          "first_price": 14.54,
-          "amount": 1000,
-          "buy": true
         }
       ]
     }
