@@ -42,7 +42,7 @@
           label="Variação"
           :numeric="true"
         >
-          <span v-if="props.row.var">R$ {{ props.row.var }} ({{ props.row.varpct}}%)</span>
+          <span v-if="props.row.var">R$ {{ props.row.var }} ({{ props.row.varpct }}%)</span>
           <span v-else>--</span>
 
           <span v-if="props.row.var > 0">📈</span>
@@ -55,24 +55,20 @@
           label="Resultado"
           :numeric="true"
         >
-          <span v-if="props.row.result">R$ {{ props.row.result }}</span>
+          <span
+            v-if="props.row.result"
+          >R$ {{ props.row.result }} ({{ (props.row.result / (props.row.first_price * props.row.amount)).toFixed(2) }}%)</span>
           <span v-else>--</span>
 
           <span v-if="props.row.result > 0">😀</span>
           <span v-else-if="props.row.result == 0">😐</span>
           <span v-else-if="props.row.result < 0">😢</span>
         </b-table-column>
-      </template>
 
-      <template slot="empty">
-        <section class="section">
-          <div class="content has-text-grey has-text-centered">
-            <p>
-              <b-icon icon="emoticon-sad" size="is-large"></b-icon>
-            </p>
-            <p>Nothing here.</p>
-          </div>
-        </section>
+        <b-table-column field="sold" label="Status" :numeric="true">
+          <span v-if="!props.row.sold" class="tag is-success">Ativo</span>
+          <span v-else class="tag is-warning">Encerrado</span>
+        </b-table-column>
       </template>
     </b-table>
   </div>

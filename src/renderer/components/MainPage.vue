@@ -55,6 +55,15 @@
           :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
           style="margin-bottom: 0.5rem;"
         >
+          <b>Valor Ativo:</b>
+          R$ {{ active_value.toFixed(2) }}
+        </h1>
+
+        <h1
+          class="title"
+          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
+          style="margin-bottom: 0.5rem;"
+        >
           <b v-if="has_error" style="text-align: justify; ">Resultados indisponíveis.</b>
           <span v-else>
             <b>Resultado:</b>
@@ -84,6 +93,10 @@
 <!-- Script -->
 <script>
 import StockTable from "./StockTable";
+import path from "path";
+import { remote } from "electron";
+
+const fs = require('fs');
 
 export default {
   name: "main-page",
@@ -92,8 +105,23 @@ export default {
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
   created() {
-    const fs = require('fs');
     this.portfolio_data = JSON.parse(fs.readFileSync(__static + "/portfolio-data.json"));
+    // this.fileName = path.join(remote.app.getPath('userData'), '/portfolio-data.json');
+    // console.log("Config path: " + this.fileName);
+
+    // /* Loads the portfolio data file */
+    // try {
+    //   if (fs.existsSync(this.fileName)) {
+    //     this.portfolio_data = JSON.parse(fs.readFileSync(this.fileName));
+    //     console.log("Loaded config file");
+    //   } else {
+    //     this.portfolio_data = { "id_count": null, "last_portfolio": null, "portfolios": [] }
+    //     fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
+    //     console.log("New config file created");
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    // }
 
     // Starts the UI state
     this.get_portfolios_data();
@@ -108,12 +136,14 @@ export default {
       is_processing: false,
       has_error: false,
       full_value: 0,
+      active_value: 0,
       final_result: 0,
       percent_result: 0,
       selected_portfolio: 1,
       portfolio_data: {},
       stock_data: [],
-      available_stocks: []
+      available_stocks: [],
+      fileName: ""
     };
   },
 
@@ -135,6 +165,13 @@ export default {
     update_selected_data(portfolio) {
       this.stock_data = portfolio.stocks;
       this.full_value = portfolio.investment;
+      this.active_value = this.full_value;
+      
+      portfolio.stocks.forEach(stock => {
+        if (stock.sold) {
+          this.active_value -= (stock.sell_price * stock.amount);
+        }
+      });
     },
 
     get_portfolios_data() {
@@ -145,7 +182,7 @@ export default {
         return portfolio.id == this.selected_portfolio;
       });
 
-      this.update_selected_data(lastPortfolio);
+      if (lastPortfolio) this.update_selected_data(lastPortfolio);
     },
 
     load_portfolio() {
@@ -170,6 +207,9 @@ export default {
       // Adds an empty portfolio with the given name
       this.portfolio_data.portfolios.push(newPortfolio);
       this.selected_portfolio = this.portfolio_data.last_portfolio = newId;
+
+      // Updates the portfolio data file and the UI
+      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
       this.update_selected_data(newPortfolio);
     },
 
@@ -211,7 +251,12 @@ export default {
       Promise.all(promises)
         .then(() => {
           this.stock_data.forEach(stock => {
-            stock.current_price = stock.aux_price;
+            if (stock.sold) {
+              stock.current_price = stock.sell_price; 
+            } else {
+              stock.current_price = stock.aux_price;
+            }
+            
             stock.var = stock.aux_var;
             stock.varpct = stock.aux_varpct;
           });
