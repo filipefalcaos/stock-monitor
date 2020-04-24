@@ -5,7 +5,7 @@
       <div class="column is-one-fifth">
         <b-select
           @input="load_portfolio"
-          v-model="selected_portfolio"
+          v-model="portfolio_data.last_portfolio"
           placeholder="Selecione uma carteira"
           expanded
         >
@@ -43,6 +43,10 @@
           <span v-else>
             <b style="margin-left: 1.3rem;">Resultado:</b>
             R$ {{ final_result }} ({{ percent_result.toFixed(2) }}%)
+
+            <span v-if="final_result > 0">😀</span>
+            <span v-else-if="final_result == 0">😐</span>
+            <span v-else-if="final_result < 0">😢</span>
           </span>
         </h1>
       </div>
@@ -77,7 +81,6 @@
 import StockTable from "./StockTable";
 import path from "path";
 import { remote } from "electron";
-
 const fs = require("fs");
 
 export default {
@@ -90,22 +93,23 @@ export default {
     this.portfolio_data = JSON.parse(
       fs.readFileSync(__static + "/portfolio-data.json")
     );
-    // this.fileName = path.join(remote.app.getPath('userData'), '/portfolio-data.json');
-    // console.log("Config path: " + this.fileName);
+    
+    this.fileName = path.join(remote.app.getPath('userData'), '/portfolio-data.json');
+    console.log("Config path: " + this.fileName);
 
-    // /* Loads the portfolio data file */
-    // try {
-    //   if (fs.existsSync(this.fileName)) {
-    //     this.portfolio_data = JSON.parse(fs.readFileSync(this.fileName));
-    //     console.log("Loaded config file");
-    //   } else {
-    //     this.portfolio_data = { "id_count": null, "last_portfolio": null, "portfolios": [] }
-    //     fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
-    //     console.log("New config file created");
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    /* Loads the portfolio data file */
+    try {
+      if (fs.existsSync(this.fileName)) {
+        this.portfolio_data = JSON.parse(fs.readFileSync(this.fileName));
+        console.log("Loaded config file");
+      } else {
+        this.portfolio_data = JSON.parse(fs.readFileSync(__static + "/portfolio-data.json"));
+        fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
+        console.log("New config file created");
+      }
+    } catch (error) {
+      console.error(error);
+    }
 
     // Starts the UI state
     this.get_portfolios_data();
@@ -123,7 +127,6 @@ export default {
       active_value: 0,
       final_result: 0,
       percent_result: 0,
-      selected_portfolio: 1,
       portfolio_data: {},
       stock_data: [],
       available_stocks: [],
@@ -159,11 +162,8 @@ export default {
     },
 
     get_portfolios_data() {
-      this.selected_portfolio = this.portfolio_data.last_portfolio;
-
-      // Gets the stocks from the last portfolio used
       let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
-        return portfolio.id == this.selected_portfolio;
+        return portfolio.id == this.portfolio_data.last_portfolio;
       });
 
       if (lastPortfolio) this.update_selected_data(lastPortfolio);
@@ -171,26 +171,29 @@ export default {
 
     load_portfolio() {
       let newPotfolio = this.portfolio_data.portfolios.find(portfolio => {
-        return portfolio.id == this.selected_portfolio;
+        return portfolio.id == this.portfolio_data.last_portfolio;
       });
 
-      // Updates the stocks data
+      // Updates the portfolio data file and the stocks data
+      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
       this.update_selected_data(newPotfolio);
       this.get_stock_prices();
     },
 
     create_portfolio(portfolio_name) {
-      let newId = this.portfolio_data.id_count + 1;
+      this.portfolio_data.id_count++;
       let newPortfolio = {
         name: portfolio_name,
-        id: newId,
+        id: this.portfolio_data.id_count,
         investment: 0,
         stocks: []
       };
 
       // Adds an empty portfolio with the given name
       this.portfolio_data.portfolios.push(newPortfolio);
-      this.selected_portfolio = this.portfolio_data.last_portfolio = newId;
+      this.selected_portfolio = this.portfolio_data.last_portfolio = this.portfolio_data.id_count;
+      this.final_result = 0;
+      this.percent_result = 0;
 
       // Updates the portfolio data file and the UI
       fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
@@ -287,7 +290,11 @@ export default {
       });
 
       this.final_result = parseFloat(sum).toFixed(2);
-      this.percent_result = (sum / this.full_value) * 100;
+      if (this.full_value === 0) { 
+        this.percent_result = 0;
+      } else {
+        this.percent_result = (sum / this.full_value) * 100;
+      }
     },
 
     get_available_stocks() {
