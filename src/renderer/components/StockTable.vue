@@ -57,7 +57,7 @@
         >
           <span
             v-if="props.row.result"
-          >R$ {{ props.row.result }} ({{ (props.row.result / (props.row.first_price * props.row.amount)).toFixed(2) }}%)</span>
+          >R$ {{ props.row.result }} ({{ get_result_percent(props.row) }}%)</span>
           <span v-else>--</span>
 
           <span v-if="props.row.result > 0">😀</span>
@@ -79,10 +79,17 @@
 export default {
   name: "stock-table",
   props: ["stockData", "newData"],
+  
   data() {
     return {
       process: process
     };
+  },
+
+  methods: {
+    get_result_percent(stock) {
+      return ((stock.result / (stock.first_price * stock.amount)) * 100).toFixed(2);
+    }
   }
 };
 </script>

@@ -1,25 +1,11 @@
 <!-- Template -->
 <template>
   <section class="section" :class="process.platform === 'win32' ? 'section-win' : 'section'">
-    <div class="columns">
-      <div class="column is-full">
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
-        >Posição: Comprado</h1>
-      </div>
-    </div>
-
-    <div class="columns">
-      <div class="column is-four-fifths">
-        <stock-table :stock-data="stock_data_buy" :new-data="new_data"></stock-table>
-      </div>
-
-      <div class="column" style="margin-left: 1.5rem; margin-top: 0.3rem;">
+    <div class="columns" style="margin-bottom: 0px!important;">
+      <div class="column is-one-fifth">
         <b-select
           @input="load_portfolio"
           v-model="selected_portfolio"
-          style="margin-bottom: 1.5rem;"
           placeholder="Selecione uma carteira"
           expanded
         >
@@ -29,47 +15,47 @@
             :key="option.id"
           >{{ option.name }}</option>
         </b-select>
+      </div>
 
+      <div class="column" >
         <div class="buttons">
-          <b-button @click="add_portfolio_dialog" type="is-success" expanded>Adicionar Carteira</b-button>
-
-          <b-button
-            @click="get_stock_prices"
-            :loading="is_processing"
-            type="is-info"
-            expanded
-          >Atualizar</b-button>
+          <b-button @click="add_portfolio_dialog" type="is-success">Adicionar Carteira</b-button>
+          <b-button @click="get_stock_prices" :loading="is_processing" type="is-info">Atualizar</b-button>
         </div>
+      </div>
+    </div>
 
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-          style="margin-bottom: 0.5rem;"
-        >
+    <div class="columns">
+      <div class="column">
+        <h1 class="title" :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'">
           <b>Valor Feito:</b>
-          R$ {{ full_value.toFixed(2) }}
-        </h1>
+          <span style="margin-right: 1.3rem;">R$ {{ full_value.toFixed(2) }}</span>
+          <span>|</span>
 
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-          style="margin-bottom: 0.5rem;"
-        >
-          <b>Valor Ativo:</b>
-          R$ {{ active_value.toFixed(2) }}
-        </h1>
+          <b style="margin-left: 1.3rem;">Valor Ativo:</b>
+          <span style="margin-right: 1.3rem;">R$ {{ active_value.toFixed(2) }}</span>
+          <span>|</span>
 
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-          style="margin-bottom: 0.5rem;"
-        >
-          <b v-if="has_error" style="text-align: justify; ">Resultados indisponíveis.</b>
+          <b
+            v-if="has_error"
+            style="margin-left: 1.3rem; text-align: justify; "
+          >Resultados indisponíveis</b>
           <span v-else>
-            <b>Resultado:</b>
+            <b style="margin-left: 1.3rem;">Resultado:</b>
             R$ {{ final_result }} ({{ percent_result.toFixed(2) }}%)
           </span>
         </h1>
+      </div>
+    </div>
+
+    <div class="columns" style="margin-top: 1rem;">
+      <div class="column is-full">
+        <h1
+          class="title"
+          :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
+        >Posição: Comprado</h1>
+
+        <stock-table :stock-data="stock_data_buy" :new-data="new_data"></stock-table>
       </div>
     </div>
 
@@ -79,11 +65,7 @@
           class="title title-text"
           :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
         >Posição: Vendido</h1>
-      </div>
-    </div>
 
-    <div class="columns">
-      <div class="column is-four-fifths">
         <stock-table :stock-data="stock_data_sell" :new-data="new_data"></stock-table>
       </div>
     </div>
@@ -96,7 +78,7 @@ import StockTable from "./StockTable";
 import path from "path";
 import { remote } from "electron";
 
-const fs = require('fs');
+const fs = require("fs");
 
 export default {
   name: "main-page",
@@ -105,7 +87,9 @@ export default {
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
   created() {
-    this.portfolio_data = JSON.parse(fs.readFileSync(__static + "/portfolio-data.json"));
+    this.portfolio_data = JSON.parse(
+      fs.readFileSync(__static + "/portfolio-data.json")
+    );
     // this.fileName = path.join(remote.app.getPath('userData'), '/portfolio-data.json');
     // console.log("Config path: " + this.fileName);
 
@@ -166,10 +150,10 @@ export default {
       this.stock_data = portfolio.stocks;
       this.full_value = portfolio.investment;
       this.active_value = this.full_value;
-      
+
       portfolio.stocks.forEach(stock => {
         if (stock.sold) {
-          this.active_value -= (stock.sell_price * stock.amount);
+          this.active_value -= stock.sell_price * stock.amount;
         }
       });
     },
@@ -252,11 +236,11 @@ export default {
         .then(() => {
           this.stock_data.forEach(stock => {
             if (stock.sold) {
-              stock.current_price = stock.sell_price; 
+              stock.current_price = stock.sell_price;
             } else {
               stock.current_price = stock.aux_price;
             }
-            
+
             stock.var = stock.aux_var;
             stock.varpct = stock.aux_varpct;
           });
