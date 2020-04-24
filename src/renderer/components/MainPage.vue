@@ -59,7 +59,7 @@
       </div>
 
       <div class="column is-2">
-          <b-button style="float: right;" type="is-info">Adicionar Ação</b-button>
+          <b-button style="float: right;" type="is-info" icon-left="plus" outlined>Ação</b-button>
       </div>
     </div>
       
@@ -78,7 +78,7 @@
       </div>
 
       <div class="column is-2">
-          <b-button style="float: right;" type="is-info">Adicionar Ação</b-button>
+          <b-button style="float: right;" type="is-info" icon-left="plus" outlined>Ação</b-button>
       </div>
     </div>
     

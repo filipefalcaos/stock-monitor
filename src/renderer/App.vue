@@ -15,6 +15,7 @@ export default {
 <!-- App styles -->
 <style>
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
+@import url("https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css");
 
 * {
   box-sizing: border-box;
