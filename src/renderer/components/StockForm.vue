@@ -8,7 +8,16 @@
 
       <section class="modal-card-body">
         <b-field label="Ação">
-          <b-input :value="stock" placeholder="PETR4" required></b-input>
+          <b-autocomplete
+            v-model="stock"
+            :data="filtered_stocks"
+            placeholder="PETR4"
+            clearable
+            required
+            @select="option => selected = option"
+          >
+            <template slot="empty">No results found</template>
+          </b-autocomplete>
         </b-field>
 
         <b-field label="Quantidade">
@@ -16,7 +25,7 @@
         </b-field>
 
         <b-field label="Preço Comprado">
-          <b-input :value="firstPrice" placeholder="20,00" required></b-input>
+          <b-input :value="first_price" placeholder="20,00" required></b-input>
         </b-field>
 
         <h1>
@@ -38,6 +47,36 @@
 <script>
 export default {
   name: "stock-form",
-  props: ["stock", "amount", "firstPrice", "isBuying"]
+  props: ["isBuying", "stocks"],
+
+  created() {
+    this.stocks.forEach(stock => {
+      let code = stock.code.split(".")[0];
+      this.codes.push(code);
+    });
+  },
+
+  data() {
+    return {
+      stock: "",
+      codes: [],
+      selected: null,
+      amount: null,
+      first_price: null
+    };
+  },
+
+  computed: {
+    filtered_stocks() {
+      return this.codes.filter((option) => {
+        return (
+          option
+            .toString()
+            .toLowerCase()
+            .indexOf(this.stock.toLowerCase()) >= 0
+        );
+      });
+    }
+  }
 };
 </script>

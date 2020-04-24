@@ -2,7 +2,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import { Button, Select, Table } from 'buefy'
 import { Notification, Dialog, Modal } from 'buefy'
-import { Field, Input } from 'buefy'
+import { Field, Input, Autocomplete } from 'buefy'
 import 'buefy/dist/buefy.css'
 
 import App from './App'
@@ -17,6 +17,7 @@ Vue.use(Dialog);
 Vue.use(Modal);
 Vue.use(Field);
 Vue.use(Input);
+Vue.use(Autocomplete);
 
 // Vue config
 Vue.http = Vue.prototype.$http = axios;

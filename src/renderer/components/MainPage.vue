@@ -111,7 +111,7 @@
       aria-role="dialog"
       aria-modal
     >
-      <stock-form :is-buying="is_buying"/>
+      <stock-form :stocks="available_stocks" :is-buying="is_buying"/>
     </b-modal>
   </section>
 </template>
