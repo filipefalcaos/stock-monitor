@@ -1,6 +1,6 @@
 <!-- Template -->
 <template>
-  <div>
+  <div class="stock-table">
     <h1
       v-if="stockData.length == 0 || !stockData"
       class="title"
@@ -93,3 +93,10 @@ export default {
   }
 };
 </script>
+
+<!-- Styles -->
+<style scoped>
+  .stock-table {
+    margin-top: -1rem;
+  }
+</style>

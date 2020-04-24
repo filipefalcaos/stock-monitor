@@ -1,8 +1,8 @@
 <!-- Template -->
 <template>
   <section class="section" :class="process.platform === 'win32' ? 'section-win' : 'section'">
-    <div class="columns" style="margin-bottom: 0px!important;">
-      <div class="column is-one-fifth">
+    <div class="columns is-vcentered">
+      <div class="column is-2">
         <b-select
           @input="load_portfolio"
           v-model="portfolio_data.last_portfolio"
@@ -17,31 +17,29 @@
         </b-select>
       </div>
 
-      <div class="column" >
+      <div class="column is-4">
         <div class="buttons">
           <b-button @click="add_portfolio_dialog" type="is-success">Adicionar Carteira</b-button>
           <b-button @click="get_stock_prices" :loading="is_processing" type="is-info">Atualizar</b-button>
         </div>
       </div>
-    </div>
 
-    <div class="columns">
       <div class="column">
-        <h1 class="title" :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'">
+        <h1 class="title" :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'" style="float: right;">
           <b>Valor Feito:</b>
-          <span style="margin-right: 1.3rem;">R$ {{ full_value.toFixed(2) }}</span>
+          <span style="margin-right: 0.5rem;">R$ {{ full_value.toFixed(2) }}</span>
           <span>|</span>
 
-          <b style="margin-left: 1.3rem;">Valor Ativo:</b>
-          <span style="margin-right: 1.3rem;">R$ {{ active_value.toFixed(2) }}</span>
+          <b style="margin-left: 0.5rem;">Valor Ativo:</b>
+          <span style="margin-right: 0.5rem;">R$ {{ active_value.toFixed(2) }}</span>
           <span>|</span>
 
           <b
             v-if="has_error"
-            style="margin-left: 1.3rem; text-align: justify; "
+            style="margin-left: 0.5rem; text-align: justify; "
           >Resultados indisponíveis</b>
           <span v-else>
-            <b style="margin-left: 1.3rem;">Resultado:</b>
+            <b style="margin-left: 0.5rem;">Resultado:</b>
             R$ {{ final_result }} ({{ percent_result.toFixed(2) }}%)
 
             <span v-if="final_result > 0">😀</span>
@@ -52,24 +50,40 @@
       </div>
     </div>
 
-    <div class="columns" style="margin-top: 1rem;">
-      <div class="column is-full">
+    <div class="columns is-vcentered" style="margin-top: 1rem;">
+      <div class="column is-10">
         <h1
           class="title"
           :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
         >Posição: Comprado</h1>
+      </div>
 
+      <div class="column is-2">
+          <b-button style="float: right;" type="is-info">Adicionar Ação</b-button>
+      </div>
+    </div>
+      
+    <div class="columns">
+      <div class="column is-full">
         <stock-table :stock-data="stock_data_buy" :new-data="new_data"></stock-table>
       </div>
     </div>
 
-    <div class="columns">
-      <div class="column is-full">
+    <div class="columns is-vcentered" style="margin-top: 1rem;">
+      <div class="column is-10">
         <h1
           class="title title-text"
           :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
         >Posição: Vendido</h1>
+      </div>
 
+      <div class="column is-2">
+          <b-button style="float: right;" type="is-info">Adicionar Ação</b-button>
+      </div>
+    </div>
+    
+    <div class="columns">
+      <div class="column is-full">
         <stock-table :stock-data="stock_data_sell" :new-data="new_data"></stock-table>
       </div>
     </div>
