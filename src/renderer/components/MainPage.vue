@@ -64,7 +64,7 @@
 
       <div class="column is-2">
         <b-button
-          @click="add_stock_dialog(0)"
+          @click="add_stock_dialog(true)"
           style="float: right;"
           type="is-info"
           icon-left="plus"
@@ -89,7 +89,7 @@
 
       <div class="column is-2">
         <b-button
-          @click="add_stock_dialog(1)"
+          @click="add_stock_dialog(false)"
           style="float: right;"
           type="is-info"
           icon-left="plus"
@@ -103,19 +103,31 @@
         <stock-table :stock-data="stock_data_sell" :new-data="new_data"></stock-table>
       </div>
     </div>
+
+    <b-modal
+      :active.sync="is_processing_stock"
+      has-modal-card
+      trap-focus
+      aria-role="dialog"
+      aria-modal
+    >
+      <stock-form :is-buying="is_buying"/>
+    </b-modal>
   </section>
 </template>
 
 <!-- Script -->
 <script>
-import StockTable from "./StockTable";
 import path from "path";
 import { remote } from "electron";
 const fs = require("fs");
 
+import StockTable from "./StockTable";
+import StockForm from "./StockForm";
+
 export default {
   name: "main-page",
-  components: { StockTable },
+  components: { StockTable, StockForm },
 
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
@@ -152,6 +164,8 @@ export default {
       process: process,
       new_data: false,
       is_processing: false,
+      is_processing_stock: false,
+      is_buying: true,
       has_error: false,
       full_value: 0,
       active_value: 0,
@@ -181,7 +195,10 @@ export default {
   methods: {
     format_num(num) {
       let number = parseFloat(num).toFixed(2);
-      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(number);
+      return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      }).format(number);
     },
 
     update_selected_data(portfolio) {
@@ -248,6 +265,11 @@ export default {
         type: "is-info",
         onConfirm: value => this.create_portfolio(value)
       });
+    },
+
+    add_stock_dialog(is_buying) {
+      this.is_processing_stock = true;
+      this.is_buying = is_buying;
     },
 
     get_stock_prices() {

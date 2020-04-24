@@ -42,7 +42,7 @@
           label="Variação"
           :numeric="true"
         >
-          <span v-if="props.row.var">R$ {{ props.row.var }} ({{ props.row.varpct }}%)</span>
+          <span v-if="props.row.var">{{ $parent.format_num(props.row.var) }} ({{ props.row.varpct }}%)</span>
           <span v-else>--</span>
 
           <span v-if="props.row.var > 0">📈</span>
@@ -57,7 +57,7 @@
         >
           <span
             v-if="props.row.result"
-          >R$ {{ props.row.result }} ({{ get_result_percent(props.row) }}%)</span>
+          >{{ $parent.format_num(props.row.result) }} ({{ get_result_percent(props.row) }}%)</span>
           <span v-else>--</span>
 
           <span v-if="props.row.result > 0">😀</span>
