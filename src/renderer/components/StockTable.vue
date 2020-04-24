@@ -22,7 +22,7 @@
           field="first_price"
           label="Preço Comprado"
           :numeric="true"
-        >R$ {{ props.row.first_price }}</b-table-column>
+        >{{ $parent.format_num(props.row.first_price) }}</b-table-column>
 
         <b-table-column field="amount" label="Quantidade" :numeric="true">{{ props.row.amount }}</b-table-column>
 
@@ -32,7 +32,7 @@
           label="Preço Atual"
           :numeric="true"
         >
-          <span v-if="props.row.current_price">R$ {{ props.row.current_price }}</span>
+          <span v-if="props.row.current_price">{{ $parent.format_num(props.row.current_price) }}</span>
           <span v-else>--</span>
         </b-table-column>
 

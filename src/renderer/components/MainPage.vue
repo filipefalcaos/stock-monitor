@@ -25,13 +25,17 @@
       </div>
 
       <div class="column">
-        <h1 class="title" :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'" style="float: right;">
+        <h1
+          class="title"
+          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
+          style="float: right;"
+        >
           <b>Valor Feito:</b>
-          <span style="margin-right: 0.5rem;">R$ {{ full_value.toFixed(2) }}</span>
+          <span style="margin-right: 0.5rem;">{{ format_num(full_value) }}</span>
           <span>|</span>
 
           <b style="margin-left: 0.5rem;">Valor Ativo:</b>
-          <span style="margin-right: 0.5rem;">R$ {{ active_value.toFixed(2) }}</span>
+          <span style="margin-right: 0.5rem;">{{ format_num(active_value) }}</span>
           <span>|</span>
 
           <b
@@ -40,7 +44,7 @@
           >Resultados indisponíveis</b>
           <span v-else>
             <b style="margin-left: 0.5rem;">Resultado:</b>
-            R$ {{ final_result }} ({{ percent_result.toFixed(2) }}%)
+            {{ format_num(final_result) }} ({{ percent_result.toFixed(2) }}%)
 
             <span v-if="final_result > 0">😀</span>
             <span v-else-if="final_result == 0">😐</span>
@@ -59,10 +63,16 @@
       </div>
 
       <div class="column is-2">
-          <b-button style="float: right;" type="is-info" icon-left="plus" outlined>Ação</b-button>
+        <b-button
+          @click="add_stock_dialog(0)"
+          style="float: right;"
+          type="is-info"
+          icon-left="plus"
+          outlined
+        >Ação</b-button>
       </div>
     </div>
-      
+
     <div class="columns">
       <div class="column is-full">
         <stock-table :stock-data="stock_data_buy" :new-data="new_data"></stock-table>
@@ -78,10 +88,16 @@
       </div>
 
       <div class="column is-2">
-          <b-button style="float: right;" type="is-info" icon-left="plus" outlined>Ação</b-button>
+        <b-button
+          @click="add_stock_dialog(1)"
+          style="float: right;"
+          type="is-info"
+          icon-left="plus"
+          outlined
+        >Ação</b-button>
       </div>
     </div>
-    
+
     <div class="columns">
       <div class="column is-full">
         <stock-table :stock-data="stock_data_sell" :new-data="new_data"></stock-table>
@@ -107,7 +123,7 @@ export default {
     this.portfolio_data = JSON.parse(
       fs.readFileSync(__static + "/portfolio-data.json")
     );
-    
+
     this.fileName = path.join(remote.app.getPath('userData'), '/portfolio-data.json');
     console.log("Config path: " + this.fileName);
 
@@ -163,6 +179,11 @@ export default {
   },
 
   methods: {
+    format_num(num) {
+      let number = parseFloat(num).toFixed(2);
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(number);
+    },
+
     update_selected_data(portfolio) {
       this.stock_data = portfolio.stocks;
       this.full_value = portfolio.investment;
@@ -304,7 +325,7 @@ export default {
       });
 
       this.final_result = parseFloat(sum).toFixed(2);
-      if (this.full_value === 0) { 
+      if (this.full_value === 0) {
         this.percent_result = 0;
       } else {
         this.percent_result = (sum / this.full_value) * 100;
