@@ -6,7 +6,7 @@
         <b-select
           @input="load_portfolio"
           v-model="portfolio_data.last_portfolio"
-          placeholder="Selecione uma carteira"
+          placeholder="Carteira"
           expanded
         >
           <option
@@ -133,17 +133,14 @@ export default {
   // of the stocks when the component is created
   created() {
     this.fileName = path.join(remote.app.getPath('userData'), '/portfolio-data.json');
-    console.log("Config path: " + this.fileName);
 
     /* Loads the portfolio data file */
     try {
       if (fs.existsSync(this.fileName)) {
         this.portfolio_data = JSON.parse(fs.readFileSync(this.fileName));
-        console.log("Loaded config file");
       } else {
-        this.portfolio_data = { id_count: 0, last_portfolio: 0, portfolios: [] };
+        this.portfolio_data = { id_count: 0, last_portfolio: null, portfolios: [] };
         fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
-        console.log("New config file created");
       }
     } catch (error) {
       console.error(error);
@@ -198,15 +195,17 @@ export default {
     },
 
     update_selected_data(portfolio) {
-      this.stock_data = portfolio.stocks;
-      this.full_value = portfolio.investment;
-      this.active_value = this.full_value;
+      let investment = 0;
+      let activeValue = 0;
 
       portfolio.stocks.forEach(stock => {
-        if (stock.sold) {
-          this.active_value -= stock.sell_price * stock.amount;
-        }
+        investment += stock.first_price * stock.amount;
+        if (stock.sold) activeValue -= stock.sell_price * stock.amount;
       });
+
+      this.stock_data = portfolio.stocks;
+      this.full_value = investment;
+      this.active_value = this.full_value + activeValue;
     },
 
     get_portfolios_data() {
@@ -233,7 +232,6 @@ export default {
       let newPortfolio = {
         name: portfolio_name,
         id: this.portfolio_data.id_count,
-        investment: 0,
         stocks: []
       };
 
