@@ -65,8 +65,8 @@
           <span v-else-if="props.row.result < 0">😢</span>
         </b-table-column>
 
-        <b-table-column field="sold" label="Status" :numeric="true">
-          <span v-if="!props.row.sold" class="tag is-success">Ativo</span>
+        <b-table-column field="closed" label="Status" :numeric="true">
+          <span v-if="!props.row.closed" class="tag is-success">Ativo</span>
           <span v-else class="tag is-warning">Encerrado</span>
         </b-table-column>
       </template>

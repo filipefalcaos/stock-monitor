@@ -200,7 +200,7 @@ export default {
 
       portfolio.stocks.forEach(stock => {
         investment += stock.initial_price * stock.amount;
-        if (stock.sold) activeValue -= stock.sell_price * stock.amount;
+        if (stock.closed) activeValue -= stock.close_price * stock.amount;
       });
 
       this.stock_data = portfolio.stocks;
@@ -272,7 +272,7 @@ export default {
         initial_price: new_stock.initial_price,
         amount: new_stock.amount,
         position: new_stock.position,
-        sold: false
+        closed: false
       };
 
       // Updates the portfolio data file and the UI
@@ -310,8 +310,8 @@ export default {
       Promise.all(promises)
         .then(() => {
           this.stock_data.forEach(stock => {
-            if (stock.sold) {
-              stock.current_price = stock.sell_price;
+            if (stock.closed) {
+              stock.current_price = stock.close_price;
             } else {
               stock.current_price = stock.aux_price;
             }
