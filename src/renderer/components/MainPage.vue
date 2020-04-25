@@ -132,10 +132,6 @@ export default {
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
   created() {
-    this.portfolio_data = JSON.parse(
-      fs.readFileSync(__static + "/portfolio-data.json")
-    );
-
     this.fileName = path.join(remote.app.getPath('userData'), '/portfolio-data.json');
     console.log("Config path: " + this.fileName);
 
@@ -145,7 +141,7 @@ export default {
         this.portfolio_data = JSON.parse(fs.readFileSync(this.fileName));
         console.log("Loaded config file");
       } else {
-        this.portfolio_data = JSON.parse(fs.readFileSync(__static + "/portfolio-data.json"));
+        this.portfolio_data = { id_count: 0, last_portfolio: 0, portfolios: [] };
         fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
         console.log("New config file created");
       }
