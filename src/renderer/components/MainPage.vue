@@ -111,7 +111,7 @@
       aria-role="dialog"
       aria-modal
     >
-      <stock-form :stocks="available_stocks" :is-buying="is_buying"/>
+      <stock-form v-on:submit-stock="add_stock" :stocks="available_stocks" :is-buying="is_buying"/>
     </b-modal>
   </section>
 </template>
@@ -265,6 +265,27 @@ export default {
         type: "is-info",
         onConfirm: value => this.create_portfolio(value)
       });
+    },
+
+    add_stock(new_stock) {
+      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
+        return portfolio.id == this.portfolio_data.last_portfolio;
+      });
+
+      let newStock = {
+        stock: new_stock.stock.code,
+        uol_code: new_stock.stock.idt,
+        first_price: new_stock.first_price,
+        amount: new_stock.amount,
+        buy: new_stock.buy,
+        sold: false
+      };
+
+      // Updates the portfolio data file and the UI
+      lastPortfolio.stocks.push(newStock);
+      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
+      this.update_selected_data(lastPortfolio);
+      this.get_stock_prices();
     },
 
     add_stock_dialog(is_buying) {
