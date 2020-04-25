@@ -26,12 +26,12 @@
         </b-field>
 
         <b-field label="Preço Comprado">
-          <b-input v-model="first_price" placeholder="20,00" type="number" step="0.01" min="0" required></b-input>
+          <b-input v-model="initial_price" placeholder="20,00" type="number" step="0.01" min="0" required></b-input>
         </b-field>
 
         <h1>
           <b>Posição:</b>
-          <span v-if="isBuying">Comprado</span>
+          <span v-if="isOpening">Comprado</span>
           <span v-else>Vendido</span>
         </h1>
       </section>
@@ -48,14 +48,14 @@
 <script>
 export default {
   name: "stock-form",
-  props: ["isBuying", "stocks"],
+  props: ["isOpening", "stocks"],
 
   data() {
     return {
       stock: "",
       selected: null,
       amount: null,
-      first_price: null
+      initial_price: null
     };
   },
 
@@ -77,8 +77,8 @@ export default {
       let newStock = {
         stock: this.selected,
         amount: this.amount,
-        first_price: this.first_price,
-        buy: this.isBuying
+        initial_price: this.initial_price,
+        position: this.isOpening ? "opening" : "closing"
       };
 
       /* Closes the modal and sends the data to MainPage */

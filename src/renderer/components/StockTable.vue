@@ -19,10 +19,10 @@
         <b-table-column field="stock" label="Ação">{{ props.row.stock }}</b-table-column>
 
         <b-table-column
-          field="first_price"
+          field="initial_price"
           label="Preço Comprado"
           :numeric="true"
-        >{{ $parent.format_num(props.row.first_price) }}</b-table-column>
+        >{{ $parent.format_num(props.row.initial_price) }}</b-table-column>
 
         <b-table-column field="amount" label="Quantidade" :numeric="true">{{ props.row.amount }}</b-table-column>
 
@@ -88,7 +88,7 @@ export default {
 
   methods: {
     get_result_percent(stock) {
-      return ((stock.result / (stock.first_price * stock.amount)) * 100).toFixed(2);
+      return ((stock.result / (stock.initial_price * stock.amount)) * 100).toFixed(2);
     }
   }
 };

@@ -75,7 +75,7 @@
 
     <div class="columns">
       <div class="column is-full">
-        <stock-table :stock-data="stock_data_buy" :new-data="new_data"></stock-table>
+        <stock-table :stock-data="opening_stocks" :new-data="new_data"></stock-table>
       </div>
     </div>
 
@@ -100,7 +100,7 @@
 
     <div class="columns">
       <div class="column is-full">
-        <stock-table :stock-data="stock_data_sell" :new-data="new_data"></stock-table>
+        <stock-table :stock-data="closing_stocks" :new-data="new_data"></stock-table>
       </div>
     </div>
 
@@ -111,7 +111,7 @@
       aria-role="dialog"
       aria-modal
     >
-      <stock-form v-on:submit-stock="add_stock" :stocks="available_stocks" :is-buying="is_buying"/>
+      <stock-form v-on:submit-stock="add_stock" :stocks="available_stocks" :is-opening="is_opening"/>
     </b-modal>
   </section>
 </template>
@@ -158,7 +158,7 @@ export default {
       new_data: false,
       is_processing: false,
       is_processing_stock: false,
-      is_buying: true,
+      is_opening: true,
       has_error: false,
       full_value: 0,
       active_value: 0,
@@ -172,15 +172,15 @@ export default {
   },
 
   computed: {
-    stock_data_buy() {
+    opening_stocks() {
       return this.stock_data.filter(stock => {
-        return stock.buy;
+        return stock.position === "opening";
       });
     },
 
-    stock_data_sell() {
+    closing_stocks() {
       return this.stock_data.filter(stock => {
-        return !stock.buy;
+        return stock.position === "closing";
       });
     }
   },
@@ -199,7 +199,7 @@ export default {
       let activeValue = 0;
 
       portfolio.stocks.forEach(stock => {
-        investment += stock.first_price * stock.amount;
+        investment += stock.initial_price * stock.amount;
         if (stock.sold) activeValue -= stock.sell_price * stock.amount;
       });
 
@@ -269,9 +269,9 @@ export default {
       let newStock = {
         stock: new_stock.stock.code,
         uol_code: new_stock.stock.idt,
-        first_price: new_stock.first_price,
+        initial_price: new_stock.initial_price,
         amount: new_stock.amount,
-        buy: new_stock.buy,
+        position: new_stock.position,
         sold: false
       };
 
@@ -282,9 +282,9 @@ export default {
       this.get_stock_prices();
     },
 
-    add_stock_dialog(is_buying) {
+    add_stock_dialog(is_opening) {
       this.is_processing_stock = true;
-      this.is_buying = is_buying;
+      this.is_opening = is_opening;
     },
 
     get_stock_prices() {
@@ -346,14 +346,14 @@ export default {
       let sum = 0;
 
       this.stock_data.forEach(stock => {
-        if (stock.buy) {
+        if (stock.position === "opening") {
           stock.result = (
-            (stock.current_price - stock.first_price) *
+            (stock.current_price - stock.initial_price) *
             stock.amount
           ).toFixed(2);
         } else {
           stock.result = (
-            (stock.first_price - stock.current_price) *
+            (stock.initial_price - stock.current_price) *
             stock.amount
           ).toFixed(2);
         }
