@@ -14,6 +14,7 @@
       :striped="true"
       :hoverable="true"
       :mobile-cards="true"
+      checkable
     >
       <template slot-scope="props">
         <b-table-column field="stock" label="Ação">{{ props.row.stock }}</b-table-column>

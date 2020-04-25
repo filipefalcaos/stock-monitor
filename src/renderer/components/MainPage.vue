@@ -374,7 +374,10 @@ export default {
       this.$http
         .get(base_url + "stock/list?size=10000")
         .then(response => {
-          this.available_stocks = response.data.data;
+          response.data.data.forEach(stock => {
+            stock.code = stock.code.split(".")[0];
+            this.available_stocks.push(stock);
+          });
         })
         .catch(error => {
           this.$buefy.notification.open({
