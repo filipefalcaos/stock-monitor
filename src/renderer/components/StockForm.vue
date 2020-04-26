@@ -29,11 +29,20 @@
           <b-input v-model="initial_price" placeholder="20,00" type="number" step="0.01" min="0" required></b-input>
         </b-field>
 
-        <h1>
-          <b>Posição:</b>
-          <span v-if="isOpening">Comprado</span>
-          <span v-else>Vendido</span>
-        </h1>
+        <b-field label="Posição">
+          <div class="block">
+            <b-radio v-model="position"
+                name="position"
+                native-value="opening">
+                Comprado
+            </b-radio>
+            <b-radio v-model="position"
+                name="position"
+                native-value="closing">
+                Vendido
+            </b-radio>
+          </div>
+        </b-field>
       </section>
 
       <footer class="modal-card-foot">
@@ -48,14 +57,15 @@
 <script>
 export default {
   name: "stock-form",
-  props: ["isOpening", "stocks"],
+  props: ["stocks"],
 
   data() {
     return {
       stock: "",
       selected: null,
       amount: null,
-      initial_price: null
+      initial_price: null,
+      position: null
     };
   },
 
@@ -78,7 +88,7 @@ export default {
         stock: this.selected,
         amount: this.amount,
         initial_price: this.initial_price,
-        position: this.isOpening ? "opening" : "closing"
+        position: this.position
       };
 
       /* Closes the modal and sends the data to MainPage */

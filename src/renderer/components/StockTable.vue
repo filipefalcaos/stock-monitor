@@ -29,7 +29,7 @@
         <b-table-column field="amount" label="Quantidade" :numeric="true">{{ props.row.amount }}</b-table-column>
 
         <b-table-column
-          :class="{ 'green-success': newData }"
+          :class="{ 'green-success': hasNewData }"
           field="current_price"
           label="Preço Atual"
           :numeric="true"
@@ -39,7 +39,7 @@
         </b-table-column>
 
         <b-table-column
-          :class="{ 'green-success': newData }"
+          :class="{ 'green-success': hasNewData }"
           field="var"
           label="Variação Diária"
           :numeric="true"
@@ -54,7 +54,7 @@
         </b-table-column>
 
         <b-table-column
-          :class="{ 'green-success': newData }"
+          :class="{ 'green-success': hasNewData }"
           field="result"
           label="Resultado"
           :numeric="true"
@@ -67,6 +67,11 @@
           <span v-if="props.row.result > 0">😀</span>
           <span v-else-if="props.row.result == 0">😐</span>
           <span v-else-if="props.row.result < 0">😢</span>
+        </b-table-column>
+
+        <b-table-column field="position" label="Posição" :numeric="true">
+          <span v-if="props.row.position === 'opening'" class="tag is-success">Comprado</span>
+          <span v-else class="tag is-warning">Vendido</span>
         </b-table-column>
 
         <b-table-column field="closed" label="Status" :numeric="true">
@@ -89,7 +94,7 @@
 <script>
 export default {
   name: "stock-table",
-  props: ["stockData", "newData"],
+  props: ["stockData", "hasNewData"],
 
   data() {
     return {

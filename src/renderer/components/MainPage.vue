@@ -64,12 +64,12 @@
         <h1
           class="title"
           :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
-        >Posição: Comprado</h1>
+        >Ações</h1>
       </div>
 
       <div class="column is-2">
         <b-button
-          @click="add_stock_dialog(true)"
+          @click="add_stock_dialog"
           style="float: right;"
           type="is-info"
           icon-left="plus"
@@ -80,32 +80,7 @@
 
     <div class="columns">
       <div class="column is-full">
-        <stock-table :stock-data="opening_stocks" :new-data="new_data"></stock-table>
-      </div>
-    </div>
-
-    <div class="columns is-vcentered" style="margin-top: 1rem;">
-      <div class="column is-10">
-        <h1
-          class="title title-text"
-          :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
-        >Posição: Vendido</h1>
-      </div>
-
-      <div class="column is-2">
-        <b-button
-          @click="add_stock_dialog(false)"
-          style="float: right;"
-          type="is-info"
-          icon-left="plus"
-          outlined
-        >Ação</b-button>
-      </div>
-    </div>
-
-    <div class="columns">
-      <div class="column is-full">
-        <stock-table :stock-data="closing_stocks" :new-data="new_data"></stock-table>
+        <stock-table :stock-data="stock_data" :has-new-data="has_new_data" />
       </div>
     </div>
 
@@ -119,7 +94,6 @@
       <stock-form
         v-on:submit-stock="add_stock"
         :stocks="available_stocks"
-        :is-opening="is_opening"
       />
     </b-modal>
   </section>
@@ -169,10 +143,9 @@ export default {
   data() {
     return {
       process: process,
-      new_data: false,
+      has_new_data: false,
       is_processing: false,
       is_processing_stock: false,
-      is_opening: true,
       has_error: false,
       full_value: 0,
       active_value: 0,
@@ -183,20 +156,6 @@ export default {
       available_stocks: [],
       fileName: ""
     };
-  },
-
-  computed: {
-    opening_stocks() {
-      return this.stock_data.filter(stock => {
-        return stock.position === "opening";
-      });
-    },
-
-    closing_stocks() {
-      return this.stock_data.filter(stock => {
-        return stock.position === "closing";
-      });
-    }
   },
 
   methods: {
@@ -296,9 +255,8 @@ export default {
       this.get_stock_prices();
     },
 
-    add_stock_dialog(is_opening) {
+    add_stock_dialog() {
       this.is_processing_stock = true;
-      this.is_opening = is_opening;
     },
 
     get_stock_prices() {
@@ -335,10 +293,10 @@ export default {
           });
 
           this.update_stock_prices();
-          this.new_data = true;
+          this.has_new_data = true;
           this.is_processing = false;
           setTimeout(() => {
-            this.new_data = false;
+            this.has_new_data = false;
           }, 2000);
         })
         .catch(error => {
