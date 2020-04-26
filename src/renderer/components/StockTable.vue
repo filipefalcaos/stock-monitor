@@ -11,9 +11,10 @@
       v-else
       :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
       :data="stockData"
-      :striped="true"
-      :hoverable="true"
-      :mobile-cards="true"
+      :checked-rows.sync="checkedRows"
+      mobile-cards
+      hoverable
+      striped
       checkable
     >
       <template slot-scope="props">
@@ -40,10 +41,12 @@
         <b-table-column
           :class="{ 'green-success': newData }"
           field="var"
-          label="Variação"
+          label="Variação Diária"
           :numeric="true"
         >
-          <span v-if="props.row.var">{{ $parent.format_num(props.row.var) }} ({{ props.row.varpct }}%)</span>
+          <span
+            v-if="props.row.var"
+          >{{ $parent.format_num(props.row.var) }} ({{ props.row.varpct }}%)</span>
           <span v-else>--</span>
 
           <span v-if="props.row.var > 0">📈</span>
@@ -71,6 +74,13 @@
           <span v-else class="tag is-warning">Encerrado</span>
         </b-table-column>
       </template>
+
+      <template slot="bottom-left">
+        <div v-if="checkedRows.length > 0" class="buttons">
+          <b-button @click="close_stocks" type="is-warning" icon-left="cancel">Encerrar</b-button>
+          <b-button @click="delete_stocks" type="is-danger" icon-left="delete">Excluir</b-button>
+        </div>
+      </template>
     </b-table>
   </div>
 </template>
@@ -80,16 +90,38 @@
 export default {
   name: "stock-table",
   props: ["stockData", "newData"],
-  
+
   data() {
     return {
-      process: process
+      process: process,
+      checkedRows: []
     };
   },
 
   methods: {
     get_result_percent(stock) {
-      return ((stock.result / (stock.initial_price * stock.amount)) * 100).toFixed(2);
+      let result = stock.result / (stock.initial_price * stock.amount);
+      return (result * 100).toFixed(2);
+    },
+
+    close_stocks() {
+      this.$buefy.dialog.confirm({
+        message: 'Tem certeza que gostaria de encerrar as ações selecionadas?',
+        confirmText: 'Encerrar',
+        cancelText: 'Cancelar',
+        type: 'is-warning',
+        onConfirm: () => this.$emit('close-stocks', this.checkedRows)
+      });
+    },
+
+    delete_stocks() {
+      this.$buefy.dialog.confirm({
+        message: 'Tem certeza que gostaria de excluir as ações selecionadas? Isto não poderá ser desfeito.',
+        confirmText: 'Excluir',
+        cancelText: 'Cancelar',
+        type: 'is-danger',
+        onConfirm: () => this.$emit('delete-stocks', this.checkedRows)
+      });
     }
   }
 };
@@ -97,7 +129,7 @@ export default {
 
 <!-- Styles -->
 <style scoped>
-  .stock-table {
-    margin-top: -1rem;
-  }
+.stock-table {
+  margin-top: -1rem;
+}
 </style>

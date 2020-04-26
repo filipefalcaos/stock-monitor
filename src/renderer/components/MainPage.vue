@@ -19,8 +19,13 @@
 
       <div class="column is-4">
         <div class="buttons">
-          <b-button @click="add_portfolio_dialog" type="is-success">Adicionar Carteira</b-button>
-          <b-button @click="get_stock_prices" :loading="is_processing" type="is-info">Atualizar</b-button>
+          <b-button @click="add_portfolio_dialog" icon-left="plus" type="is-success">Carteira</b-button>
+          <b-button
+            @click="get_stock_prices"
+            :loading="is_processing"
+            icon-left="sync"
+            type="is-info"
+          >Atualizar</b-button>
         </div>
       </div>
 
@@ -111,7 +116,11 @@
       aria-role="dialog"
       aria-modal
     >
-      <stock-form v-on:submit-stock="add_stock" :stocks="available_stocks" :is-opening="is_opening"/>
+      <stock-form
+        v-on:submit-stock="add_stock"
+        :stocks="available_stocks"
+        :is-opening="is_opening"
+      />
     </b-modal>
   </section>
 </template>
@@ -132,14 +141,19 @@ export default {
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
   created() {
-    this.fileName = path.join(remote.app.getPath('userData'), '/portfolio-data.json');
+    const dataPath = "/portfolio-data.json";
+    this.fileName = path.join(remote.app.getPath("userData"), dataPath);
 
     /* Loads the portfolio data file */
     try {
       if (fs.existsSync(this.fileName)) {
         this.portfolio_data = JSON.parse(fs.readFileSync(this.fileName));
       } else {
-        this.portfolio_data = { id_count: 0, last_portfolio: null, portfolios: [] };
+        this.portfolio_data = {
+          id_count: 0,
+          last_portfolio: null,
+          portfolios: []
+        };
         fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
       }
     } catch (error) {
@@ -250,7 +264,7 @@ export default {
       this.$buefy.dialog.prompt({
         message: "Insira um nome para a nova carteira.",
         inputAttrs: {
-          placeholder: "Portfólio",
+          placeholder: "Carteira",
           maxlength: 30
         },
         confirmText: "Adicionar",
