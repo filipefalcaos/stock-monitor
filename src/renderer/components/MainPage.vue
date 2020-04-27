@@ -39,10 +39,6 @@
           <span style="margin-right: 0.5rem;">{{ format_num(full_value) }}</span>
           <span>|</span>
 
-          <b style="margin-left: 0.5rem;">Valor Ativo:</b>
-          <span style="margin-right: 0.5rem;">{{ format_num(active_value) }}</span>
-          <span>|</span>
-
           <b
             v-if="has_error"
             style="margin-left: 0.5rem; text-align: justify; "
@@ -80,7 +76,12 @@
 
     <div class="columns">
       <div class="column is-full">
-        <stock-table :stock-data="stock_data" :has-new-data="has_new_data" />
+        <stock-table
+          v-on:close-stocks="close_stocks"
+          v-on:delete-stocks="delete_stocks"
+          :stock-data="stock_data"
+          :has-new-data="has_new_data"
+        />
       </div>
     </div>
 
@@ -91,18 +92,16 @@
       aria-role="dialog"
       aria-modal
     >
-      <stock-form
-        v-on:submit-stock="add_stock"
-        :stocks="available_stocks"
-      />
+      <stock-form v-on:submit-stock="add_stock" :stocks="available_stocks" />
     </b-modal>
   </section>
 </template>
 
 <!-- Script -->
 <script>
-import path from "path";
 import { remote } from "electron";
+import { nanoid } from "nanoid";
+import path from "path";
 const fs = require("fs");
 
 import StockTable from "./StockTable";
@@ -124,7 +123,6 @@ export default {
         this.portfolio_data = JSON.parse(fs.readFileSync(this.fileName));
       } else {
         this.portfolio_data = {
-          id_count: 0,
           last_portfolio: null,
           portfolios: []
         };
@@ -148,7 +146,6 @@ export default {
       is_processing_stock: false,
       has_error: false,
       full_value: 0,
-      active_value: 0,
       final_result: 0,
       percent_result: 0,
       portfolio_data: {},
@@ -169,16 +166,12 @@ export default {
 
     update_selected_data(portfolio) {
       let investment = 0;
-      let activeValue = 0;
-
       portfolio.stocks.forEach(stock => {
         investment += stock.initial_price * stock.amount;
-        if (stock.closed) activeValue -= stock.close_price * stock.amount;
       });
 
       this.stock_data = portfolio.stocks;
       this.full_value = investment;
-      this.active_value = this.full_value + activeValue;
     },
 
     get_portfolios_data() {
@@ -195,27 +188,26 @@ export default {
       });
 
       // Updates the portfolio data file and the stocks data
-      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
+      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
       this.update_selected_data(newPotfolio);
       this.get_stock_prices();
     },
 
     create_portfolio(portfolio_name) {
-      this.portfolio_data.id_count++;
       let newPortfolio = {
+        id: nanoid(),
         name: portfolio_name,
-        id: this.portfolio_data.id_count,
         stocks: []
       };
 
       // Adds an empty portfolio with the given name
       this.portfolio_data.portfolios.push(newPortfolio);
-      this.selected_portfolio = this.portfolio_data.last_portfolio = this.portfolio_data.id_count;
+      this.portfolio_data.last_portfolio = newPortfolio.id;
       this.final_result = 0;
       this.percent_result = 0;
 
       // Updates the portfolio data file and the UI
-      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
+      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
       this.update_selected_data(newPortfolio);
     },
 
@@ -240,6 +232,7 @@ export default {
       });
 
       let newStock = {
+        id: nanoid(),
         stock: new_stock.stock.code,
         uol_code: new_stock.stock.idt,
         initial_price: new_stock.initial_price,
@@ -250,13 +243,37 @@ export default {
 
       // Updates the portfolio data file and the UI
       lastPortfolio.stocks.push(newStock);
-      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
+      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
       this.update_selected_data(lastPortfolio);
       this.get_stock_prices();
     },
 
     add_stock_dialog() {
       this.is_processing_stock = true;
+    },
+
+    close_stocks(closeObj) {
+      this.stock_data.forEach(stock => {
+        if (stock.id === closeObj.stock.id) {
+          stock.closed = true;
+          stock.close_price = closeObj.close_price;
+          return;
+        }
+
+        console.log(stock);
+      });
+
+      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
+        return portfolio.id == this.portfolio_data.last_portfolio;
+      });
+
+      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
+      this.update_selected_data(lastPortfolio);
+      this.get_stock_prices();
+    },
+
+    delete_stocks(stocks) {
+      console.log(stocks);
     },
 
     get_stock_prices() {

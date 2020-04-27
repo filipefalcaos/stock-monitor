@@ -5,7 +5,7 @@
       v-if="stockData.length == 0 || !stockData"
       class="title"
       :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-    >Não há ações para esta posição.</h1>
+    >Essa carteira não possui ações cadastradas.</h1>
 
     <b-table
       v-else
@@ -82,7 +82,12 @@
 
       <template slot="bottom-left">
         <div v-if="checkedRows.length > 0" class="buttons">
-          <b-button @click="close_stocks" type="is-warning" icon-left="cancel">Encerrar</b-button>
+          <b-button
+            v-if="checkedRows.length === 1"
+            @click="close_stocks"
+            type="is-warning"
+            icon-left="cancel"
+          >Encerrar</b-button>
           <b-button @click="delete_stocks" type="is-danger" icon-left="delete">Excluir</b-button>
         </div>
       </template>
@@ -110,22 +115,34 @@ export default {
     },
 
     close_stocks() {
-      this.$buefy.dialog.confirm({
-        message: 'Tem certeza que gostaria de encerrar as ações selecionadas?',
-        confirmText: 'Encerrar',
-        cancelText: 'Cancelar',
-        type: 'is-warning',
-        onConfirm: () => this.$emit('close-stocks', this.checkedRows)
+      this.$buefy.dialog.prompt({
+        message: "Insira o valor de encerramento da operação.",
+        inputAttrs: {
+          type: "number",
+          placeholder: "Valor de encerramento",
+          maxlength: 30,
+          min: 0,
+          step: 0.01
+        },
+        confirmText: "Encerrar",
+        cancelText: "Cancelar",
+        trapFocus: true,
+        type: "is-warning",
+        onConfirm: value => {
+          const closeObj = { close_price: value, stock: this.checkedRows[0] };
+          this.$emit("close-stocks", closeObj);
+        }
       });
     },
 
     delete_stocks() {
       this.$buefy.dialog.confirm({
-        message: 'Tem certeza que gostaria de excluir as ações selecionadas? Isto não poderá ser desfeito.',
-        confirmText: 'Excluir',
-        cancelText: 'Cancelar',
-        type: 'is-danger',
-        onConfirm: () => this.$emit('delete-stocks', this.checkedRows)
+        message:
+          "Tem certeza que gostaria de excluir as ações selecionadas? Isto não poderá ser desfeito.",
+        confirmText: "Excluir",
+        cancelText: "Cancelar",
+        type: "is-danger",
+        onConfirm: () => this.$emit("delete-stocks", this.checkedRows)
       });
     }
   }

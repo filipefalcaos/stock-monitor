@@ -33,12 +33,14 @@
           <div class="block">
             <b-radio v-model="position"
                 name="position"
-                native-value="opening">
+                native-value="opening"
+                required>
                 Comprado
             </b-radio>
             <b-radio v-model="position"
                 name="position"
-                native-value="closing">
+                native-value="closing"
+                required>
                 Vendido
             </b-radio>
           </div>
