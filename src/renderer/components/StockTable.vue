@@ -31,7 +31,7 @@
         <b-table-column
           :class="{ 'green-success': hasNewData }"
           field="current_price"
-          label="Preço Atual"
+          label="Último Preço"
           :numeric="true"
         >
           <span v-if="props.row.current_price">{{ $parent.format_num(props.row.current_price) }}</span>
@@ -48,9 +48,6 @@
             v-if="props.row.var"
           >{{ $parent.format_num(props.row.var) }} ({{ props.row.varpct }}%)</span>
           <span v-else>--</span>
-
-          <span v-if="props.row.var > 0">📈</span>
-          <span v-else-if="props.row.var < 0">📉</span>
         </b-table-column>
 
         <b-table-column
@@ -63,10 +60,6 @@
             v-if="props.row.result"
           >{{ $parent.format_num(props.row.result) }} ({{ get_result_percent(props.row) }}%)</span>
           <span v-else>--</span>
-
-          <span v-if="props.row.result > 0">😀</span>
-          <span v-else-if="props.row.result == 0">😐</span>
-          <span v-else-if="props.row.result < 0">😢</span>
         </b-table-column>
 
         <b-table-column field="position" label="Posição" :numeric="true">

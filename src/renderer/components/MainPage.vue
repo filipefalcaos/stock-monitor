@@ -46,10 +46,6 @@
           <span v-else>
             <b style="margin-left: 0.5rem;">Resultado:</b>
             {{ format_num(final_result) }} ({{ percent_result.toFixed(2) }}%)
-
-            <span v-if="final_result > 0">😀</span>
-            <span v-else-if="final_result == 0">😐</span>
-            <span v-else-if="final_result < 0">😢</span>
           </span>
         </h1>
       </div>
@@ -69,7 +65,6 @@
           style="float: right;"
           type="is-info"
           icon-left="plus"
-          outlined
         >Ação</b-button>
       </div>
     </div>

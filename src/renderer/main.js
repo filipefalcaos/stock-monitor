@@ -3,7 +3,6 @@ import axios from 'axios'
 import { Button, Select, Table } from 'buefy'
 import { Notification, Dialog, Modal } from 'buefy'
 import { Field, Input, Radio, Autocomplete } from 'buefy'
-import 'buefy/dist/buefy.css'
 
 import App from './App'
 import router from './router'
