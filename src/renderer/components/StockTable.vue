@@ -131,6 +131,7 @@ export default {
         onConfirm: value => {
           const closeObj = { close_price: value, stock: this.checkedRows[0] };
           this.$emit("close-stocks", closeObj);
+          this.checkedRows = [];
         }
       });
     },
@@ -142,7 +143,10 @@ export default {
         confirmText: "Excluir",
         cancelText: "Cancelar",
         type: "is-danger",
-        onConfirm: () => this.$emit("delete-stocks", this.checkedRows)
+        onConfirm: () => {
+          this.$emit("delete-stocks", this.checkedRows);
+          this.checkedRows = [];
+        }
       });
     }
   }

@@ -267,13 +267,22 @@ export default {
         return portfolio.id == this.portfolio_data.last_portfolio;
       });
 
+      // Updates the portfolio data file and the UI
       fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
       this.update_selected_data(lastPortfolio);
       this.get_stock_prices();
     },
 
     delete_stocks(stocks) {
-      console.log(stocks);
+      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
+        return portfolio.id == this.portfolio_data.last_portfolio;
+      });
+      
+      // Updates the portfolio data file and the UI
+      lastPortfolio.stocks = this.stock_data.filter(stock => !stocks.includes(stock));
+      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
+      this.update_selected_data(lastPortfolio);
+      this.get_stock_prices();
     },
 
     get_stock_prices() {
