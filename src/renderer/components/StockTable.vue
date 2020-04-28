@@ -22,9 +22,9 @@
 
         <b-table-column
           field="initial_price"
-          label="Preço Comprado"
+          label="Preço Inicial"
           :numeric="true"
-        >{{ $parent.format_num(props.row.initial_price) }}</b-table-column>
+        >{{ $parent.format_currency(props.row.initial_price) }}</b-table-column>
 
         <b-table-column field="amount" label="Quantidade" :numeric="true">{{ props.row.amount }}</b-table-column>
 
@@ -34,7 +34,9 @@
           label="Último Preço"
           :numeric="true"
         >
-          <span v-if="props.row.current_price">{{ $parent.format_num(props.row.current_price) }}</span>
+          <span
+            v-if="props.row.current_price"
+          >{{ $parent.format_currency(props.row.current_price) }}</span>
           <span v-else>--</span>
         </b-table-column>
 
@@ -46,7 +48,7 @@
         >
           <span
             v-if="props.row.var"
-          >{{ $parent.format_num(props.row.var) }} ({{ props.row.varpct }}%)</span>
+          >{{ $parent.format_currency(props.row.var) }} ({{ $parent.format_percent(props.row.varpct) }})</span>
           <span v-else>--</span>
         </b-table-column>
 
@@ -57,8 +59,8 @@
           :numeric="true"
         >
           <span
-            v-if="props.row.result"
-          >{{ $parent.format_num(props.row.result) }} ({{ get_result_percent(props.row) }}%)</span>
+            v-if="props.row.result !== undefined"
+          >{{ $parent.format_currency(props.row.result) }} ({{ $parent.format_percent(get_result_percent(props.row)) }})</span>
           <span v-else>--</span>
         </b-table-column>
 
@@ -103,8 +105,7 @@ export default {
 
   methods: {
     get_result_percent(stock) {
-      let result = stock.result / (stock.initial_price * stock.amount);
-      return (result * 100).toFixed(2);
+      return stock.result / (stock.initial_price * stock.amount);
     },
 
     close_stocks() {

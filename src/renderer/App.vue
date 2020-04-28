@@ -21,29 +21,59 @@ export default {
 // Set new colors
 $primary: #2a9fd6;
 $primary-invert: findColorInvert($primary);
-$info: #2984D3;
+$info: #2984d3;
 $info-invert: findColorInvert($info);
 $link: #3273e2;
 $link-invert: findColorInvert($link);
-$success: #3FBF61;
+$success: #3fbf61;
 $success-invert: findColorInvert($success);
-$warning: #FED746;
+$warning: #fed746;
 $warning-invert: findColorInvert($warning);
-$danger: #EA2B55;
+$danger: #ea2b55;
 $danger-invert: findColorInvert($danger);
 
 // Setup $colors to use as bulma classes
 $colors: (
-    "white": ($white, $black),
-    "black": ($black, $white),
-    "light": ($light, $light-invert),
-    "dark": ($dark, $dark-invert),
-    "primary": ($primary, $primary-invert),
-    "info": ($info, $info-invert),
-    "link": ($link, $link-invert),
-    "success": ($success, $success-invert),
-    "warning": ($warning, $warning-invert),
-    "danger": ($danger, $danger-invert)
+  "white": (
+    $white,
+    $black
+  ),
+  "black": (
+    $black,
+    $white
+  ),
+  "light": (
+    $light,
+    $light-invert
+  ),
+  "dark": (
+    $dark,
+    $dark-invert
+  ),
+  "primary": (
+    $primary,
+    $primary-invert
+  ),
+  "info": (
+    $info,
+    $info-invert
+  ),
+  "link": (
+    $link,
+    $link-invert
+  ),
+  "success": (
+    $success,
+    $success-invert
+  ),
+  "warning": (
+    $warning,
+    $warning-invert
+  ),
+  "danger": (
+    $danger,
+    $danger-invert
+  )
 );
 
 // Import Bulma and Buefy styles
@@ -58,7 +88,7 @@ $colors: (
 
 html {
   font-family: "Source Sans Pro", sans-serif;
-  background-color: rgb(40, 56, 75);
+  // background-color: rgb(40, 56, 75);
 }
 
 .section {
@@ -71,24 +101,24 @@ html {
 
 .title-text {
   font-size: 24px !important;
-  color: #FFFFFF;
+  // color: #FFFFFF;
 }
 
 .title-text-win {
   font-size: 18px !important;
-  color: #FFFFFF;
+  // color: #FFFFFF;
 }
 
 .base-text {
   font-size: 16px !important;
   font-weight: 500 !important;
-  color: #FFFFFF;
+  // color: #FFFFFF;
 }
 
 .base-text-win {
   font-size: 14px !important;
   font-weight: 500 !important;
-  color: #FFFFFF;
+  // color: #FFFFFF;
 }
 
 .green-success {

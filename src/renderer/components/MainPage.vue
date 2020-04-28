@@ -35,8 +35,8 @@
           :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
           style="float: right;"
         >
-          <b>Valor Feito:</b>
-          <span style="margin-right: 0.5rem;">{{ format_num(full_value) }}</span>
+          <b>Valor Investido:</b>
+          <span style="margin-right: 0.5rem;">{{ format_currency(full_value) }}</span>
           <span>|</span>
 
           <b
@@ -45,7 +45,7 @@
           >Resultados indisponíveis</b>
           <span v-else>
             <b style="margin-left: 0.5rem;">Resultado:</b>
-            {{ format_num(final_result) }} ({{ percent_result.toFixed(2) }}%)
+            {{ format_currency(final_result) }} ({{ format_percent(percent_result) }})
           </span>
         </h1>
       </div>
@@ -151,12 +151,22 @@ export default {
   },
 
   methods: {
-    format_num(num) {
-      let number = parseFloat(num).toFixed(2);
+    format_currency(num) {
       return new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "BRL"
-      }).format(number);
+        currency: "BRL",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(num);
+    },
+
+    format_percent(num) {
+      console.log(num);
+      return new Intl.NumberFormat("pt-BR", {
+        style: "percent",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(num);
     },
 
     update_selected_data(portfolio) {
@@ -167,6 +177,7 @@ export default {
 
       this.stock_data = portfolio.stocks;
       this.full_value = investment;
+      console.log(this.portfolio_data);
     },
 
     get_portfolios_data() {
@@ -310,7 +321,7 @@ export default {
             }
 
             stock.var = stock.aux_var;
-            stock.varpct = stock.aux_varpct;
+            stock.varpct = stock.aux_varpct / 100;
           });
 
           this.update_stock_prices();
@@ -340,25 +351,19 @@ export default {
 
       this.stock_data.forEach(stock => {
         if (stock.position === "opening") {
-          stock.result = (
-            (stock.current_price - stock.initial_price) *
-            stock.amount
-          ).toFixed(2);
+          stock.result = (stock.current_price - stock.initial_price) * stock.amount;
         } else {
-          stock.result = (
-            (stock.initial_price - stock.current_price) *
-            stock.amount
-          ).toFixed(2);
+          stock.result = (stock.initial_price - stock.current_price) * stock.amount;
         }
 
         sum += parseFloat(stock.result);
       });
 
-      this.final_result = parseFloat(sum).toFixed(2);
+      this.final_result = parseFloat(sum);
       if (this.full_value === 0) {
         this.percent_result = 0;
       } else {
-        this.percent_result = (sum / this.full_value) * 100;
+        this.percent_result = sum / this.full_value;
       }
     },
 
