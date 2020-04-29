@@ -5,7 +5,7 @@
       v-if="stockData.length == 0 || !stockData"
       class="title"
       :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-    >Essa carteira não possui ações cadastradas.</h1>
+    >Sem ações listadas.</h1>
 
     <b-table
       v-else
@@ -23,16 +23,16 @@
         <b-table-column
           field="initial_price"
           label="Preço Inicial"
-          :numeric="true"
+          numeric
         >{{ $parent.format_currency(props.row.initial_price) }}</b-table-column>
 
-        <b-table-column field="amount" label="Quantidade" :numeric="true">{{ props.row.amount }}</b-table-column>
+        <b-table-column field="amount" label="Quantidade" sortable numeric>{{ props.row.amount }}</b-table-column>
 
         <b-table-column
           :class="{ 'green-success': hasNewData }"
           field="current_price"
           label="Último Preço"
-          :numeric="true"
+          numeric
         >
           <span
             v-if="props.row.current_price"
@@ -42,9 +42,10 @@
 
         <b-table-column
           :class="{ 'green-success': hasNewData }"
-          field="var"
+          field="varpct"
           label="Variação Diária"
-          :numeric="true"
+          sortable
+          numeric
         >
           <span
             v-if="props.row.var"
@@ -56,7 +57,8 @@
           :class="{ 'green-success': hasNewData }"
           field="result"
           label="Resultado"
-          :numeric="true"
+          sortable
+          numeric
         >
           <span
             v-if="props.row.result !== undefined"
@@ -67,11 +69,6 @@
         <b-table-column field="position" label="Posição" :numeric="true">
           <span v-if="props.row.position === 'opening'" class="tag is-success">Comprado</span>
           <span v-else class="tag is-warning">Vendido</span>
-        </b-table-column>
-
-        <b-table-column field="closed" label="Status" :numeric="true">
-          <span v-if="!props.row.closed" class="tag is-success">Ativo</span>
-          <span v-else class="tag is-warning">Encerrado</span>
         </b-table-column>
       </template>
 

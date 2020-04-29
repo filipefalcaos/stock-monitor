@@ -35,8 +35,12 @@
           :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
           style="float: right;"
         >
-          <b>Valor Investido:</b>
+          <b>Total:</b>
           <span style="margin-right: 0.5rem;">{{ format_currency(full_value) }}</span>
+          <span>|</span>
+
+          <b style="margin-left: 0.5rem;">Ativo:</b>
+          <span style="margin-right: 0.5rem;">{{ format_currency(active_value) }}</span>
           <span>|</span>
 
           <b
@@ -56,7 +60,7 @@
         <h1
           class="title"
           :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
-        >Ações</h1>
+        >Em aberto</h1>
       </div>
 
       <div class="column is-2">
@@ -74,7 +78,27 @@
         <stock-table
           v-on:close-stocks="close_stocks"
           v-on:delete-stocks="delete_stocks"
-          :stock-data="stock_data"
+          :stock-data="open_stocks"
+          :has-new-data="has_new_data"
+        />
+      </div>
+    </div>
+
+    <div class="columns is-vcentered" style="margin-top: 1rem;">
+      <div class="column is-full">
+        <h1
+          class="title"
+          :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
+        >Encerradas</h1>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column is-full">
+        <stock-table
+          v-on:close-stocks="close_stocks"
+          v-on:delete-stocks="delete_stocks"
+          :stock-data="closed_stocks"
           :has-new-data="has_new_data"
         />
       </div>
@@ -141,6 +165,7 @@ export default {
       is_processing_stock: false,
       has_error: false,
       full_value: 0,
+      active_value: 0,
       final_result: 0,
       percent_result: 0,
       portfolio_data: {},
@@ -148,6 +173,16 @@ export default {
       available_stocks: [],
       fileName: ""
     };
+  },
+
+  computed: {
+    open_stocks() {
+      return this.stock_data.filter(stock => !stock.closed);
+    },
+
+    closed_stocks() {
+      return this.stock_data.filter(stock => stock.closed);
+    }
   },
 
   methods: {
@@ -161,7 +196,6 @@ export default {
     },
 
     format_percent(num) {
-      console.log(num);
       return new Intl.NumberFormat("pt-BR", {
         style: "percent",
         minimumFractionDigits: 2,
@@ -171,13 +205,15 @@ export default {
 
     update_selected_data(portfolio) {
       let investment = 0;
+      let inactiveInvestment = 0;
       portfolio.stocks.forEach(stock => {
         investment += stock.initial_price * stock.amount;
+        if (stock.closed) inactiveInvestment += stock.initial_price * stock.amount;
       });
 
       this.stock_data = portfolio.stocks;
       this.full_value = investment;
-      console.log(this.portfolio_data);
+      this.active_value = investment - inactiveInvestment;
     },
 
     get_portfolios_data() {
