@@ -145,6 +145,7 @@ export default {
           last_portfolio: null,
           portfolios: []
         };
+
         fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
       }
     } catch (error) {
@@ -203,6 +204,29 @@ export default {
       }).format(num);
     },
 
+    update_portoflio_file() {
+      let portfolioCopy = JSON.parse(JSON.stringify(this.portfolio_data));
+
+      // Delete fields that should not be persisted
+      portfolioCopy.portfolios.forEach(portfolio => {
+        portfolio.stocks.forEach(stock => {
+          delete stock.aux_price;
+          delete stock.aux_var;
+          delete stock.aux_varpct;
+          delete stock.var;
+          delete stock.varpct;
+
+          if (!stock.closed) {
+            delete stock.result;
+            delete stock.resultpct;
+            delete stock.current_price;
+          }
+        });
+      });
+
+      fs.writeFileSync(this.fileName, JSON.stringify(portfolioCopy, null, 2));
+    },
+
     update_selected_data(portfolio) {
       let investment = 0;
       let inactiveInvestment = 0;
@@ -230,8 +254,8 @@ export default {
         return portfolio.id == this.portfolio_data.last_portfolio;
       });
 
-      // Updates the portfolio data file and the stocks data
-      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
+      // Updates the portfolio data file and the stocks UI
+      this.update_portoflio_file();
       this.update_selected_data(newPotfolio);
       this.get_stock_prices();
     },
@@ -249,8 +273,8 @@ export default {
       this.final_result = 0;
       this.percent_result = 0;
 
-      // Updates the portfolio data file and the UI
-      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
+      // Updates the portfolio data file and the stocks UI
+      this.update_portoflio_file();
       this.update_selected_data(newPortfolio);
     },
 
@@ -284,9 +308,9 @@ export default {
         closed: false
       };
 
-      // Updates the portfolio data file and the UI
+      // Updates the portfolio data file and the stocks UI
       lastPortfolio.stocks.push(newStock);
-      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
+      this.update_portoflio_file();
       this.update_selected_data(lastPortfolio);
       this.get_stock_prices();
     },
@@ -310,8 +334,8 @@ export default {
         return portfolio.id == this.portfolio_data.last_portfolio;
       });
 
-      // Updates the portfolio data file and the UI
-      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
+      // Updates the portfolio data file and the stocks UI
+      this.update_portoflio_file();
       this.update_selected_data(lastPortfolio);
       this.get_stock_prices();
     },
@@ -321,9 +345,9 @@ export default {
         return portfolio.id == this.portfolio_data.last_portfolio;
       });
       
-      // Updates the portfolio data file and the UI
+      // Updates the portfolio data file and the stocks UI
       lastPortfolio.stocks = this.stock_data.filter(stock => !stocks.includes(stock));
-      fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data, null, 2));
+      this.update_portoflio_file();
       this.update_selected_data(lastPortfolio);
       this.get_stock_prices();
     },
