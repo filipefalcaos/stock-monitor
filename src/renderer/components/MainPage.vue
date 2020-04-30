@@ -206,6 +206,7 @@ export default {
     update_selected_data(portfolio) {
       let investment = 0;
       let inactiveInvestment = 0;
+
       portfolio.stocks.forEach(stock => {
         investment += stock.initial_price * stock.amount;
         if (stock.closed) inactiveInvestment += stock.initial_price * stock.amount;
@@ -392,6 +393,7 @@ export default {
           stock.result = (stock.initial_price - stock.current_price) * stock.amount;
         }
 
+        stock.resultpct = stock.result / (stock.initial_price * stock.amount);
         sum += parseFloat(stock.result);
       });
 

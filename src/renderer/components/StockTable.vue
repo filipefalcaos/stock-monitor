@@ -12,17 +12,19 @@
       :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
       :data="stockData"
       :checked-rows.sync="checkedRows"
+      default-sort="stock"
       mobile-cards
       hoverable
       striped
       checkable
     >
       <template slot-scope="props">
-        <b-table-column field="stock" label="Ação">{{ props.row.stock }}</b-table-column>
+        <b-table-column field="stock" label="Ação" sortable>{{ props.row.stock }}</b-table-column>
 
         <b-table-column
           field="initial_price"
           label="Preço Inicial"
+          sortable
           numeric
         >{{ $parent.format_currency(props.row.initial_price) }}</b-table-column>
 
@@ -32,6 +34,7 @@
           :class="{ 'green-success': hasNewData }"
           field="current_price"
           label="Último Preço"
+          sortable
           numeric
         >
           <span
@@ -55,18 +58,18 @@
 
         <b-table-column
           :class="{ 'green-success': hasNewData }"
-          field="result"
+          field="resultpct"
           label="Resultado"
           sortable
           numeric
         >
           <span
             v-if="props.row.result !== undefined"
-          >{{ $parent.format_currency(props.row.result) }} ({{ $parent.format_percent(get_result_percent(props.row)) }})</span>
+          >{{ $parent.format_currency(props.row.result) }} ({{ $parent.format_percent(props.row.resultpct) }})</span>
           <span v-else>--</span>
         </b-table-column>
 
-        <b-table-column field="position" label="Posição" :numeric="true">
+        <b-table-column field="position" label="Posição" sortable numeric>
           <span v-if="props.row.position === 'opening'" class="tag is-success">Comprado</span>
           <span v-else class="tag is-warning">Vendido</span>
         </b-table-column>
@@ -93,6 +96,14 @@ export default {
   name: "stock-table",
   props: ["stockData", "hasNewData"],
 
+  // Converts all initial prices to float, ensuring that the table ordering
+  // works properly
+  created() {
+    this.stockData.forEach(stock => {
+      stock.initial_price = parseFloat(stock.initial_price);
+    });
+  },
+
   data() {
     return {
       process: process,
@@ -101,10 +112,6 @@ export default {
   },
 
   methods: {
-    get_result_percent(stock) {
-      return stock.result / (stock.initial_price * stock.amount);
-    },
-
     close_stocks() {
       this.$buefy.dialog.prompt({
         message: "Insira o valor de encerramento da operação.",
