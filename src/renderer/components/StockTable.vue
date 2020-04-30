@@ -78,7 +78,7 @@
       <template slot="bottom-left">
         <div v-if="checkedRows.length > 0" class="buttons">
           <b-button
-            v-if="checkedRows.length === 1"
+            v-if="checkedRows.length === 1 && !checkedRows[0].closed"
             @click="close_stocks"
             type="is-warning"
             icon-left="cancel"
