@@ -127,7 +127,8 @@ export default {
         onConfirm: () => {
           this.$emit("delete-stocks", this.checkedRows);
           this.checkedRows = [];
-        }
+        },
+        onCancel: () => this.checkedRows = []
       });
     }
   }

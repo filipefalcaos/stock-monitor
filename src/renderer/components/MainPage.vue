@@ -337,25 +337,49 @@ export default {
     },
 
     close_stocks(closeObj) {
-      console.log(closeObj);
-      // this.stock_data.forEach(stock => {
-      //   if (stock.id === closeObj.stock.id) {
-      //     stock.closed = true;
-      //     stock.close_price = closeObj.close_price;
-      //     return;
-      //   }
+      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
+        return portfolio.id == this.portfolio_data.last_portfolio;
+      });
 
-      //   console.log(stock);
-      // });
+      // Checks if a new stock must be created and closed (partial closing), or just close 
+      // the existing one
+      if (closeObj.new_amount === closeObj.old_stock.amount) {
+        this.stock_data.forEach(stock => {
+          if (stock.id === closeObj.old_stock.id) {
+            stock.closed = true;
+            stock.close_price = closeObj.close_price;
+            return;
+          }
+        });
+      } else {
+        let diff = closeObj.old_stock.amount - closeObj.new_amount;
+        
+        // Updates the remaining amount
+        this.stock_data.forEach(stock => {
+          if (stock.id === closeObj.old_stock.id) {
+            stock.amount = diff;
+            return;
+          }
+        });
 
-      // let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
-      //   return portfolio.id == this.portfolio_data.last_portfolio;
-      // });
+        // Adds a new stock to partially close
+        lastPortfolio.stocks.push({
+          id: nanoid(),
+          stock: closeObj.old_stock.stock,
+          uol_code: closeObj.old_stock.uol_code,
+          initial_price: closeObj.old_stock.initial_price,
+          amount: closeObj.new_amount,
+          position: closeObj.old_stock.position,
+          closed: true,
+          close_price: closeObj.close_price,
+          current_price: closeObj.close_price
+        });
+      }
 
-      // // Updates the portfolio data file and the stocks UI
-      // this.update_portoflio_file();
-      // this.update_selected_data(lastPortfolio);
-      // this.get_stock_prices();
+      // Updates the portfolio data file and the stocks UI
+      this.update_portoflio_file();
+      this.update_selected_data(lastPortfolio);
+      this.get_stock_prices();
     },
 
     close_stock_dialog(stock) {
