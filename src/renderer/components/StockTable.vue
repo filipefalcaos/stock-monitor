@@ -113,25 +113,8 @@ export default {
 
   methods: {
     close_stocks() {
-      this.$buefy.dialog.prompt({
-        message: "Insira o valor de encerramento da operação.",
-        inputAttrs: {
-          type: "number",
-          placeholder: "Valor de encerramento",
-          maxlength: 30,
-          min: 0,
-          step: 0.01
-        },
-        confirmText: "Encerrar",
-        cancelText: "Cancelar",
-        trapFocus: true,
-        type: "is-warning",
-        onConfirm: value => {
-          const closeObj = { close_price: value, stock: this.checkedRows[0] };
-          this.$emit("close-stocks", closeObj);
-          this.checkedRows = [];
-        }
-      });
+      this.$emit("close-stock", this.checkedRows[0]);
+      this.checkedRows = [];
     },
 
     delete_stocks() {

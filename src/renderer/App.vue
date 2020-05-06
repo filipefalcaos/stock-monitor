@@ -91,6 +91,11 @@ html {
   // background-color: rgb(40, 56, 75);
 }
 
+.modal-border-top {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
 .section {
   padding: 2rem !important;
 }

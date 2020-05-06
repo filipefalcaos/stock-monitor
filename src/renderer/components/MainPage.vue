@@ -73,10 +73,11 @@
       </div>
     </div>
 
+    <!-- Table of open positions -->
     <div class="columns">
       <div class="column is-full">
         <stock-table
-          v-on:close-stocks="close_stocks"
+          v-on:close-stock="close_stock_dialog"
           v-on:delete-stocks="delete_stocks"
           :stock-data="open_stocks"
           :has-new-data="has_new_data"
@@ -93,10 +94,11 @@
       </div>
     </div>
 
+    <!-- Table of closed positions -->
     <div class="columns">
       <div class="column is-full">
         <stock-table
-          v-on:close-stocks="close_stocks"
+          v-on:close-stock="close_stock_dialog"
           v-on:delete-stocks="delete_stocks"
           :stock-data="closed_stocks"
           :has-new-data="has_new_data"
@@ -104,14 +106,26 @@
       </div>
     </div>
 
+    <!-- Modal to add stocks -->
     <b-modal
-      :active.sync="is_processing_stock"
+      :active.sync="modal_add_active"
       has-modal-card
       trap-focus
       aria-role="dialog"
       aria-modal
     >
       <stock-form v-on:submit-stock="add_stock" :stocks="available_stocks" />
+    </b-modal>
+
+    <!-- Modal to close stocks -->
+    <b-modal
+      :active.sync="modal_close_active"
+      has-modal-card
+      trap-focus
+      aria-role="dialog"
+      aria-modal
+    >
+      <close-stock-form v-on:update-stock="close_stocks" :to-close="stock_to_close" />
     </b-modal>
   </section>
 </template>
@@ -125,10 +139,11 @@ const fs = require("fs");
 
 import StockTable from "./StockTable";
 import StockForm from "./StockForm";
+import CloseStockForm from './CloseStockForm';
 
 export default {
   name: "main-page",
-  components: { StockTable, StockForm },
+  components: { StockTable, StockForm, CloseStockForm },
 
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
@@ -163,7 +178,8 @@ export default {
       process: process,
       has_new_data: false,
       is_processing: false,
-      is_processing_stock: false,
+      modal_add_active: false,
+      modal_close_active: false,
       has_error: false,
       full_value: 0,
       active_value: 0,
@@ -172,6 +188,7 @@ export default {
       portfolio_data: {},
       stock_data: [],
       available_stocks: [],
+      stock_to_close: null,
       fileName: ""
     };
   },
@@ -316,28 +333,34 @@ export default {
     },
 
     add_stock_dialog() {
-      this.is_processing_stock = true;
+      this.modal_add_active = true;
     },
 
     close_stocks(closeObj) {
-      this.stock_data.forEach(stock => {
-        if (stock.id === closeObj.stock.id) {
-          stock.closed = true;
-          stock.close_price = closeObj.close_price;
-          return;
-        }
+      console.log(closeObj);
+      // this.stock_data.forEach(stock => {
+      //   if (stock.id === closeObj.stock.id) {
+      //     stock.closed = true;
+      //     stock.close_price = closeObj.close_price;
+      //     return;
+      //   }
 
-        console.log(stock);
-      });
+      //   console.log(stock);
+      // });
 
-      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolio_data.last_portfolio;
-      });
+      // let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
+      //   return portfolio.id == this.portfolio_data.last_portfolio;
+      // });
 
-      // Updates the portfolio data file and the stocks UI
-      this.update_portoflio_file();
-      this.update_selected_data(lastPortfolio);
-      this.get_stock_prices();
+      // // Updates the portfolio data file and the stocks UI
+      // this.update_portoflio_file();
+      // this.update_selected_data(lastPortfolio);
+      // this.get_stock_prices();
+    },
+
+    close_stock_dialog(stock) {
+      this.stock_to_close = stock;
+      this.modal_close_active = true;
     },
 
     delete_stocks(stocks) {

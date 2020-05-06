@@ -2,11 +2,7 @@
 <template>
   <form @submit.prevent="submit_new_stock">
     <div class="modal-card" style="width: 450px;">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Nova Ação</p>
-      </header>
-
-      <section class="modal-card-body">
+      <section class="modal-card-body modal-border-top">
         <b-field label="Ação">
           <b-autocomplete
             v-model="stock"
@@ -22,27 +18,24 @@
         </b-field>
 
         <b-field label="Quantidade">
-          <b-input v-model="amount" placeholder="100" type="number" required></b-input>
+          <b-input v-model="amount" placeholder="100" type="number" min="0" required></b-input>
         </b-field>
 
         <b-field label="Preço Comprado">
-          <b-input v-model="initial_price" placeholder="20,00" type="number" step="0.01" min="0" required></b-input>
+          <b-input
+            v-model="initial_price"
+            placeholder="20,00"
+            type="number"
+            step="0.01"
+            min="0"
+            required
+          ></b-input>
         </b-field>
 
         <b-field label="Posição">
           <div class="block">
-            <b-radio v-model="position"
-                name="position"
-                native-value="opening"
-                required>
-                Comprado
-            </b-radio>
-            <b-radio v-model="position"
-                name="position"
-                native-value="closing"
-                required>
-                Vendido
-            </b-radio>
+            <b-radio v-model="position" name="position" native-value="opening" required>Comprado</b-radio>
+            <b-radio v-model="position" name="position" native-value="closing" required>Vendido</b-radio>
           </div>
         </b-field>
       </section>
