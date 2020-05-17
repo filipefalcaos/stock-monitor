@@ -128,7 +128,7 @@ export default {
           this.$emit("delete-stocks", this.checkedRows);
           this.checkedRows = [];
         },
-        onCancel: () => this.checkedRows = []
+        onCancel: () => (this.checkedRows = [])
       });
     }
   }

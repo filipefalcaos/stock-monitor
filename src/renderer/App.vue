@@ -1,14 +1,48 @@
 <!-- Entry template -->
 <template>
   <div id="app">
-    <router-view></router-view>
+    <b-sidebar type="is-light" fullheight overlay :open.sync="open">
+      <div class="p-1">
+        <img src="static/imgs/logo.png" alt="Stock monitoring for B3" :to="{ path: '/' }" />
+
+        <!-- The app's menu -->
+        <b-menu style="margin-top: 2rem;">
+          <b-menu-list label="Menu">
+            <b-menu-item icon="finance" label="Carteiras" @click="toHome" />
+            <b-menu-item icon="poll-box" label="Desempenho" @click="toStats" />
+          </b-menu-list>
+
+          <b-menu-list label="Ações">
+            <b-menu-item icon="exit-to-app" label="Logout" />
+          </b-menu-list>
+        </b-menu>
+      </div>
+    </b-sidebar>
+
+    <!-- The app's view -->
+    <router-view v-on:toggle-menu="open = open ? false : true" />
   </div>
 </template>
 
 <!-- Entry script -->
 <script>
 export default {
-  name: "stock-monitor"
+  name: "stock-monitor",
+  data() {
+    return {
+      open: false
+    };
+  },
+
+  methods: {
+    toHome() {
+      this.$router.push({ name: 'home' });
+    },
+
+    toStats() {
+      this.$router.push({ name: 'stats' });
+    }
+  }
 };
 </script>
 
@@ -23,7 +57,7 @@ $primary: #2a9fd6;
 $primary-invert: findColorInvert($primary);
 $info: #2984d3;
 $info-invert: findColorInvert($info);
-$link: #3273e2;
+$link: #2984d3;
 $link-invert: findColorInvert($link);
 $success: #3fbf61;
 $success-invert: findColorInvert($success);
@@ -91,6 +125,15 @@ html {
   // background-color: rgb(40, 56, 75);
 }
 
+.p-1 {
+  padding: 1em;
+}
+
+.active-menu {
+  background-color: #2984d3;
+  color: #ffffff;
+}
+
 .modal-border-top {
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
@@ -98,10 +141,12 @@ html {
 
 .section {
   padding: 2rem !important;
+  width: 100%;
 }
 
 .section-win {
   padding: 20px !important;
+  width: 100%;
 }
 
 .title-text {

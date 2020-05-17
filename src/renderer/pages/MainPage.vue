@@ -1,25 +1,32 @@
 <!-- Template -->
 <template>
-  <section class="section" :class="process.platform === 'win32' ? 'section-win' : 'section'">
-    <div class="columns is-vcentered">
-      <div class="column is-2">
-        <b-select
-          @input="load_portfolio"
-          v-model="portfolio_data.last_portfolio"
-          placeholder="Carteira"
-          expanded
-        >
-          <option
-            v-for="option in portfolio_data.portfolios"
-            :value="option.id"
-            :key="option.id"
-          >{{ option.name }}</option>
-        </b-select>
-      </div>
+  <section :class="process.platform === 'win32' ? 'section-win' : 'section'">
+    <nav class="level" style="margin-bottom: 12px;">
+      <div class="level-left">
+        <div class="level-item">
+          <b-button @click="$emit('toggle-menu')" type="is-light" icon-left="menu">Menu</b-button>
+        </div>
 
-      <div class="column is-4">
-        <div class="buttons">
+        <div style="margin-left: 2rem;" class="level-item">
+          <b-select
+            @input="load_portfolio"
+            v-model="portfolio_data.last_portfolio"
+            placeholder="Carteira"
+            expanded
+          >
+            <option
+              v-for="option in portfolio_data.portfolios"
+              :value="option.id"
+              :key="option.id"
+            >{{ option.name }}</option>
+          </b-select>
+        </div>
+
+        <div class="level-item">
           <b-button @click="add_portfolio_dialog" icon-left="plus" type="is-success">Carteira</b-button>
+        </div>
+
+        <div class="level-item">
           <b-button
             @click="get_stock_prices"
             :loading="is_processing"
@@ -29,31 +36,33 @@
         </div>
       </div>
 
-      <div class="column">
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-          style="float: right;"
-        >
-          <b>Total:</b>
-          <span style="margin-right: 0.5rem;">{{ format_currency(full_value) }}</span>
-          <span>|</span>
+      <div class="level-right">
+        <div class="level-item">
+          <h1
+            class="title"
+            :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
+            style="float: right;"
+          >
+            <b>Total:</b>
+            <span style="margin-right: 0.5rem;">{{ format_currency(full_value) }}</span>
+            <span>|</span>
 
-          <b style="margin-left: 0.5rem;">Ativo:</b>
-          <span style="margin-right: 0.5rem;">{{ format_currency(active_value) }}</span>
-          <span>|</span>
+            <b style="margin-left: 0.5rem;">Ativo:</b>
+            <span style="margin-right: 0.5rem;">{{ format_currency(active_value) }}</span>
+            <span>|</span>
 
-          <b
-            v-if="has_error"
-            style="margin-left: 0.5rem; text-align: justify; "
-          >Resultados indisponíveis</b>
-          <span v-else>
-            <b style="margin-left: 0.5rem;">Resultado:</b>
-            {{ format_currency(final_result) }} ({{ format_percent(percent_result) }})
-          </span>
-        </h1>
+            <b
+              v-if="has_error"
+              style="margin-left: 0.5rem; text-align: justify; "
+            >Resultados indisponíveis</b>
+            <span v-else>
+              <b style="margin-left: 0.5rem;">Resultado:</b>
+              {{ format_currency(final_result) }} ({{ format_percent(percent_result) }})
+            </span>
+          </h1>
+        </div>
       </div>
-    </div>
+    </nav>
 
     <div class="columns is-vcentered" style="margin-top: 1rem;">
       <div class="column is-10">
@@ -137,9 +146,9 @@ import { nanoid } from "nanoid";
 import path from "path";
 const fs = require("fs");
 
-import StockTable from "./StockTable";
-import StockForm from "./StockForm";
-import CloseStockForm from './CloseStockForm';
+import StockTable from "../components/StockTable";
+import StockForm from "../components/StockForm";
+import CloseStockForm from "../components/CloseStockForm";
 
 export default {
   name: "main-page",
@@ -341,7 +350,7 @@ export default {
         return portfolio.id == this.portfolio_data.last_portfolio;
       });
 
-      // Checks if a new stock must be created and closed (partial closing), or just close 
+      // Checks if a new stock must be created and closed (partial closing), or just close
       // the existing one
       if (closeObj.new_amount === closeObj.old_stock.amount) {
         this.stock_data.forEach(stock => {
@@ -353,7 +362,7 @@ export default {
         });
       } else {
         let diff = closeObj.old_stock.amount - closeObj.new_amount;
-        
+
         // Updates the remaining amount
         this.stock_data.forEach(stock => {
           if (stock.id === closeObj.old_stock.id) {
@@ -391,7 +400,7 @@ export default {
       let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
         return portfolio.id == this.portfolio_data.last_portfolio;
       });
-      
+
       // Updates the portfolio data file and the stocks UI
       lastPortfolio.stocks = this.stock_data.filter(stock => !stocks.includes(stock));
       this.update_portoflio_file();
