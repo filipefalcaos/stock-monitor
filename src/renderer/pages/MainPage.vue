@@ -81,7 +81,7 @@
 
       <div class="level-right">
         <b-button
-          @click="add_stock_dialog"
+          @click="modal_add_active = true"
           style="float: right;"
           type="is-info"
           icon-left="plus"
@@ -198,15 +198,14 @@ export default {
     ...mapState({
       dataFileName: state => state.portfolios.dataFileName,
       portfolioData: state => state.portfolios.portfolioData,
-      availableStocks: state => state.stocks.availableStocks,
-      currentStocks: state => state.stocks.currentStocks
+      currentStocks: state => state.portfolios.currentStocks,
+      availableStocks: state => state.stocks.availableStocks
     }),
 
     ...mapGetters({
       lastPortfolio: "lastPortfolio",
       investment: "investment",
       activeInvestment: "activeInvestment",
-      finalResult: "finalResult",
       openStocks: "openStocks",
       closedStocks: "closedStocks"
     })
@@ -237,19 +236,9 @@ export default {
     },
 
     create_portfolio(portfolio_name) {
-      let newPortfolio = {
-        id: nanoid(),
-        name: portfolio_name,
-        stocks: []
-      };
-
-      // Adds an empty portfolio with the given name
-      this.portfolioData.portfolios.push(newPortfolio);
-      this.portfolioData.last_portfolio = newPortfolio.id;
       this.final_result = 0;
       this.percent_result = 0;
-
-      // Updates the portfolio data file and the stocks UI
+      this.$store.commit("newPortfolio", portfolio_name);
       this.$store.commit("updateDataFile");
       this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
     },
@@ -270,72 +259,14 @@ export default {
     },
 
     add_stock(new_stock) {
-      let lastPortfolio = this.portfolioData.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolioData.last_portfolio;
-      });
-
-      let newStock = {
-        id: nanoid(),
-        stock: new_stock.stock.code,
-        uol_code: new_stock.stock.idt,
-        initial_price: new_stock.initial_price,
-        amount: new_stock.amount,
-        position: new_stock.position,
-        closed: false
-      };
-
-      // Updates the portfolio data file and the stocks UI
-      lastPortfolio.stocks.push(newStock);
+      this.$store.commit("addToPortfolio", new_stock);
       this.$store.commit("updateDataFile");
       this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
       this.get_stock_prices();
     },
 
-    add_stock_dialog() {
-      this.modal_add_active = true;
-    },
-
     close_stocks(closeObj) {
-      let lastPortfolio = this.portfolioData.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolioData.last_portfolio;
-      });
-
-      // Checks if a new stock must be created and closed (partial closing), or just close
-      // the existing one
-      if (closeObj.new_amount === closeObj.old_stock.amount) {
-        this.currentStocks.forEach(stock => {
-          if (stock.id === closeObj.old_stock.id) {
-            stock.closed = true;
-            stock.close_price = closeObj.close_price;
-            return;
-          }
-        });
-      } else {
-        let diff = closeObj.old_stock.amount - closeObj.new_amount;
-
-        // Updates the remaining amount
-        this.currentStocks.forEach(stock => {
-          if (stock.id === closeObj.old_stock.id) {
-            stock.amount = diff;
-            return;
-          }
-        });
-
-        // Adds a new stock to partially close
-        lastPortfolio.stocks.push({
-          id: nanoid(),
-          stock: closeObj.old_stock.stock,
-          uol_code: closeObj.old_stock.uol_code,
-          initial_price: closeObj.old_stock.initial_price,
-          amount: closeObj.new_amount,
-          position: closeObj.old_stock.position,
-          closed: true,
-          close_price: closeObj.close_price,
-          current_price: closeObj.close_price
-        });
-      }
-
-      // Updates the portfolio data file and the stocks UI
+      this.$store.commit("closePosition", closeObj);
       this.$store.commit("updateDataFile");
       this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
       this.get_stock_prices();
@@ -346,13 +277,8 @@ export default {
       this.modal_close_active = true;
     },
 
-    delete_stocks(stocks) {
-      let lastPortfolio = this.portfolioData.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolioData.last_portfolio;
-      });
-
-      // Updates the portfolio data file and the stocks UI
-      lastPortfolio.stocks = this.currentStocks.filter(stock => !stocks.includes(stock));
+    delete_stocks(positions) {
+      this.$store.commit("deletePosition", positions);
       this.$store.commit("updateDataFile");
       this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
       this.get_stock_prices();

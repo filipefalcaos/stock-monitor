@@ -4,21 +4,12 @@ import { NotificationProgrammatic } from "buefy";
 // Initial state
 const state = () => ({
   availableStocks: [],
-  currentStocks: [],
   apiError: false,
   apiBaseUrl: "http://cotacoes.economia.uol.com.br/ws/asset/"
 });
 
 // Getters
-const getters = {
-  openStocks: (state) => {
-    return state.currentStocks.filter(stock => !stock.closed);
-  },
-
-  closedStocks: (state) => {
-    return state.currentStocks.filter(stock => stock.closed);
-  }
-}
+const getters = {}
 
 // Actions
 const actions = {
@@ -32,7 +23,6 @@ const actions = {
         });
       })
       .catch(error => {
-        console.error(error);
         NotificationProgrammatic.open({
           duration: 5000,
           message:
@@ -48,10 +38,6 @@ const actions = {
 const mutations = {
   addAvailableStock(state, stock) {
     state.availableStocks.push(stock);
-  },
-
-  setCurrentStocks(state, stocks) {
-    state.currentStocks = stocks;
   }
 }
 
