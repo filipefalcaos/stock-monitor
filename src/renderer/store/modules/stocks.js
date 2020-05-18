@@ -4,12 +4,21 @@ import { NotificationProgrammatic } from "buefy";
 // Initial state
 const state = () => ({
   availableStocks: [],
+  currentStocks: [],
   apiError: false,
   apiBaseUrl: "http://cotacoes.economia.uol.com.br/ws/asset/"
 });
 
 // Getters
-const getters = {}
+const getters = {
+  openStocks: (state) => {
+    return state.currentStocks.filter(stock => !stock.closed);
+  },
+
+  closedStocks: (state) => {
+    return state.currentStocks.filter(stock => stock.closed);
+  }
+}
 
 // Actions
 const actions = {
@@ -39,6 +48,10 @@ const actions = {
 const mutations = {
   addAvailableStock(state, stock) {
     state.availableStocks.push(stock);
+  },
+
+  setCurrentStocks(state, stocks) {
+    state.currentStocks = stocks;
   }
 }
 

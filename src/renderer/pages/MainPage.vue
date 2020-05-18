@@ -44,11 +44,11 @@
             style="float: right;"
           >
             <b>Total:</b>
-            <span style="margin-right: 0.5rem;">{{ format_currency(full_value) }}</span>
+            <span style="margin-right: 0.5rem;">{{ format_currency(investment) }}</span>
             <span>|</span>
 
             <b style="margin-left: 0.5rem;">Ativo:</b>
-            <span style="margin-right: 0.5rem;">{{ format_currency(active_value) }}</span>
+            <span style="margin-right: 0.5rem;">{{ format_currency(activeInvestment) }}</span>
             <span>|</span>
 
             <b
@@ -95,7 +95,7 @@
         <stock-table
           v-on:close-stock="close_stock_dialog"
           v-on:delete-stocks="delete_stocks"
-          :stock-data="open_stocks"
+          :stock-data="openStocks"
           :has-new-data="has_new_data"
         />
       </div>
@@ -123,7 +123,7 @@
         <stock-table
           v-on:close-stock="close_stock_dialog"
           v-on:delete-stocks="delete_stocks"
-          :stock-data="closed_stocks"
+          :stock-data="closedStocks"
           :has-new-data="has_new_data"
         />
       </div>
@@ -173,7 +173,7 @@ export default {
     this.$store.commit("loadDataFile");
 
     // Starts the UI state
-    this.get_portfolios_data();
+    this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
     this.get_stock_prices();
     await this.$store.dispatch('getAvailableStocks');
   },
@@ -188,11 +188,8 @@ export default {
       has_error: false,
       show_open: true,
       show_closed: false,
-      full_value: 0,
-      active_value: 0,
       final_result: 0,
       percent_result: 0,
-      stock_data: [],
       stock_to_close: null
     };
   },
@@ -201,21 +198,18 @@ export default {
     ...mapState({
       dataFileName: state => state.portfolios.dataFileName,
       portfolioData: state => state.portfolios.portfolioData,
-
-      availableStocks: state => state.stocks.availableStocks
+      availableStocks: state => state.stocks.availableStocks,
+      currentStocks: state => state.stocks.currentStocks
     }),
 
     ...mapGetters({
-      lastPortfolio: "lastPortfolio"
-    }),
-
-    open_stocks() {
-      return this.stock_data.filter(stock => !stock.closed);
-    },
-
-    closed_stocks() {
-      return this.stock_data.filter(stock => stock.closed);
-    }
+      lastPortfolio: "lastPortfolio",
+      investment: "investment",
+      activeInvestment: "activeInvestment",
+      finalResult: "finalResult",
+      openStocks: "openStocks",
+      closedStocks: "closedStocks"
+    })
   },
 
   methods: {
@@ -236,27 +230,9 @@ export default {
       }).format(num);
     },
 
-    update_selected_data(portfolio) {
-      let investment = 0;
-      let inactiveInvestment = 0;
-
-      portfolio.stocks.forEach(stock => {
-        investment += stock.initial_price * stock.amount;
-        if (stock.closed) inactiveInvestment += stock.initial_price * stock.amount;
-      });
-
-      this.stock_data = portfolio.stocks;
-      this.full_value = investment;
-      this.active_value = investment - inactiveInvestment;
-    },
-
-    get_portfolios_data() {
-      if (this.lastPortfolio) this.update_selected_data(this.lastPortfolio);
-    },
-
     load_portfolio() {
       this.$store.commit("updateDataFile");
-      this.update_selected_data(this.lastPortfolio);
+      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
       this.get_stock_prices();
     },
 
@@ -275,7 +251,7 @@ export default {
 
       // Updates the portfolio data file and the stocks UI
       this.$store.commit("updateDataFile");
-      this.update_selected_data(newPortfolio);
+      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
     },
 
     add_portfolio_dialog() {
@@ -311,7 +287,7 @@ export default {
       // Updates the portfolio data file and the stocks UI
       lastPortfolio.stocks.push(newStock);
       this.$store.commit("updateDataFile");
-      this.update_selected_data(lastPortfolio);
+      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
       this.get_stock_prices();
     },
 
@@ -327,7 +303,7 @@ export default {
       // Checks if a new stock must be created and closed (partial closing), or just close
       // the existing one
       if (closeObj.new_amount === closeObj.old_stock.amount) {
-        this.stock_data.forEach(stock => {
+        this.currentStocks.forEach(stock => {
           if (stock.id === closeObj.old_stock.id) {
             stock.closed = true;
             stock.close_price = closeObj.close_price;
@@ -338,7 +314,7 @@ export default {
         let diff = closeObj.old_stock.amount - closeObj.new_amount;
 
         // Updates the remaining amount
-        this.stock_data.forEach(stock => {
+        this.currentStocks.forEach(stock => {
           if (stock.id === closeObj.old_stock.id) {
             stock.amount = diff;
             return;
@@ -361,7 +337,7 @@ export default {
 
       // Updates the portfolio data file and the stocks UI
       this.$store.commit("updateDataFile");
-      this.update_selected_data(lastPortfolio);
+      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
       this.get_stock_prices();
     },
 
@@ -376,9 +352,9 @@ export default {
       });
 
       // Updates the portfolio data file and the stocks UI
-      lastPortfolio.stocks = this.stock_data.filter(stock => !stocks.includes(stock));
+      lastPortfolio.stocks = this.currentStocks.filter(stock => !stocks.includes(stock));
       this.$store.commit("updateDataFile");
-      this.update_selected_data(lastPortfolio);
+      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
       this.get_stock_prices();
     },
 
@@ -389,7 +365,7 @@ export default {
       this.has_error = false;
 
       // Gets the most recent price of each stock
-      this.stock_data.forEach(stock => {
+      this.currentStocks.forEach(stock => {
         promises.push(
           this.$http
             .get(base_url + stock.uol_code + "/intraday?size=1")
@@ -404,7 +380,7 @@ export default {
       // After all prices are collected, update the UI
       Promise.all(promises)
         .then(() => {
-          this.stock_data.forEach(stock => {
+          this.currentStocks.forEach(stock => {
             if (stock.closed) {
               stock.current_price = stock.close_price;
             } else {
@@ -439,8 +415,7 @@ export default {
 
     update_stock_prices() {
       let sum = 0;
-
-      this.stock_data.forEach(stock => {
+      this.currentStocks.forEach(stock => {
         if (stock.position === "opening") {
           stock.result = (stock.current_price - stock.initial_price) * stock.amount;
         } else {
@@ -452,10 +427,10 @@ export default {
       });
 
       this.final_result = parseFloat(sum);
-      if (this.full_value === 0) {
+      if (this.investment === 0) {
         this.percent_result = 0;
       } else {
-        this.percent_result = sum / this.full_value;
+        this.percent_result = sum / this.investment;
       }
     }
   }

@@ -14,6 +14,39 @@ const getters = {
     return state.portfolioData.portfolios.find(portfolio => {
       return portfolio.id == state.portfolioData.last_portfolio;
     });
+  },
+
+  investment: (state, getters) => {
+    state; /* Unused */
+    return getters.lastPortfolio.stocks.reduce((total, stock) => {
+      return total + stock.initial_price * stock.amount;
+    }, 0);
+  },
+
+  activeInvestment: (state, getters) => {
+    state; /* Unused */
+
+    return getters.investment - getters.lastPortfolio.stocks.reduce((total, stock) => {
+      if (stock.closed) {
+        return total + stock.initial_price * stock.amount;
+      } else {
+        return total;
+      }
+    }, 0);
+  },
+
+  finalResult: (state, getters) => {
+    state; /* Unused */
+
+    if (getters.lastPortfolio.stocks.length === 0) {
+      return 0;
+    } else {
+      return getters.lastPortfolio.stocks.reduce((total, stock) => {
+        console.log(total, typeof total);
+        console.log(stock.result, typeof stock.result);
+        return parseFloat(total + parseFloat(stock.result));
+      }, 0);
+    }
   }
 }
 
