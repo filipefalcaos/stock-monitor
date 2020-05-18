@@ -1,6 +1,6 @@
 <!-- Template -->
 <template>
-  <form @submit.prevent="close_stock">
+  <form @submit.prevent="close_position">
     <div class="modal-card" style="width: 450px;">
       <section class="modal-card-body modal-border-top">
         <b-field label="Ação">{{ toClose.stock }}</b-field>
@@ -39,7 +39,7 @@
 <!-- Script -->
 <script>
 export default {
-  name: "close-stock-form",
+  name: "close-position-form",
   props: ["toClose"],
 
   data() {
@@ -50,12 +50,12 @@ export default {
   },
 
   methods: {
-    close_stock() {
+    close_position() {
       this.$parent.close();
-      this.$emit("update-stock", {
+      this.$emit("update-position", {
         new_amount: this.amount,
         close_price: this.close_price,
-        old_stock: this.toClose
+        old_position: JSON.parse(JSON.stringify(this.toClose))
       });
     }
   }

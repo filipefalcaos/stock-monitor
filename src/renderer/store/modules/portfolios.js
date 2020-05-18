@@ -7,7 +7,7 @@ const fs = require("fs");
 const state = () => ({
   dataFileName: "",
   portfolioData: {},
-  currentStocks: []
+  currentPositions: []
 });
 
 // Getters
@@ -20,40 +20,34 @@ const getters = {
 
   investment: (state, getters) => {
     state; /* Unused */
-    return getters.lastPortfolio.stocks.reduce((total, stock) => {
-      return total + stock.initial_price * stock.amount;
+    return getters.lastPortfolio.positions.reduce((total, position) => {
+      return total + position.initial_price * position.amount;
     }, 0);
   },
 
   activeInvestment: (state, getters) => {
     state; /* Unused */
 
-    return getters.investment - getters.lastPortfolio.stocks.reduce((total, stock) => {
-      if (stock.closed) {
-        return total + stock.initial_price * stock.amount;
+    return getters.investment - getters.lastPortfolio.positions.reduce((total, position) => {
+      if (position.closed) {
+        return total + position.initial_price * position.amount;
       } else {
         return total;
       }
     }, 0);
   },
 
-  openStocks: (state) => {
-    return state.currentStocks.filter(stock => !stock.closed);
+  openPositions: (state) => {
+    return state.currentPositions.filter(position => !position.closed);
   },
 
-  closedStocks: (state) => {
-    return state.currentStocks.filter(stock => stock.closed);
+  closedPositions: (state) => {
+    return state.currentPositions.filter(position => position.closed);
   }
 }
 
 // Actions
-const actions = {
-  getAllProducts({ commit }) {
-    shop.getProducts(products => {
-      commit('setProducts', products)
-    });
-  }
-}
+const actions = {}
 
 // Mutations
 const mutations = {
@@ -84,17 +78,17 @@ const mutations = {
 
     // Delete fields that should not be persisted
     portfolioCopy.portfolios.forEach(portfolio => {
-      portfolio.stocks.forEach(stock => {
-        delete stock.aux_price;
-        delete stock.aux_var;
-        delete stock.aux_varpct;
-        delete stock.var;
-        delete stock.varpct;
+      portfolio.positions.forEach(position => {
+        delete position.aux_price;
+        delete position.aux_var;
+        delete position.aux_varpct;
+        delete position.var;
+        delete position.varpct;
 
-        if (!stock.closed) {
-          delete stock.result;
-          delete stock.resultpct;
-          delete stock.current_price;
+        if (!position.closed) {
+          delete position.result;
+          delete position.resultpct;
+          delete position.current_price;
         }
       });
     });
@@ -107,26 +101,26 @@ const mutations = {
     state.portfolioData.portfolios.push({
       id: state.portfolioData.last_portfolio,
       name: portfolioName,
-      stocks: []
+      positions: []
     });
   },
 
-  setCurrentStocks(state, stocks) {
-    state.currentStocks = stocks;
+  setCurrentPositions(state, positions) {
+    state.currentPositions = positions;
   },
 
-  addToPortfolio(state, stockData) {
+  addToPortfolio(state, postionData) {
     let lastPortfolio = state.portfolioData.portfolios.find(portfolio => {
       return portfolio.id == state.portfolioData.last_portfolio;
     });
 
-    lastPortfolio.stocks.push({
+    lastPortfolio.positions.push({
       id: nanoid(),
-      stock: stockData.stock.code,
-      uol_code: stockData.stock.idt,
-      initial_price: stockData.initial_price,
-      amount: stockData.amount,
-      position: stockData.position,
+      stock: postionData.stock.code,
+      uol_code: postionData.stock.idt,
+      initial_price: postionData.initial_price,
+      amount: postionData.amount,
+      type: postionData.type,
       closed: false
     });
   },
@@ -136,35 +130,35 @@ const mutations = {
       return portfolio.id == state.portfolioData.last_portfolio;
     });
 
-    // Checks if a new stock must be created and closed (partial closing), or just close
+    // Checks if a new position must be created and closed (partial closing), or just close
     // the existing one
-    if (closeObj.new_amount === closeObj.old_stock.amount) {
-      state.currentStocks.forEach(stock => {
-        if (stock.id === closeObj.old_stock.id) {
-          stock.closed = true;
-          stock.close_price = closeObj.close_price;
+    if (closeObj.new_amount === closeObj.old_position.amount) {
+      state.currentPositions.forEach(position => {
+        if (position.id === closeObj.old_position.id) {
+          position.closed = true;
+          position.close_price = closeObj.close_price;
           return;
         }
       });
     } else {
-      let diff = closeObj.old_stock.amount - closeObj.new_amount;
+      let diff = closeObj.old_position.amount - closeObj.new_amount;
 
       // Updates the remaining amount
-      state.currentStocks.forEach(stock => {
-        if (stock.id === closeObj.old_stock.id) {
-          stock.amount = diff;
+      state.currentPositions.forEach(position => {
+        if (position.id === closeObj.old_position.id) {
+          position.amount = diff;
           return;
         }
       });
 
-      // Adds a new stock to partially close
-      lastPortfolio.stocks.push({
+      // Adds a new position to partially close
+      lastPortfolio.positions.push({
         id: nanoid(),
-        stock: closeObj.old_stock.stock,
-        uol_code: closeObj.old_stock.uol_code,
-        initial_price: closeObj.old_stock.initial_price,
+        stock: closeObj.old_position.stock,
+        uol_code: closeObj.old_position.uol_code,
+        initial_price: closeObj.old_position.initial_price,
         amount: closeObj.new_amount,
-        position: closeObj.old_stock.position,
+        type: closeObj.old_position.type,
         closed: true,
         close_price: closeObj.close_price,
         current_price: closeObj.close_price
@@ -177,7 +171,7 @@ const mutations = {
       return portfolio.id == state.portfolioData.last_portfolio;
     });
 
-    lastPortfolio.stocks = state.currentStocks.filter(stock => !positions.includes(stock));
+    lastPortfolio.positions = state.currentPositions.filter(position => !positions.includes(position));
   }
 }
 

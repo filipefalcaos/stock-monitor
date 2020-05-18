@@ -1,8 +1,8 @@
 <!-- Template -->
 <template>
-  <div class="stock-table">
+  <div class="position-table">
     <h1
-      v-if="stockData.length == 0 || !stockData"
+      v-if="positionData.length == 0 || !positionData"
       class="title"
       :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
     >Sem ações listadas.</h1>
@@ -10,7 +10,7 @@
     <b-table
       v-else
       :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
-      :data="stockData"
+      :data="positionData"
       :checked-rows.sync="checkedRows"
       default-sort="stock"
       mobile-cards
@@ -69,8 +69,8 @@
           <span v-else>--</span>
         </b-table-column>
 
-        <b-table-column field="position" label="Posição" sortable numeric>
-          <span v-if="props.row.position === 'opening'" class="tag is-success">Comprado</span>
+        <b-table-column field="type" label="Posição" sortable numeric>
+          <span v-if="props.row.type === 'long'" class="tag is-success">Comprado</span>
           <span v-else class="tag is-warning">Vendido</span>
         </b-table-column>
       </template>
@@ -79,11 +79,11 @@
         <div v-if="checkedRows.length > 0" class="buttons">
           <b-button
             v-if="checkedRows.length === 1 && !checkedRows[0].closed"
-            @click="close_stocks"
+            @click="close_position"
             type="is-warning"
             icon-left="cancel"
           >Encerrar</b-button>
-          <b-button @click="delete_stocks" type="is-danger" icon-left="delete">Excluir</b-button>
+          <b-button @click="delete_positions" type="is-danger" icon-left="delete">Excluir</b-button>
         </div>
       </template>
     </b-table>
@@ -93,14 +93,14 @@
 <!-- Script -->
 <script>
 export default {
-  name: "stock-table",
-  props: ["stockData", "hasNewData"],
+  name: "position-table",
+  props: ["positionData", "hasNewData"],
 
   // Converts all initial prices to float, ensuring that the table ordering
   // works properly
   created() {
-    this.stockData.forEach(stock => {
-      stock.initial_price = parseFloat(stock.initial_price);
+    this.positionData.forEach(position => {
+      position.initial_price = parseFloat(position.initial_price);
     });
   },
 
@@ -112,12 +112,12 @@ export default {
   },
 
   methods: {
-    close_stocks() {
-      this.$emit("close-stock", this.checkedRows[0]);
+    close_position() {
+      this.$emit("close-position", this.checkedRows[0]);
       this.checkedRows = [];
     },
 
-    delete_stocks() {
+    delete_positions() {
       this.$buefy.dialog.confirm({
         message:
           "Tem certeza que gostaria de excluir as ações selecionadas? Isto não poderá ser desfeito.",
@@ -125,7 +125,7 @@ export default {
         cancelText: "Cancelar",
         type: "is-danger",
         onConfirm: () => {
-          this.$emit("delete-stocks", this.checkedRows);
+          this.$emit("delete-positions", this.checkedRows);
           this.checkedRows = [];
         },
         onCancel: () => (this.checkedRows = [])
@@ -137,7 +137,7 @@ export default {
 
 <!-- Styles -->
 <style scoped>
-.stock-table {
+.position-table {
   margin-top: -1rem;
 }
 </style>

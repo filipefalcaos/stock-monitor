@@ -92,10 +92,10 @@
     <!-- Table of open positions -->
     <div v-if="show_open" class="columns">
       <div class="column is-full">
-        <stock-table
-          v-on:close-stock="close_stock_dialog"
-          v-on:delete-stocks="delete_stocks"
-          :stock-data="openStocks"
+        <position-table
+          v-on:close-position="close_position_dialog"
+          v-on:delete-positions="delete_positions"
+          :position-data="openPositions"
           :has-new-data="has_new_data"
         />
       </div>
@@ -120,16 +120,16 @@
     <!-- Table of closed positions -->
     <div v-if="show_closed" class="columns">
       <div class="column is-full">
-        <stock-table
-          v-on:close-stock="close_stock_dialog"
-          v-on:delete-stocks="delete_stocks"
-          :stock-data="closedStocks"
+        <position-table
+          v-on:close-position="close_position_dialog"
+          v-on:delete-positions="delete_positions"
+          :position-data="closedPositions"
           :has-new-data="has_new_data"
         />
       </div>
     </div>
 
-    <!-- Modal to add stocks -->
+    <!-- Modal to add positions -->
     <b-modal
       :active.sync="modal_add_active"
       has-modal-card
@@ -137,10 +137,10 @@
       aria-role="dialog"
       aria-modal
     >
-      <stock-form v-on:submit-stock="add_stock" :stocks="availableStocks" />
+      <position-form v-on:submit-position="add_position" :stocks="availableStocks" />
     </b-modal>
 
-    <!-- Modal to close stocks -->
+    <!-- Modal to close positions -->
     <b-modal
       :active.sync="modal_close_active"
       has-modal-card
@@ -148,7 +148,7 @@
       aria-role="dialog"
       aria-modal
     >
-      <close-stock-form v-on:update-stock="close_stocks" :to-close="stock_to_close" />
+      <close-position-form v-on:update-position="close_position" :to-close="position_to_close" />
     </b-modal>
   </section>
 </template>
@@ -158,22 +158,22 @@
 import { nanoid } from "nanoid";
 import { mapGetters, mapState } from "vuex";
 
-import StockTable from "../components/StockTable";
-import StockForm from "../components/StockForm";
-import CloseStockForm from "../components/CloseStockForm";
+import PositionTable from "../components/PositionTable";
+import PositionForm from "../components/PositionForm";
+import ClosePositionForm from "../components/ClosePositionForm";
 
 export default {
   name: "main-page",
-  components: { StockTable, StockForm, CloseStockForm },
+  components: { PositionTable, PositionForm, ClosePositionForm },
 
   // Gets the last state of the portfolio data. Also, gets the current state
-  // of the stocks when the component is created
+  // of the positions when the component is created
   async created() {
     this.$store.commit("setDataFileName");
     this.$store.commit("loadDataFile");
 
     // Starts the UI state
-    this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
+    this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
     this.get_stock_prices();
     await this.$store.dispatch('getAvailableStocks');
   },
@@ -190,7 +190,7 @@ export default {
       show_closed: false,
       final_result: 0,
       percent_result: 0,
-      stock_to_close: null
+      position_to_close: null
     };
   },
 
@@ -198,7 +198,7 @@ export default {
     ...mapState({
       dataFileName: state => state.portfolios.dataFileName,
       portfolioData: state => state.portfolios.portfolioData,
-      currentStocks: state => state.portfolios.currentStocks,
+      currentPositions: state => state.portfolios.currentPositions,
       availableStocks: state => state.stocks.availableStocks
     }),
 
@@ -206,8 +206,8 @@ export default {
       lastPortfolio: "lastPortfolio",
       investment: "investment",
       activeInvestment: "activeInvestment",
-      openStocks: "openStocks",
-      closedStocks: "closedStocks"
+      openPositions: "openPositions",
+      closedPositions: "closedPositions"
     })
   },
 
@@ -231,7 +231,7 @@ export default {
 
     load_portfolio() {
       this.$store.commit("updateDataFile");
-      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
+      this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
       this.get_stock_prices();
     },
 
@@ -240,7 +240,7 @@ export default {
       this.percent_result = 0;
       this.$store.commit("newPortfolio", portfolio_name);
       this.$store.commit("updateDataFile");
-      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
+      this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
     },
 
     add_portfolio_dialog() {
@@ -258,29 +258,29 @@ export default {
       });
     },
 
-    add_stock(new_stock) {
-      this.$store.commit("addToPortfolio", new_stock);
+    add_position(newPosition) {
+      this.$store.commit("addToPortfolio", newPosition);
       this.$store.commit("updateDataFile");
-      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
+      this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
       this.get_stock_prices();
     },
 
-    close_stocks(closeObj) {
+    close_position(closeObj) {
       this.$store.commit("closePosition", closeObj);
       this.$store.commit("updateDataFile");
-      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
+      this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
       this.get_stock_prices();
     },
 
-    close_stock_dialog(stock) {
-      this.stock_to_close = stock;
+    close_position_dialog(position) {
+      this.position_to_close = position;
       this.modal_close_active = true;
     },
 
-    delete_stocks(positions) {
+    delete_positions(positions) {
       this.$store.commit("deletePosition", positions);
       this.$store.commit("updateDataFile");
-      this.$store.commit("setCurrentStocks", this.lastPortfolio.stocks);
+      this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
       this.get_stock_prices();
     },
 
@@ -291,14 +291,14 @@ export default {
       this.has_error = false;
 
       // Gets the most recent price of each stock
-      this.currentStocks.forEach(stock => {
+      this.currentPositions.forEach(position => {
         promises.push(
           this.$http
-            .get(base_url + stock.uol_code + "/intraday?size=1")
+            .get(base_url + position.uol_code + "/intraday?size=1")
             .then(response => {
-              stock.aux_price = response.data.data[0].price;
-              stock.aux_var = response.data.data[0].var;
-              stock.aux_varpct = response.data.data[0].varpct;
+              position.aux_price = response.data.data[0].price;
+              position.aux_var = response.data.data[0].var;
+              position.aux_varpct = response.data.data[0].varpct;
             })
         );
       });
@@ -306,15 +306,15 @@ export default {
       // After all prices are collected, update the UI
       Promise.all(promises)
         .then(() => {
-          this.currentStocks.forEach(stock => {
-            if (stock.closed) {
-              stock.current_price = stock.close_price;
+          this.currentPositions.forEach(position => {
+            if (position.closed) {
+              position.current_price = position.close_price;
             } else {
-              stock.current_price = stock.aux_price;
+              position.current_price = position.aux_price;
             }
 
-            stock.var = stock.aux_var;
-            stock.varpct = stock.aux_varpct / 100;
+            position.var = position.aux_var;
+            position.varpct = position.aux_varpct / 100;
           });
 
           this.update_stock_prices();
@@ -341,15 +341,15 @@ export default {
 
     update_stock_prices() {
       let sum = 0;
-      this.currentStocks.forEach(stock => {
-        if (stock.position === "opening") {
-          stock.result = (stock.current_price - stock.initial_price) * stock.amount;
+      this.currentPositions.forEach(position => {
+        if (position.type === "long") {
+          position.result = (position.current_price - position.initial_price) * position.amount;
         } else {
-          stock.result = (stock.initial_price - stock.current_price) * stock.amount;
+          position.result = (position.initial_price - position.current_price) * position.amount;
         }
 
-        stock.resultpct = stock.result / (stock.initial_price * stock.amount);
-        sum += parseFloat(stock.result);
+        position.resultpct = position.result / (position.initial_price * position.amount);
+        sum += parseFloat(position.result);
       });
 
       this.final_result = parseFloat(sum);

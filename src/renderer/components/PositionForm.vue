@@ -1,6 +1,6 @@
 <!-- Template -->
 <template>
-  <form @submit.prevent="submit_new_stock">
+  <form @submit.prevent="submit_position">
     <div class="modal-card" style="width: 450px;">
       <section class="modal-card-body modal-border-top">
         <b-field label="Ativo">
@@ -34,8 +34,8 @@
 
         <b-field label="Posição">
           <div class="block">
-            <b-radio v-model="position" name="position" native-value="opening" required>Comprado</b-radio>
-            <b-radio v-model="position" name="position" native-value="closing" required>Vendido</b-radio>
+            <b-radio v-model="type" name="type" native-value="long" required>Comprado</b-radio>
+            <b-radio v-model="type" name="type" native-value="short" required>Vendido</b-radio>
           </div>
         </b-field>
       </section>
@@ -51,7 +51,7 @@
 <!-- Script -->
 <script>
 export default {
-  name: "stock-form",
+  name: "position-form",
   props: ["stocks"],
 
   data() {
@@ -60,7 +60,7 @@ export default {
       selected: null,
       amount: null,
       initial_price: null,
-      position: null
+      type: null
     };
   },
 
@@ -78,17 +78,17 @@ export default {
   },
 
   methods: {
-    submit_new_stock() {
-      let newStock = {
+    submit_position() {
+      let newPosition = {
         stock: this.selected,
         amount: this.amount,
         initial_price: this.initial_price,
-        position: this.position
+        type: this.type
       };
 
       /* Closes the modal and sends the data to MainPage */
       this.$parent.close();
-      this.$emit("submit-stock", newStock);
+      this.$emit("submit-position", newPosition);
     }
   }
 };
