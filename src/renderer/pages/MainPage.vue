@@ -10,12 +10,12 @@
         <div style="margin-left: 2rem;" class="level-item">
           <b-select
             @input="load_portfolio"
-            v-model="portfolio_data.last_portfolio"
+            v-model="portfolioData.last_portfolio"
             placeholder="Carteira"
             expanded
           >
             <option
-              v-for="option in portfolio_data.portfolios"
+              v-for="option in portfolioData.portfolios"
               :value="option.id"
               :key="option.id"
             >{{ option.name }}</option>
@@ -137,7 +137,7 @@
       aria-role="dialog"
       aria-modal
     >
-      <stock-form v-on:submit-stock="add_stock" :stocks="available_stocks" />
+      <stock-form v-on:submit-stock="add_stock" :stocks="availableStocks" />
     </b-modal>
 
     <!-- Modal to close stocks -->
@@ -155,10 +155,8 @@
 
 <!-- Script -->
 <script>
-import { remote } from "electron";
 import { nanoid } from "nanoid";
-import path from "path";
-const fs = require("fs");
+import { mapGetters, mapState } from "vuex";
 
 import StockTable from "../components/StockTable";
 import StockForm from "../components/StockForm";
@@ -170,30 +168,14 @@ export default {
 
   // Gets the last state of the portfolio data. Also, gets the current state
   // of the stocks when the component is created
-  created() {
-    const dataPath = "/portfolio-data.json";
-    this.fileName = path.join(remote.app.getPath("userData"), dataPath);
-
-    /* Loads the portfolio data file */
-    try {
-      if (fs.existsSync(this.fileName)) {
-        this.portfolio_data = JSON.parse(fs.readFileSync(this.fileName));
-      } else {
-        this.portfolio_data = {
-          last_portfolio: null,
-          portfolios: []
-        };
-
-        fs.writeFileSync(this.fileName, JSON.stringify(this.portfolio_data));
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  async created() {
+    this.$store.commit("setDataFileName");
+    this.$store.commit("loadDataFile");
 
     // Starts the UI state
     this.get_portfolios_data();
     this.get_stock_prices();
-    this.get_available_stocks();
+    await this.$store.dispatch('getAvailableStocks');
   },
 
   data() {
@@ -210,15 +192,23 @@ export default {
       active_value: 0,
       final_result: 0,
       percent_result: 0,
-      portfolio_data: {},
       stock_data: [],
-      available_stocks: [],
-      stock_to_close: null,
-      fileName: ""
+      stock_to_close: null
     };
   },
 
   computed: {
+    ...mapState({
+      dataFileName: state => state.portfolios.dataFileName,
+      portfolioData: state => state.portfolios.portfolioData,
+
+      availableStocks: state => state.stocks.availableStocks
+    }),
+
+    ...mapGetters({
+      lastPortfolio: "lastPortfolio"
+    }),
+
     open_stocks() {
       return this.stock_data.filter(stock => !stock.closed);
     },
@@ -246,29 +236,6 @@ export default {
       }).format(num);
     },
 
-    update_portoflio_file() {
-      let portfolioCopy = JSON.parse(JSON.stringify(this.portfolio_data));
-
-      // Delete fields that should not be persisted
-      portfolioCopy.portfolios.forEach(portfolio => {
-        portfolio.stocks.forEach(stock => {
-          delete stock.aux_price;
-          delete stock.aux_var;
-          delete stock.aux_varpct;
-          delete stock.var;
-          delete stock.varpct;
-
-          if (!stock.closed) {
-            delete stock.result;
-            delete stock.resultpct;
-            delete stock.current_price;
-          }
-        });
-      });
-
-      fs.writeFileSync(this.fileName, JSON.stringify(portfolioCopy, null, 2));
-    },
-
     update_selected_data(portfolio) {
       let investment = 0;
       let inactiveInvestment = 0;
@@ -284,21 +251,12 @@ export default {
     },
 
     get_portfolios_data() {
-      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolio_data.last_portfolio;
-      });
-
-      if (lastPortfolio) this.update_selected_data(lastPortfolio);
+      if (this.lastPortfolio) this.update_selected_data(this.lastPortfolio);
     },
 
     load_portfolio() {
-      let newPotfolio = this.portfolio_data.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolio_data.last_portfolio;
-      });
-
-      // Updates the portfolio data file and the stocks UI
-      this.update_portoflio_file();
-      this.update_selected_data(newPotfolio);
+      this.$store.commit("updateDataFile");
+      this.update_selected_data(this.lastPortfolio);
       this.get_stock_prices();
     },
 
@@ -310,13 +268,13 @@ export default {
       };
 
       // Adds an empty portfolio with the given name
-      this.portfolio_data.portfolios.push(newPortfolio);
-      this.portfolio_data.last_portfolio = newPortfolio.id;
+      this.portfolioData.portfolios.push(newPortfolio);
+      this.portfolioData.last_portfolio = newPortfolio.id;
       this.final_result = 0;
       this.percent_result = 0;
 
       // Updates the portfolio data file and the stocks UI
-      this.update_portoflio_file();
+      this.$store.commit("updateDataFile");
       this.update_selected_data(newPortfolio);
     },
 
@@ -336,8 +294,8 @@ export default {
     },
 
     add_stock(new_stock) {
-      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolio_data.last_portfolio;
+      let lastPortfolio = this.portfolioData.portfolios.find(portfolio => {
+        return portfolio.id == this.portfolioData.last_portfolio;
       });
 
       let newStock = {
@@ -352,7 +310,7 @@ export default {
 
       // Updates the portfolio data file and the stocks UI
       lastPortfolio.stocks.push(newStock);
-      this.update_portoflio_file();
+      this.$store.commit("updateDataFile");
       this.update_selected_data(lastPortfolio);
       this.get_stock_prices();
     },
@@ -362,8 +320,8 @@ export default {
     },
 
     close_stocks(closeObj) {
-      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolio_data.last_portfolio;
+      let lastPortfolio = this.portfolioData.portfolios.find(portfolio => {
+        return portfolio.id == this.portfolioData.last_portfolio;
       });
 
       // Checks if a new stock must be created and closed (partial closing), or just close
@@ -402,7 +360,7 @@ export default {
       }
 
       // Updates the portfolio data file and the stocks UI
-      this.update_portoflio_file();
+      this.$store.commit("updateDataFile");
       this.update_selected_data(lastPortfolio);
       this.get_stock_prices();
     },
@@ -413,13 +371,13 @@ export default {
     },
 
     delete_stocks(stocks) {
-      let lastPortfolio = this.portfolio_data.portfolios.find(portfolio => {
-        return portfolio.id == this.portfolio_data.last_portfolio;
+      let lastPortfolio = this.portfolioData.portfolios.find(portfolio => {
+        return portfolio.id == this.portfolioData.last_portfolio;
       });
 
       // Updates the portfolio data file and the stocks UI
       lastPortfolio.stocks = this.stock_data.filter(stock => !stocks.includes(stock));
-      this.update_portoflio_file();
+      this.$store.commit("updateDataFile");
       this.update_selected_data(lastPortfolio);
       this.get_stock_prices();
     },
@@ -499,27 +457,6 @@ export default {
       } else {
         this.percent_result = sum / this.full_value;
       }
-    },
-
-    get_available_stocks() {
-      let base_url = "http://cotacoes.economia.uol.com.br/ws/asset/";
-      this.$http
-        .get(base_url + "stock/list?size=10000")
-        .then(response => {
-          response.data.data.forEach(stock => {
-            stock.code = stock.code.split(".")[0];
-            this.available_stocks.push(stock);
-          });
-        })
-        .catch(error => {
-          this.$buefy.notification.open({
-            duration: 5000,
-            message:
-              "Não foi possível obter a lista de ações. Por favor, cheque sua conexão.",
-            position: "is-bottom-right",
-            type: "is-danger"
-          });
-        });
     }
   }
 };
