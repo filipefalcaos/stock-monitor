@@ -3,7 +3,7 @@
   <div id="app">
     <b-sidebar type="is-light" fullheight overlay :open.sync="open">
       <div class="p-1">
-        <img src="static/imgs/logo.png" alt="Stock monitoring for B3" :to="{ path: '/' }" />
+        <img src="./assets/imgs/logo.png" alt="Stock monitoring for B3" :to="{ path: '/' }" />
 
         <!-- The app's menu -->
         <b-menu style="margin-top: 2rem;">
@@ -150,7 +150,7 @@ html {
 }
 
 .title-text {
-  font-size: 24px !important;
+  font-size: 20px !important;
   // color: #FFFFFF;
 }
 

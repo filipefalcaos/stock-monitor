@@ -3,7 +3,7 @@
   <form @submit.prevent="submit_new_stock">
     <div class="modal-card" style="width: 450px;">
       <section class="modal-card-body modal-border-top">
-        <b-field label="Ação">
+        <b-field label="Ativo">
           <b-autocomplete
             v-model="stock"
             :data="filtered_stocks"

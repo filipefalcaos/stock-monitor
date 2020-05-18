@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-import { Button, Select, Table, Sidebar, Menu } from 'buefy'
+import { Button, Icon, Select, Table, Sidebar, Menu } from 'buefy'
 import { Notification, Dialog, Modal } from 'buefy'
 import { Field, Input, Radio, Autocomplete } from 'buefy'
 
@@ -9,6 +9,7 @@ import router from './router'
 
 // Buefy config
 Vue.use(Button);
+Vue.use(Icon);
 Vue.use(Select);
 Vue.use(Table);
 Vue.use(Sidebar);

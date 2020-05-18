@@ -1,7 +1,7 @@
 <!-- Template -->
 <template>
   <section :class="process.platform === 'win32' ? 'section-win' : 'section'">
-    <nav class="level" style="margin-bottom: 12px;">
+    <nav class="level">
       <div class="level-left">
         <div class="level-item">
           <b-button @click="$emit('toggle-menu')" type="is-light" icon-left="menu">Menu</b-button>
@@ -64,26 +64,33 @@
       </div>
     </nav>
 
-    <div class="columns is-vcentered" style="margin-top: 1rem;">
-      <div class="column is-10">
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
-        >Em aberto</h1>
+    <nav class="level">
+      <div class="level-left">
+        <div class="level-item" style="margin-right: 0;">
+          <h1
+            class="title"
+            :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
+          >Em aberto</h1>
+        </div>
+
+        <div class="level-item">
+          <b-icon v-if="show_open" @click.native="show_open = (show_open ? false : true)" icon="menu-down" />
+          <b-icon v-if="!show_open" @click.native="show_open = (show_open ? false : true)" icon="menu-up" />
+        </div>
       </div>
 
-      <div class="column is-2">
+      <div class="level-right">
         <b-button
           @click="add_stock_dialog"
           style="float: right;"
           type="is-info"
           icon-left="plus"
-        >Ação</b-button>
+        >Ativo</b-button>
       </div>
-    </div>
+    </nav>
 
     <!-- Table of open positions -->
-    <div class="columns">
+    <div v-if="show_open" class="columns">
       <div class="column is-full">
         <stock-table
           v-on:close-stock="close_stock_dialog"
@@ -94,17 +101,24 @@
       </div>
     </div>
 
-    <div class="columns is-vcentered" style="margin-top: 1rem;">
-      <div class="column is-full">
-        <h1
-          class="title"
-          :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
-        >Encerradas</h1>
+    <nav class="level">
+      <div class="level-left">
+        <div class="level-item" style="margin-right: 0;">
+          <h1
+            class="title"
+            :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
+          >Encerradas</h1>
+        </div>
+
+        <div class="level-item">
+          <b-icon v-if="show_closed" @click.native="show_closed = (show_closed ? false : true)" icon="menu-down" />
+          <b-icon v-if="!show_closed" @click.native="show_closed = (show_closed ? false : true)" icon="menu-up" />
+        </div>
       </div>
-    </div>
+    </nav>
 
     <!-- Table of closed positions -->
-    <div class="columns">
+    <div v-if="show_closed" class="columns">
       <div class="column is-full">
         <stock-table
           v-on:close-stock="close_stock_dialog"
@@ -190,6 +204,8 @@ export default {
       modal_add_active: false,
       modal_close_active: false,
       has_error: false,
+      show_open: true,
+      show_closed: false,
       full_value: 0,
       active_value: 0,
       final_result: 0,
