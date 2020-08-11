@@ -19,6 +19,20 @@
       checkable
     >
       <template slot-scope="props">
+        <b-table-column field="created_at" label="Abertura" sortable>
+          <span v-if="props.row.created_at">
+            {{ $parent.format_date(props.row.created_at) }}
+          </span>
+          <span v-else>--</span>
+        </b-table-column>
+
+        <b-table-column field="closed_at" label="Encerramento" sortable>
+          <span v-if="props.row.closed_at">
+            {{ $parent.format_date(props.row.closed_at) }}
+          </span>
+          <span v-else>--</span>
+        </b-table-column>
+
         <b-table-column field="stock" label="Ação" sortable>{{ props.row.stock }}</b-table-column>
 
         <b-table-column

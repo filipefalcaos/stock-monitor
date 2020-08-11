@@ -101,6 +101,7 @@ const mutations = {
     state.portfolioData.portfolios.push({
       id: state.portfolioData.last_portfolio,
       name: portfolioName,
+      created_at: Date.now(),
       positions: []
     });
   },
@@ -121,6 +122,7 @@ const mutations = {
       initial_price: postionData.initial_price,
       amount: postionData.amount,
       type: postionData.type,
+      created_at: Date.now(),
       closed: false
     });
   },
@@ -137,6 +139,7 @@ const mutations = {
         if (position.id === closeObj.old_position.id) {
           position.closed = true;
           position.close_price = closeObj.close_price;
+          position.closed_at = Date.now();
           return;
         }
       });
@@ -160,6 +163,8 @@ const mutations = {
         amount: closeObj.new_amount,
         type: closeObj.old_position.type,
         closed: true,
+        created_at: closeObj.old_position.created_at,
+        closed_at: Date.now(),
         close_price: closeObj.close_price,
         current_price: closeObj.close_price
       });

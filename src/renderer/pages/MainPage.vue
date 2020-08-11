@@ -229,6 +229,18 @@ export default {
       }).format(num);
     },
 
+    format_date(timestamp) {
+      let timestampDate = new Date(timestamp);
+      let day = timestampDate.getDate().toString().padStart(2, "0");
+      let month = (timestampDate.getMonth() + 1).toString().padStart(2, "0");
+      let hour = timestampDate.getHours().toString().padStart(2, "0");
+      let minute = timestampDate.getMinutes().toString().padStart(2, "0");
+
+      let date = day + '-' + month + '-' + timestampDate.getFullYear();
+      let time = hour + ":" + minute;
+      return date + ' ' + time;
+    },
+
     load_portfolio() {
       this.$store.commit("updateDataFile");
       this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
