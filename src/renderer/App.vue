@@ -8,8 +8,9 @@
         <!-- The app's menu -->
         <b-menu style="margin-top: 2rem;">
           <b-menu-list label="Menu">
-            <b-menu-item icon="finance" label="Carteiras" @click="toHome" />
             <b-menu-item icon="poll-box" label="Desempenho" @click="toStats" />
+            <b-menu-item icon="finance" label="Carteiras" @click="toPortfolios" />
+            <b-menu-item icon="currency-usd" label="Opções" @click="toOptions" />
           </b-menu-list>
 
           <b-menu-list label="Ações">
@@ -35,8 +36,12 @@ export default {
   },
 
   methods: {
-    toHome() {
-      this.$router.push({ name: 'home' });
+    toPortfolios() {
+      this.$router.push({ name: 'portfolios' });
+    },
+
+    toOptions() {
+      this.$router.push({ name: 'options' });
     },
 
     toStats() {

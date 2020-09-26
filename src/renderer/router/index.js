@@ -6,12 +6,17 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: require('@/pages/MainPage').default
+      path: '/portfolios',
+      name: 'portfolios',
+      component: require('@/pages/PortfolioPage').default
     },
     {
-      path: '/stats',
+      path: '/options',
+      name: 'options',
+      component: require('@/pages/OptionsPage').default
+    },
+    {
+      path: '/',
       name: 'stats',
       component: require('@/pages/StatsPage').default
     },
