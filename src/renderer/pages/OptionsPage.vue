@@ -8,6 +8,17 @@
         </div>
       </div>
     </nav>
+
+    <nav class="level" style="margin-top: 1.7rem;">
+      <div class="level-left">
+        <div class="level-item" style="margin-right: 0;">
+          <h1
+            class="title"
+            :class="process.platform === 'win32' ? 'title-text-win' : 'title-text'"
+          >Operações em Opções</h1>
+        </div>
+      </div>
+    </nav>
   </section>
 </template>
 

@@ -12,7 +12,7 @@
       :class="process.platform === 'win32' ? 'base-text-win' : 'base-text'"
       :data="positionData"
       :checked-rows.sync="checkedRows"
-      default-sort="stock"
+      default-sort="created_at"
       mobile-cards
       hoverable
       striped
