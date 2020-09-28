@@ -266,7 +266,7 @@ export default {
     },
 
     add_position(newPosition) {
-      this.$store.commit("addToPortfolio", newPosition);
+      this.$store.commit("addPosition", newPosition);
       this.$store.commit("updateDataFile");
       this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
       this.get_stock_prices();

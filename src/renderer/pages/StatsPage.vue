@@ -21,7 +21,7 @@
     </nav>
 
     <!-- Chart of Portfolio Results -->
-    <line-chart :labels="labels" :data="data" title="Resultados de Carteiras" />
+    <line-chart :labels="stats.currentDates" :data="stats.currentResults" title="Resultados de Carteiras" />
 
     <nav class="level" style="margin-top: 1.7rem;">
       <div class="level-left">
@@ -38,7 +38,7 @@
 
 <!-- Script -->
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import LineChart from "../charts/LineChart";
 
 export default {
@@ -51,18 +51,20 @@ export default {
     this.$store.commit("setDataFileName");
     this.$store.commit("loadDataFile");
     this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
+    this.$store.commit("computeStats");
   },
   
   data() {
     return {
-      process: process,
-      data: [600,	1150,	342,	6050,	2522,	3241,	1259,	157, 1545, 9841],
-      labels: ["Babol",	"Cabanatuan",	"Daegu",	"Jerusalem",	"Fairfield",	"New York",	"Gangtok", "Buenos Aires", 
-               "Hafar Al-Batin", "Idlib"]
+      process: process
     };
   },
 
   computed: {
+    ...mapState({
+      stats: state => state.portfolios.stats
+    }),
+
     ...mapGetters({
       lastPortfolio: "lastPortfolio"
     })

@@ -7,7 +7,8 @@ const fs = require("fs");
 const state = () => ({
   dataFileName: "",
   portfolioData: {},
-  currentPositions: []
+  currentPositions: [],
+  stats: {}
 });
 
 // Getters
@@ -96,6 +97,17 @@ const mutations = {
     fs.writeFileSync(state.dataFileName, JSON.stringify(portfolioCopy, null, 2));
   },
 
+  setCurrentPositions(state, positions) {
+    state.currentPositions = positions;
+  },
+
+  computeStats(state) {
+    let closed = state.currentPositions.filter(position => position.closed);
+    closed.sort((a, b) => a.closed_at - b.closed_at);
+    state.stats.currentResults = closed.map(a => parseInt(a.result)).map(cumulativeSum);
+    state.stats.currentDates = closed.map(a => a.closed_at).map(formatDate);
+  },
+
   newPortfolio(state, portfolioName) {
     state.portfolioData.last_portfolio = nanoid();
     state.portfolioData.portfolios.push({
@@ -106,11 +118,7 @@ const mutations = {
     });
   },
 
-  setCurrentPositions(state, positions) {
-    state.currentPositions = positions;
-  },
-
-  addToPortfolio(state, postionData) {
+  addPosition(state, postionData) {
     let lastPortfolio = state.portfolioData.portfolios.find(portfolio => {
       return portfolio.id == state.portfolioData.last_portfolio;
     });
@@ -185,4 +193,20 @@ export default {
   getters,
   actions,
   mutations
+}
+
+// Computes the cumulative sum of a numerical array
+const cumulativeSum = (sum => value => sum += value)(0);
+
+// Formats a given timestamp, in milliseconds
+function formatDate(timestamp) {
+  let timestampDate = new Date(timestamp);
+  let day = timestampDate.getDate().toString().padStart(2, "0");
+  let month = (timestampDate.getMonth() + 1).toString().padStart(2, "0");
+  let hour = timestampDate.getHours().toString().padStart(2, "0");
+  let minute = timestampDate.getMinutes().toString().padStart(2, "0");
+
+  let date = day + '-' + month + '-' + timestampDate.getFullYear();
+  let time = hour + ":" + minute;
+  return date + ' ' + time;
 }
