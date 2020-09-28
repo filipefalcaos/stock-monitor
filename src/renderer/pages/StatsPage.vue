@@ -20,6 +20,9 @@
       </div>
     </nav>
 
+    <!-- Chart of Portfolio Results -->
+    <line-chart :labels="labels" :data="data" title="Resultados de Carteiras" />
+
     <nav class="level" style="margin-top: 1.7rem;">
       <div class="level-left">
         <div class="level-item" style="margin-right: 0;">
@@ -35,12 +38,19 @@
 
 <!-- Script -->
 <script>
+import LineChart from "../charts/LineChart";
+
 export default {
   name: "stats-page",
+  components: { LineChart },
+  
   data() {
     return {
-      process: process
+      process: process,
+      data: [600,	1150,	342,	6050,	2522,	3241,	1259,	157, 1545, 9841],
+      labels: ["Babol",	"Cabanatuan",	"Daegu",	"Jerusalem",	"Fairfield",	"New York",	"Gangtok", "Buenos Aires", 
+               "Hafar Al-Batin", "Idlib"]
     };
-  },
+  }
 }
 </script>
