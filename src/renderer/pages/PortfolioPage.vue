@@ -166,14 +166,9 @@ export default {
   name: "main-page",
   components: { PositionTable, PositionForm, ClosePositionForm },
 
-  // Gets the last state of the portfolio data. Also, gets the current state
-  // of the positions when the component is created
+  // Gets the latest stock prices when the component is created and initializes 
+  // the portfolios UI
   async created() {
-    this.$store.commit("setDataFileName");
-    this.$store.commit("loadDataFile");
-
-    // Starts the UI state
-    this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
     this.get_stock_prices();
     await this.$store.dispatch('getAvailableStocks');
   },

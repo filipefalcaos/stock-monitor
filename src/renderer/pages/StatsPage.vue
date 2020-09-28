@@ -38,11 +38,20 @@
 
 <!-- Script -->
 <script>
+import { mapGetters } from "vuex";
 import LineChart from "../charts/LineChart";
 
 export default {
   name: "stats-page",
   components: { LineChart },
+
+  // Gets the last state of the portfolio and options data when the component 
+  // is created. Also, gets the current state of the positions
+  created() {
+    this.$store.commit("setDataFileName");
+    this.$store.commit("loadDataFile");
+    this.$store.commit("setCurrentPositions", this.lastPortfolio.positions);
+  },
   
   data() {
     return {
@@ -51,6 +60,12 @@ export default {
       labels: ["Babol",	"Cabanatuan",	"Daegu",	"Jerusalem",	"Fairfield",	"New York",	"Gangtok", "Buenos Aires", 
                "Hafar Al-Batin", "Idlib"]
     };
-  }
+  },
+
+  computed: {
+    ...mapGetters({
+      lastPortfolio: "lastPortfolio"
+    })
+  },
 }
 </script>
