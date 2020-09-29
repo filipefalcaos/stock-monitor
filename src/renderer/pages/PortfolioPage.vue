@@ -137,7 +137,7 @@
       aria-role="dialog"
       aria-modal
     >
-      <position-form v-on:submit-position="add_position" :stocks="availableStocks" />
+      <position-form v-on:submit-position="add_position" />
     </b-modal>
 
     <!-- Modal to close positions -->
@@ -170,7 +170,6 @@ export default {
   // the portfolios UI
   async created() {
     this.get_stock_prices();
-    await this.$store.dispatch('getAvailableStocks');
   },
 
   data() {
@@ -193,8 +192,7 @@ export default {
     ...mapState({
       dataFileName: state => state.portfolios.dataFileName,
       portfolioData: state => state.portfolios.portfolioData,
-      currentPositions: state => state.portfolios.currentPositions,
-      availableStocks: state => state.stocks.availableStocks
+      currentPositions: state => state.portfolios.currentPositions
     }),
 
     ...mapGetters({
@@ -293,19 +291,20 @@ export default {
 
     get_stock_prices() {
       let promises = [];
-      let base_url = "http://cotacoes.economia.uol.com.br/ws/asset/";
+      let base_url = "https://query2.finance.yahoo.com/v10/";
       this.is_processing = true;
       this.has_error = false;
 
       // Gets the most recent price of each stock
       this.currentPositions.forEach(position => {
+        console.log(position);
         promises.push(
           this.$http
-            .get(base_url + position.uol_code + "/intraday?size=1")
+            .get(base_url + "finance/quoteSummary/" + position.stock + "?modules=price")
             .then(response => {
-              position.aux_price = response.data.data[0].price;
-              position.aux_var = response.data.data[0].var;
-              position.aux_varpct = response.data.data[0].varpct;
+              position.aux_price = response.data.quoteSummary.result[0].price.regularMarketPrice.raw;
+              position.aux_var = response.data.quoteSummary.result[0].price.regularMarketChange.raw;
+              position.aux_varpct = response.data.quoteSummary.result[0].price.regularMarketChangePercent.raw * 100;
             })
         );
       });
