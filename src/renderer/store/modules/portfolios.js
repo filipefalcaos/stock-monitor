@@ -106,9 +106,10 @@ const mutations = {
       return portfolio.id == state.portfolioData.last_portfolio;
     });
 
-    // Computes the cumulative sum
     let closed = state.currentPositions.filter(position => position.closed);
     closed.sort((a, b) => a.closed_at - b.closed_at);
+
+    // Computes the cumulative sum
     state.stats.currentResults = closed.map(a => parseInt(a.result)).map(cumulativeSum(0));
     state.stats.currentDates = closed.map(a => a.closed_at).map(formatDate);
 

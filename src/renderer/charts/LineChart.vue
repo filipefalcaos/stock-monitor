@@ -20,7 +20,7 @@
             {
               label: "",
               data: [],
-              fill: "origin",
+              fill: false,
               borderColor: '#2984D3',
               backgroundColor: '#2984D3',
               borderWidth: 1
@@ -45,6 +45,24 @@
           },
           legend: {
             display: true
+          },
+          tooltips: {
+            enabled: true,
+            mode: 'single',
+            callbacks: {
+              label: function (tooltipItems, data) { 
+                return ' R$ ' + tooltipItems.yLabel;
+              }
+            }
+          },
+          scales: {
+            yAxes: [{
+              ticks: {
+                callback: function (value, index, values) {
+                  return 'R$ ' + value;
+                }
+              }
+            }]
           },
           responsive: true,
           maintainAspectRatio: false
