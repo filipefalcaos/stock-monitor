@@ -102,10 +102,21 @@ const mutations = {
   },
 
   computeStats(state) {
+    let lastPortfolio = state.portfolioData.portfolios.find(portfolio => {
+      return portfolio.id == state.portfolioData.last_portfolio;
+    });
+
+    // Computes the cumulative sum
     let closed = state.currentPositions.filter(position => position.closed);
     closed.sort((a, b) => a.closed_at - b.closed_at);
-    state.stats.currentResults = closed.map(a => parseInt(a.result)).map(cumulativeSum);
+    state.stats.currentResults = closed.map(a => parseInt(a.result)).map(cumulativeSum(0));
     state.stats.currentDates = closed.map(a => a.closed_at).map(formatDate);
+
+    // Makes the cumulative sum start with 0
+    let startDate = lastPortfolio.created_at;
+    startDate = formatDate(startDate);
+    state.stats.currentResults.unshift(0);
+    state.stats.currentDates.unshift(startDate);
   },
 
   newPortfolio(state, portfolioName) {
@@ -194,7 +205,7 @@ export default {
 }
 
 // Computes the cumulative sum of a numerical array
-const cumulativeSum = (sum => value => sum += value)(0);
+const cumulativeSum = (sum => value => sum += value);
 
 // Formats a given timestamp, in milliseconds
 function formatDate(timestamp) {
