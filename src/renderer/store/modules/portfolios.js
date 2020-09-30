@@ -125,8 +125,7 @@ const mutations = {
 
     lastPortfolio.positions.push({
       id: nanoid(),
-      stock: postionData.stock.code,
-      uol_code: postionData.stock.idt,
+      stock: postionData.stock,
       initial_price: postionData.initial_price,
       amount: postionData.amount,
       type: postionData.type,
@@ -166,7 +165,6 @@ const mutations = {
       lastPortfolio.positions.push({
         id: nanoid(),
         stock: closeObj.old_position.stock,
-        uol_code: closeObj.old_position.uol_code,
         initial_price: closeObj.old_position.initial_price,
         amount: closeObj.new_amount,
         type: closeObj.old_position.type,

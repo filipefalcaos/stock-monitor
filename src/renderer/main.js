@@ -2,7 +2,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import { Button, Icon, Select, Table, Sidebar, Menu } from 'buefy'
 import { Notification, Dialog, Modal } from 'buefy'
-import { Field, Input, Radio, Autocomplete } from 'buefy'
+import { Field, Input, Radio } from 'buefy'
 
 import App from './App'
 import router from './router'
@@ -21,7 +21,6 @@ Vue.use(Modal);
 Vue.use(Field);
 Vue.use(Input);
 Vue.use(Radio);
-Vue.use(Autocomplete);
 
 // Vue config
 Vue.http = Vue.prototype.$http = axios;

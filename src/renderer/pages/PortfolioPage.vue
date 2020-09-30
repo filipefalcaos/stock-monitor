@@ -297,7 +297,6 @@ export default {
 
       // Gets the most recent price of each stock
       this.currentPositions.forEach(position => {
-        console.log(position);
         promises.push(
           this.$http
             .get(base_url + "finance/quoteSummary/" + position.stock + "?modules=price")

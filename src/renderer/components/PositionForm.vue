@@ -4,17 +4,7 @@
     <div class="modal-card" style="width: 450px;">
       <section class="modal-card-body modal-border-top">
         <b-field label="Ativo">
-          <b-autocomplete
-            v-model="stock"
-            :data="filtered_stocks"
-            field="code"
-            placeholder="PETR4"
-            clearable
-            required
-            @select="option => selected = option"
-          >
-            <template slot="empty">Sem resultados</template>
-          </b-autocomplete>
+          <b-input v-model="stock" placeholder="PETR4.SA" required></b-input>
         </b-field>
 
         <b-field label="Quantidade">
@@ -52,35 +42,20 @@
 <script>
 export default {
   name: "position-form",
-  props: ["stocks"],
-
+  
   data() {
     return {
       stock: "",
-      selected: null,
       amount: null,
       initial_price: null,
       type: null
     };
   },
 
-  computed: {
-    filtered_stocks() {
-      return this.stocks.filter(option => {
-        return (
-          option.code
-            .toString()
-            .toLowerCase()
-            .indexOf(this.stock.toLowerCase()) >= 0
-        );
-      });
-    }
-  },
-
   methods: {
     submit_position() {
       let newPosition = {
-        stock: this.selected,
+        stock: this.stock.toUpperCase(),
         amount: this.amount,
         initial_price: this.initial_price,
         type: this.type
