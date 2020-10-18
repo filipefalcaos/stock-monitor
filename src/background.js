@@ -1,8 +1,10 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, Menu } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+
+const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -14,15 +16,48 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+// Creates the Electron menu
+function createMenu() {
+  const template = [
+    ...(process.platform === 'darwin' ? [{
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideothers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    }] : []),
+    {
+      label: 'Arquivo',
+      submenu: [
+        process.platform === 'darwin' ? { role: 'close' } : { role: 'quit', label: 'Sair' }
+      ]
+    },
+    {
+      label: 'Editar',
+      submenu: [
+        { role: 'copy', label: 'Copiar' },
+        { role: 'paste', label: 'Colar' },
+        { role: 'selectAll', label: 'Selecionar Tudo' }
+      ]
+    }
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
+// Creates the Electron window
 function createWindow() {
-  // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 2000,
+    height: 1000,
     webPreferences: {
-      // Use pluginOptions.nodeIntegration, leave this alone
-      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
+      preload: path.join(__dirname, 'preload.js'),
+      enableRemoteModule: true
     }
   })
 
@@ -36,6 +71,9 @@ function createWindow() {
     win.loadURL('app://./index.html')
   }
 
+  createMenu(win)
+  win.maximize()
+  
   win.on('closed', () => {
     win = null
   })
