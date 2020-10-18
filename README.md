@@ -1,20 +1,30 @@
 # stock-monitor
 
-> A stock monitor for my needs
+A Vue app on top of Electron that tracks the performance of equities portfolios and options operations.
 
-#### Build Setup
+## Features
 
-``` bash
-# install dependencies
-npm install
+- Dashboard for overall performance tracking
+- Tracks the performance of stock portfolios on any market supported by Yahoo Finance
+- Tracks the performance of manually added options operations
+- Accounts for dividends and splits on portfolios
 
-# serve with hot reload at localhost:9080
-npm run dev
+## Building
 
-# build electron application for production
-npm run build
+### Compiles and hot-reloads for development
+```
+yarn serve
 ```
 
----
+### Compiles and minifies for production
+```
+yarn build
+```
 
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+### Lints and fixes files
+```
+yarn lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
