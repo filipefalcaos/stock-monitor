@@ -71,7 +71,7 @@ const mutations = {
         fs.writeFileSync(state.dataFileName, JSON.stringify(state.portfolioData))
       }
     } catch (error) {
-      console.error(error)
+      error /* Unused */
     }
   },
 

@@ -1,3 +1,4 @@
+/* global __static */
 'use strict'
 
 import { app, protocol, BrowserWindow, Menu } from 'electron'
@@ -59,7 +60,8 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       enableRemoteModule: true
-    }
+    },
+    icon: path.join(__static, 'icon.png')
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
