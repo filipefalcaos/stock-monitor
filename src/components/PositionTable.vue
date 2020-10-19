@@ -1,10 +1,8 @@
 <template>
   <div>
-    <h5
-      v-if="positionData.length == 0 || !positionData"
-    >
+    <h6 v-if="positionData.length == 0 || !positionData">
       Sem ações listadas.
-    </h5>
+    </h6>
 
     <b-table
       v-else

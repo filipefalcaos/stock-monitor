@@ -45,7 +45,10 @@
       </CCol>
     </CRow>
 
-    <CRow class="mt-2">
+    <CRow
+      class="mt-2"
+      align-vertical="center"
+    >
       <CCol
         sm="4"
         class="d-none d-md-block"
@@ -71,6 +74,7 @@
           <CButton
             style="margin-right: 12px;"
             color="success"
+            @click="modal_add_active = true"
           >
             Novo Ativo
           </CButton>
@@ -80,7 +84,9 @@
             toggler-text="Ações" 
             color="secondary"
           >
-            <CDropdownItem>Nova Carteira</CDropdownItem>
+            <CDropdownItem @click="add_portfolio_dialog">
+              Nova Carteira
+            </CDropdownItem>
             <CDropdownItem>Editar Carteira</CDropdownItem>
             <CDropdownItem>Excluir Carteira</CDropdownItem>
           </CDropdown>
@@ -135,17 +141,47 @@
         />
       </CCardBody>
     </CCard>
+
+    <!-- Modal to add positions -->
+    <b-modal
+      :active.sync="modal_add_active"
+      has-modal-card
+      trap-focus
+      aria-role="dialog"
+      aria-modal
+    >
+      <position-form @submit-position="add_position" />
+    </b-modal>
+
+    <!-- Modal to close positions -->
+    <b-modal
+      :active.sync="modal_close_active"
+      has-modal-card
+      trap-focus
+      aria-role="dialog"
+      aria-modal
+    >
+      <close-position-form
+        :to-close="position_to_close"
+        @update-position="close_position"
+      />
+    </b-modal>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { format_currency, format_percent, format_date } from '../utils'
+
+import ClosePositionForm from '../components/ClosePositionForm'
+import PositionForm from '../components/PositionForm'
 import PositionTable from '../components/PositionTable'
 
 export default {
   name: 'Portfolios',
   components: {
+    ClosePositionForm,
+    PositionForm,
     PositionTable
   },
 
@@ -200,6 +236,43 @@ export default {
     },
 
     load_portfolio() {
+      this.$store.commit('updateDataFile')
+      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
+      this.get_stock_prices()
+    },
+
+    create_portfolio(portfolio_name) {
+      this.final_result = 0
+      this.percent_result = 0
+      this.$store.commit('newPortfolio', portfolio_name)
+      this.$store.commit('updateDataFile')
+      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
+    },
+
+    add_portfolio_dialog() {
+      this.$buefy.dialog.prompt({
+        message: 'Insira um nome para a nova carteira.',
+        inputAttrs: {
+          placeholder: 'Carteira',
+          maxlength: 30
+        },
+        confirmText: 'Adicionar',
+        cancelText: 'Cancelar',
+        trapFocus: true,
+        type: 'is-info',
+        onConfirm: value => this.create_portfolio(value)
+      })
+    },
+
+    add_position(newPosition) {
+      this.$store.commit('addPosition', newPosition)
+      this.$store.commit('updateDataFile')
+      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
+      this.get_stock_prices()
+    },
+
+    close_position(closeObj) {
+      this.$store.commit('closePosition', closeObj)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
       this.get_stock_prices()
