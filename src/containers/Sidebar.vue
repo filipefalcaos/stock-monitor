@@ -7,16 +7,9 @@
   >
     <CSidebarBrand to="/">
       <img
-        height="40px"
+        style="height: 30px;"
         class="c-sidebar-brand-minimized"
-        src="../assets/logo.png"
-        alt="stock-monitor logo"
-      >
-      <img
-        height="80px"
-        style="margin: 10px"
-        class="c-sidebar-brand-full"
-        src="../assets/logo-big.png"
+        src="../assets/logo-small.png"
         alt="stock-monitor logo"
       >
     </CSidebarBrand>
@@ -24,10 +17,6 @@
     <CRenderFunction
       flat
       :content-to-render="$options.nav"
-    />
-    <CSidebarMinimizer
-      class="d-md-down-none"
-      @click.native="$store.commit('set', ['sidebarMinimize', !minimize])"
     />
   </CSidebar>
 </template>

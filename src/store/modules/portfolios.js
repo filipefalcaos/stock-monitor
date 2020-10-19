@@ -1,5 +1,7 @@
 import { remote } from 'electron'
 import { nanoid } from 'nanoid'
+import { format_date } from '../../utils'
+
 import path from 'path'
 const fs = require('fs')
 
@@ -44,6 +46,11 @@ const getters = {
 
   closedPositions: (state) => {
     return state.currentPositions.filter(position => position.closed)
+  },
+
+  lastPositions: (state) => {
+    state.currentPositions.sort((a, b) => a.created_at - b.created_at)
+    return state.currentPositions.slice(1).slice(-10).reverse()
   }
 }
 
@@ -112,11 +119,11 @@ const mutations = {
 
     // Computes the cumulative sum
     state.stats.currentResults = closed.map(a => parseInt(a.result)).map(cumulativeSum(0))
-    state.stats.currentDates = closed.map(a => a.closed_at).map(formatDate)
+    state.stats.currentDates = closed.map(a => a.closed_at).map(format_date)
 
     // Makes the cumulative sum start with 0
     let startDate = lastPortfolio.created_at
-    startDate = formatDate(startDate)
+    startDate = format_date(startDate)
     state.stats.currentResults.unshift(0)
     state.stats.currentDates.unshift(startDate)
   },
@@ -208,16 +215,3 @@ export default {
 
 // Computes the cumulative sum of a numerical array
 const cumulativeSum = (sum => value => sum += value)
-
-// Formats a given timestamp, in milliseconds
-function formatDate(timestamp) {
-  let timestampDate = new Date(timestamp)
-  let day = timestampDate.getDate().toString().padStart(2, "0")
-  let month = (timestampDate.getMonth() + 1).toString().padStart(2, "0")
-  let hour = timestampDate.getHours().toString().padStart(2, "0")
-  let minute = timestampDate.getMinutes().toString().padStart(2, "0")
-
-  let date = day + '-' + month + '-' + timestampDate.getFullYear()
-  let time = hour + ":" + minute
-  return date + ' ' + time
-}

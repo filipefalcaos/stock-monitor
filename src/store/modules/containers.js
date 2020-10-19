@@ -1,7 +1,7 @@
 // Initial state
 const state = () => ({
   sidebarShow: 'responsive',
-  sidebarMinimize: false
+  sidebarMinimize: true
 })
 
 // Getters

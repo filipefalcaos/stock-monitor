@@ -71,6 +71,7 @@
               P&L - Ações
             </h4>
           </CCol>
+          
           <CCol
             sm="7"
             class="d-none d-md-block"
@@ -110,6 +111,7 @@
               P&L - Opções
             </h4>
           </CCol>
+          
           <CCol
             sm="7"
             class="d-none d-md-block"
@@ -150,19 +152,29 @@
             </h4>
           </CCol>
         </CRow>
+
+        <!-- Table of last opened positions -->
+        <position-table
+          class="mt-3"
+          :position-data="lastPositions"
+          :has-actions="false"
+        />
       </CCardBody>
     </CCard>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters, mapState } from 'vuex'
+import { format_currency, format_percent, format_date } from '../utils'
 import LineChart from './charts/LineChart'
+import PositionTable from "../components/PositionTable"
 
 export default {
   name: 'Dashboard',
   components: {
-    LineChart
+    LineChart,
+    PositionTable
   },
   
   data() {
@@ -175,9 +187,25 @@ export default {
     ...mapState({
       stats: state => state.portfolios.stats
     }),
+    
     ...mapGetters({
-      lastPortfolio: "lastPortfolio"
+      lastPortfolio: 'lastPortfolio',
+      lastPositions: 'lastPositions'
     })
+  },
+
+  methods: {
+    format_currency(num) {
+      return format_currency(num)
+    },
+
+    format_percent(num) {
+      return format_percent(num)
+    },
+
+    format_date(timestamp) {
+      return format_date(timestamp)
+    }
   }
 }
 </script>

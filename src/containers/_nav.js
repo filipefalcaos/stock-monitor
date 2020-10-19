@@ -30,7 +30,7 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Resultados',
+        name: 'Relatórios',
         to: '/res-report',
         icon: 'cil-chart-pie'
       },
