@@ -89,7 +89,13 @@
             </CButtonGroup>
           </CCol>
         </CRow>
-        <MainChartExample style="height:300px; margin-top:20px;" />
+        
+        <LineChart
+          :data="stats.currentResults"
+          :labels="stats.currentDates"
+          title="P&L - Ações"
+          style="height:300px; margin-top:20px;"
+        />
       </CCardBody>
     </CCard>
 
@@ -122,39 +128,56 @@
             </CButtonGroup>
           </CCol>
         </CRow>
-        <MainChartExample style="height:300px; margin-top:20px;" />
+
+        <LineChart
+          :data="stats.currentResults"
+          :labels="stats.currentDates"
+          title="P&L - Opções"
+          style="height:300px; margin-top:20px;"
+        />
+      </CCardBody>
+    </CCard>
+    
+    <CCard>
+      <CCardBody>
+        <CRow>
+          <CCol sm="5">
+            <h4
+              id="traffic"
+              class="card-title mb-0"
+            >
+              Últimas Operações
+            </h4>
+          </CCol>
+        </CRow>
       </CCardBody>
     </CCard>
   </div>
 </template>
 
 <script>
-import MainChartExample from './charts/MainChartExample'
+import { mapGetters, mapState } from "vuex"
+import LineChart from './charts/LineChart'
 
 export default {
   name: 'Dashboard',
   components: {
-    MainChartExample
+    LineChart
   },
+  
   data() {
     return {
       selected: 'Month'
     }
   },
-  methods: {
-    color(value) {
-      let $color
-      if (value <= 25) {
-        $color = 'info'
-      } else if (value > 25 && value <= 50) {
-        $color = 'success'
-      } else if (value > 50 && value <= 75) {
-        $color = 'warning'
-      } else if (value > 75 && value <= 100) {
-        $color = 'danger'
-      }
-      return $color
-    }
+
+  computed: {
+    ...mapState({
+      stats: state => state.portfolios.stats
+    }),
+    ...mapGetters({
+      lastPortfolio: "lastPortfolio"
+    })
   }
 }
 </script>

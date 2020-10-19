@@ -6,10 +6,9 @@
     @update:show="(value) => $store.commit('set', ['sidebarShow', value])"
   >
     <CSidebarBrand
-      class="d-md-down-none"
       to="/"
     >
-      <CIcon 
+      <!-- <CIcon 
         class="c-sidebar-brand-full" 
         name="logo" 
         size="custom-size" 
@@ -22,7 +21,20 @@
         size="custom-size" 
         :height="35" 
         view-box="0 0 110 134"
-      />
+      /> -->
+      <img
+        height="40px"
+        class="c-sidebar-brand-minimized"
+        src="../assets/logo.png"
+        alt="stock-monitor logo"
+      >
+      <img
+        height="80px"
+        style="margin: 10px"
+        class="c-sidebar-brand-full"
+        src="../assets/logo-big.png"
+        alt="stock-monitor logo"
+      >
     </CSidebarBrand>
 
     <CRenderFunction
