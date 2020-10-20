@@ -24,7 +24,11 @@
         alt="Logo"
       />
     </CHeaderBrand>
-    <CHeaderNav class="d-md-down-none mr-auto" />
+    <CHeaderNav class="d-md-down-none mr-auto">
+      <CHeaderNavItem class="px-3">
+        {{ $route.name }}
+      </CHeaderNavItem>
+    </CHeaderNav>
     <CHeaderNav class="mr-4">
       <CHeaderNavItem class="d-md-down-none mx-2">
         <CHeaderNavLink>

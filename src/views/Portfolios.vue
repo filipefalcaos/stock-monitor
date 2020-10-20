@@ -87,8 +87,12 @@
             <CDropdownItem @click="add_portfolio_dialog">
               Nova Carteira
             </CDropdownItem>
-            <CDropdownItem>Editar Carteira</CDropdownItem>
-            <CDropdownItem>Excluir Carteira</CDropdownItem>
+            <CDropdownItem @click="edit_portfolio_dialog">
+              Editar Carteira
+            </CDropdownItem>
+            <CDropdownItem @click="delete_portfolio_dialog">
+              Excluir Carteira
+            </CDropdownItem>
           </CDropdown>
         </div>
       </CCol>
@@ -251,9 +255,9 @@ export default {
 
     add_portfolio_dialog() {
       this.$buefy.dialog.prompt({
-        message: 'Insira um nome para a nova carteira.',
+        message: 'Forneça um nome para a nova carteira.',
         inputAttrs: {
-          placeholder: 'Carteira',
+          placeholder: 'Nome da Carteira',
           maxlength: 30
         },
         confirmText: 'Adicionar',
@@ -261,6 +265,45 @@ export default {
         trapFocus: true,
         type: 'is-info',
         onConfirm: value => this.create_portfolio(value)
+      })
+    },
+
+    edit_portfolio(portfolio_id, portfolio_name) {
+      let payload = {id: portfolio_id, name: portfolio_name}
+      this.$store.commit('editPortfolio', payload)
+      this.$store.commit('updateDataFile')
+    },
+
+    edit_portfolio_dialog() {
+      this.$buefy.dialog.prompt({
+        message: 'Forneça um nome para a carteira.',
+        inputAttrs: {
+          placeholder: 'Nome da Carteira',
+          value: this.lastPortfolio.name,
+          maxlength: 30
+        },
+        confirmText: 'Editar',
+        cancelText: 'Cancelar',
+        trapFocus: true,
+        type: 'is-info',
+        onConfirm: value => this.edit_portfolio(this.lastPortfolio.id, value)
+      })
+    },
+
+    delete_portfolio(portfolio_id) {
+      this.$store.commit('deletePortfolio', portfolio_id)
+      this.$store.commit('updateDataFile')
+      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
+      this.get_stock_prices()
+    },
+
+    delete_portfolio_dialog() {
+      this.$buefy.dialog.confirm({
+        message: 'Tem certeza que gostaria de excluir a carteira? Isto não poderá ser desfeito.',
+        confirmText: 'Excluir',
+        cancelText: 'Cancelar',
+        type: 'is-danger',
+        onConfirm: () => this.delete_portfolio(this.lastPortfolio.id)
       })
     },
 

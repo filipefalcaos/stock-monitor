@@ -26,22 +26,22 @@ export default new Router({
         },
         {
           path: 'portfolios',
-          name: 'Portfolios',
+          name: 'Carteiras',
           component: Portfolios
         },
         {
           path: 'options',
-          name: 'Options',
+          name: 'Opções',
           component: UnderConstruction
         },
         {
           path: 'res-report',
-          name: 'Results',
+          name: 'Relatórios',
           component: UnderConstruction
         },
         {
           path: 'res-taxes',
-          name: 'Taxes',
+          name: 'Impostos',
           component: UnderConstruction
         }
       ]

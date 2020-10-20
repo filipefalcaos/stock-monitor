@@ -167,7 +167,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { format_currency, format_percent, format_date } from '../utils'
-import LineChart from './charts/LineChart'
+import LineChart from '../components/charts/LineChart'
 import PositionTable from "../components/PositionTable"
 
 export default {

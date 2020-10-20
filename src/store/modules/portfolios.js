@@ -61,7 +61,7 @@ const actions = {}
 const mutations = {
   setDataFileName(state) {
     const dataPath = '/portfolio-data.json'
-    state.dataFileName = path.join(remote.app.getPath("userData"), dataPath)
+    state.dataFileName = path.join(remote.app.getPath('userData'), dataPath)
   },
 
   loadDataFile(state) {
@@ -136,6 +136,19 @@ const mutations = {
       created_at: Date.now(),
       positions: []
     })
+  },
+
+  editPortfolio(state, payload) {
+    let currPortfolio = state.portfolioData.portfolios.find(portfolio => {
+      return portfolio.id == payload.id
+    })
+
+    currPortfolio.name = payload.name
+  },
+
+  deletePortfolio(state, portfolioId) {
+    state.portfolioData.portfolios = state.portfolioData.portfolios.filter(portfolio => portfolio.id !== portfolioId)
+    state.portfolioData.last_portfolio = state.portfolioData.portfolios[0].id
   },
 
   addPosition(state, postionData) {
