@@ -30,5 +30,4 @@ export default {
 <style lang="scss">
   @import "~buefy/dist/buefy.css";
   @import 'assets/scss/style';
-  @import url("https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css");
 </style>
