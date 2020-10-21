@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!isEmpty">
     <CRow align-vertical="center">
       <CCol sm="2">
         <b-select
@@ -171,6 +171,16 @@
       />
     </b-modal>
   </div>
+
+  <div v-else>
+    <h5>Não há carteiras cadastradas. Cadastre sua primeira carteira utilizando o botão abaixo.</h5>
+    <CButton
+      color="success"
+      @click="add_portfolio_dialog"
+    >
+      Nova Carteira
+    </CButton>
+  </div>
 </template>
 
 <script>
@@ -216,14 +226,15 @@ export default {
       investment: 'investment',
       activeInvestment: 'activeInvestment',
       openPositions: 'openPositions',
-      closedPositions: 'closedPositions'
+      closedPositions: 'closedPositions',
+      isEmpty: 'isEmpty'
     })
   },
   
   // Gets the latest stock prices when the component is created and initializes 
   // the portfolios UI
   async created() {
-    this.get_stock_prices()
+    if (!this.isEmpty) this.get_stock_prices()
   },
 
   methods: {
@@ -293,8 +304,11 @@ export default {
     delete_portfolio(portfolio_id) {
       this.$store.commit('deletePortfolio', portfolio_id)
       this.$store.commit('updateDataFile')
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.get_stock_prices()
+
+      if (!this.isEmpty) {
+        this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
+        this.get_stock_prices()
+      }
     },
 
     delete_portfolio_dialog() {

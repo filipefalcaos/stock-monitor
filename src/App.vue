@@ -12,8 +12,10 @@ export default {
     ...mapState({
       stats: state => state.portfolios.stats
     }),
+    
     ...mapGetters({
-      lastPortfolio: 'lastPortfolio'
+      lastPortfolio: 'lastPortfolio',
+      isEmpty: 'isEmpty'
     })
   },
 
@@ -21,8 +23,11 @@ export default {
   created() {
     this.$store.commit('setDataFileName');
     this.$store.commit('loadDataFile');
-    this.$store.commit('setCurrentPositions', this.lastPortfolio.positions);
-    this.$store.commit('computeStats');
+    
+    if (!this.isEmpty) {
+      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions);
+      this.$store.commit('computeStats');
+    }
   }
 }
 </script>

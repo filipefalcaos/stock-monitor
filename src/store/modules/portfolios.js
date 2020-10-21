@@ -51,6 +51,10 @@ const getters = {
   lastPositions: (state) => {
     state.currentPositions.sort((a, b) => a.created_at - b.created_at)
     return state.currentPositions.slice(1).slice(-10).reverse()
+  },
+
+  isEmpty: (state) => {
+    return state.portfolioData.portfolios.length === 0
   }
 }
 
@@ -148,7 +152,12 @@ const mutations = {
 
   deletePortfolio(state, portfolioId) {
     state.portfolioData.portfolios = state.portfolioData.portfolios.filter(portfolio => portfolio.id !== portfolioId)
-    state.portfolioData.last_portfolio = state.portfolioData.portfolios[0].id
+    
+    if (state.portfolioData.portfolios.length > 0) {
+      state.portfolioData.last_portfolio = state.portfolioData.portfolios[0].id
+    } else {
+      state.portfolioData.last_portfolio = null
+    }
   },
 
   addPosition(state, postionData) {

@@ -24,13 +24,13 @@
                   <CCol sm="6">
                     <CCallout color="info">
                       <small class="text-muted">Operações - Ações</small><br>
-                      <strong class="h4">50</strong>
+                      <strong class="h4">--</strong>
                     </CCallout>
                   </CCol>
                   <CCol sm="6">
                     <CCallout color="danger">
                       <small class="text-muted">Operações - Opções</small><br>
-                      <strong class="h4">22</strong>
+                      <strong class="h4">--</strong>
                     </CCallout>
                   </CCol>
                 </CRow>
@@ -43,13 +43,13 @@
                   <CCol sm="6">
                     <CCallout color="warning">
                       <small class="text-muted">CAGR - Ações</small><br>
-                      <strong class="h4">12%</strong>
+                      <strong class="h4">--</strong>
                     </CCallout>
                   </CCol>
                   <CCol sm="6">
                     <CCallout color="success">
                       <small class="text-muted">CAGR - Opções</small><br>
-                      <strong class="h4">15%</strong>
+                      <strong class="h4">--</strong>
                     </CCallout>
                   </CCol>
                 </CRow>
@@ -63,7 +63,7 @@
     <CCard>
       <CCardBody>
         <CRow>
-          <CCol sm="5">
+          <CCol sm="10">
             <h4
               id="traffic"
               class="card-title mb-0"
@@ -73,37 +73,45 @@
           </CCol>
           
           <CCol
-            sm="7"
+            sm="2"
             class="d-none d-md-block"
           >
-            <CButtonGroup class="float-right mr-3">
-              <CButton
-                v-for="(value, key) in ['Day', 'Month', 'Year']"
-                :key="key"
-                color="outline-secondary"
-                class="mx-0"
-                :pressed="value === selected ? true : false"
-                @click="selected = value"
+            <div style="float: right;">
+              <b-select
+                v-model="portfolioData.last_portfolio"
+                placeholder="Carteira"
+                expanded
+                @input="load_portfolio"
               >
-                {{ value }}
-              </CButton>
-            </CButtonGroup>
+                <option
+                  v-for="option in portfolioData.portfolios"
+                  :key="option.id"
+                  :value="option.id"
+                >
+                  {{ option.name }}
+                </option>
+              </b-select>
+            </div>
           </CCol>
         </CRow>
         
         <LineChart
+          v-if="!isEmpty"
           :data="stats.currentResults"
           :labels="stats.currentDates"
           title="P&L - Ações"
           style="height:300px; margin-top:20px;"
         />
+        <h6 v-else>
+          Sem informações disponíveis.
+        </h6>
       </CCardBody>
     </CCard>
 
     <CCard>
       <CCardBody>
         <CRow>
-          <CCol sm="5">
+          <CCol sm="10">
             <h4
               id="traffic"
               class="card-title mb-0"
@@ -113,30 +121,38 @@
           </CCol>
           
           <CCol
-            sm="7"
+            sm="2"
             class="d-none d-md-block"
           >
-            <CButtonGroup class="float-right mr-3">
-              <CButton
-                v-for="(value, key) in ['Day', 'Month', 'Year']"
-                :key="key"
-                color="outline-secondary"
-                class="mx-0"
-                :pressed="value === selected ? true : false"
-                @click="selected = value"
+            <div style="float: right;">
+              <b-select
+                v-model="portfolioData.last_portfolio"
+                placeholder="Carteira"
+                expanded
+                @input="load_portfolio"
               >
-                {{ value }}
-              </CButton>
-            </CButtonGroup>
+                <option
+                  v-for="option in portfolioData.portfolios"
+                  :key="option.id"
+                  :value="option.id"
+                >
+                  {{ option.name }}
+                </option>
+              </b-select>
+            </div>
           </CCol>
         </CRow>
 
         <LineChart
+          v-if="!isEmpty"
           :data="stats.currentResults"
           :labels="stats.currentDates"
           title="P&L - Opções"
           style="height:300px; margin-top:20px;"
         />
+        <h6 v-else>
+          Sem informações disponíveis.
+        </h6>
       </CCardBody>
     </CCard>
     
@@ -185,12 +201,14 @@ export default {
 
   computed: {
     ...mapState({
-      stats: state => state.portfolios.stats
+      stats: state => state.portfolios.stats,
+      portfolioData: state => state.portfolios.portfolioData
     }),
     
     ...mapGetters({
       lastPortfolio: 'lastPortfolio',
-      lastPositions: 'lastPositions'
+      lastPositions: 'lastPositions',
+      isEmpty: 'isEmpty'
     })
   },
 
@@ -205,7 +223,12 @@ export default {
 
     format_date(timestamp) {
       return format_date(timestamp)
-    }
+    },
+
+    load_portfolio() {
+      this.$store.commit('updateDataFile')
+      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
+    },
   }
 }
 </script>
