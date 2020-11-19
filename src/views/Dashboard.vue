@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CRow>
+    <!-- <CRow>
       <CCol md="12">
         <CCard>
           <CCardBody>
@@ -58,7 +58,7 @@
           </CCardBody>
         </CCard>
       </CCol>
-    </CRow>
+    </CRow> -->
 
     <CCard>
       <CCardBody>
@@ -95,12 +95,12 @@
           </CCol>
         </CRow>
         
-        <LineChart
+        <line-chart
           v-if="!isEmpty"
           :data="stats.currentResults"
           :labels="stats.currentDates"
-          title="P&L - Ações"
-          style="height:300px; margin-top:20px;"
+          :title="lastPortfolio.name"
+          style="height: 300px; margin-top: 20px;"
         />
         <h6 v-else>
           Sem informações disponíveis.
@@ -108,7 +108,7 @@
       </CCardBody>
     </CCard>
 
-    <CCard>
+    <!-- <CCard>
       <CCardBody>
         <CRow>
           <CCol sm="10">
@@ -143,18 +143,18 @@
           </CCol>
         </CRow>
 
-        <LineChart
+        <line-chart
           v-if="!isEmpty"
           :data="stats.currentResults"
           :labels="stats.currentDates"
           title="P&L - Opções"
-          style="height:300px; margin-top:20px;"
+          style="height:300px; margin-top: 20px;"
         />
         <h6 v-else>
           Sem informações disponíveis.
         </h6>
       </CCardBody>
-    </CCard>
+    </CCard> -->
     
     <CCard>
       <CCardBody>
@@ -212,6 +212,12 @@ export default {
     })
   },
 
+  // Computes the statistics on the portfolios/options data when the component
+  // is created
+  created() {
+    this.$store.commit('computeStats')
+  },
+
   methods: {
     format_currency(num) {
       return format_currency(num)
@@ -228,6 +234,8 @@ export default {
     load_portfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
+      this.$store.commit('computeStats') // Updates the stats
+      //this.$forceUpdate()
     },
   }
 }

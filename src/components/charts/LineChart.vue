@@ -1,18 +1,15 @@
 <template>
-  <CChartLine
-    :datasets="defaultDatasets"
-    :options="defaultOptions"
-    :labels="labels"
-  />
+  <div class="chart-container">
+    <canvas :id="chartId" />
+  </div>
 </template>
 
 <script>
-import { CChartLine } from '@coreui/vue-chartjs'
+import Chart from 'chart.js'
+import { nanoid } from 'nanoid'
 
 export default {
   name: 'LineChart',
-  components: { CChartLine },
-  
   props: {
     data: {
       type: Array,
@@ -30,22 +27,41 @@ export default {
 
   data() {
     return {
-      defaultDatasets: [
-        {
-          label: '',
-          fill: false,
-          borderColor: '#20A8D8',
-          backgroundColor: '#20A8D8',
-          borderWidth: 2,
-          data: [39, 80, -40, 35, 40, 20, 45]
-        }
-      ]
+      chart: null,
+      chartId: ''
     }
   },
 
-  computed: {
-    defaultOptions() {
-      return {
+  watch: {
+    data: function(newData, oldData) {
+      oldData /* Unused */
+      this.chart.data.labels = this.labels
+      this.chart.data.datasets[0].data = newData
+      this.chart.update()
+    }
+  },
+
+  created() {
+    this.chartId = nanoid()
+  },
+
+  mounted() {
+    var ctx = document.getElementById(this.chartId).getContext('2d');
+    this.chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: this.labels,
+        datasets: [{
+          label: this.title,
+          borderColor: '#20A8D8',
+          backgroundColor: '#20A8D8',
+          cubicInterpolationMode: 'monotone',
+          data: this.data,
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
         maintainAspectRatio: false,
         elements: {
           point: {
@@ -53,47 +69,20 @@ export default {
             hitRadius: 10,
             hoverRadius: 2,
             hoverBorderWidth: 3
+          },
+          line: {
+            borderWidth: 2
           }
-        },
-        legend: {
-          display: false
-        },
-        scales: {
-          xAxes: [{
-            gridLines: {
-              drawOnChartArea: false
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-              callback: function (value, index, values) {
-                index, values /* Unused */
-                return 'R$ ' + value
-              }
-            },
-            gridLines: {
-              display: true
-            }
-          }]
-        },
-        tooltips: {
-          enabled: true,
-          mode: 'single',
-          callbacks: {
-            label: function (tooltipItems, data) {
-              data /* Unused */
-              return ' R$ ' + tooltipItems.yLabel
-            }
-          }
-        },
+        }
       }
-    }
-  },
-
-  created() {
-    this.defaultDatasets[0].data = this.data;
-    this.defaultDatasets[0].label = this.title;
+    });
   }
 }
 </script>
+
+<style scoped>
+.chart-container {
+  width: 100%;
+  height: 600px
+}
+</style>

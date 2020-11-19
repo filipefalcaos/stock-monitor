@@ -21,13 +21,9 @@ export default {
 
   // Gets the last state of the portfolios and options data when the app is created
   created() {
-    this.$store.commit('setDataFileName');
-    this.$store.commit('loadDataFile');
-    
-    if (!this.isEmpty) {
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions);
-      this.$store.commit('computeStats');
-    }
+    this.$store.commit('setDataFileName')
+    this.$store.commit('loadDataFile')
+    if (!this.isEmpty) this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
   }
 }
 </script>

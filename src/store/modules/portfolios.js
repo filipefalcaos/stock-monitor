@@ -122,12 +122,37 @@ const mutations = {
     closed.sort((a, b) => a.closed_at - b.closed_at)
 
     // Computes the cumulative sum
-    state.stats.currentResults = closed.map(a => parseInt(a.result)).map(cumulativeSum(0))
-    state.stats.currentDates = closed.map(a => a.closed_at).map(format_date)
+    let results = closed.map(a => parseInt(a.result)).map(cumulativeSum(0))
+    let dates = closed.map(a => a.closed_at).map(format_date)
+    let data = results.map((x, i) => [x, dates[i]])
+    
+    // Groups results by day
+    const groupedResults = data.reduce((groups, result) => {
+      const date = result[1].split(' ')[0]
+      if (!groups[date]) groups[date] = []
+      groups[date].push(result)
+      return groups
+    }, {})
+
+    const groupArrays = Object.keys(groupedResults).map((date) => {
+      return {
+        date,
+        results: groupedResults[date]
+      }
+    })
+
+    let dailyResults = [], finalDates = []
+    groupArrays.forEach(x => {
+      dailyResults.push(x.results[x.results.length - 1][0])
+      finalDates.push(x.date)
+    })
+
+    state.stats.currentResults = dailyResults
+    state.stats.currentDates = finalDates
 
     // Makes the cumulative sum start with 0
     let startDate = lastPortfolio.created_at
-    startDate = format_date(startDate)
+    startDate = format_date(startDate).split(' ')[0]
     state.stats.currentResults.unshift(0)
     state.stats.currentDates.unshift(startDate)
   },
