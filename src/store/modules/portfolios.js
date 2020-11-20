@@ -1,6 +1,6 @@
 import { remote } from 'electron'
 import { nanoid } from 'nanoid'
-import { format_date } from '../../utils'
+import { format_date_month } from '../../utils'
 
 import path from 'path'
 const fs = require('fs')
@@ -123,7 +123,7 @@ const mutations = {
 
     // Computes the cumulative sum
     let results = closed.map(a => parseInt(a.result)).map(cumulativeSum(0))
-    let dates = closed.map(a => a.closed_at).map(format_date)
+    let dates = closed.map(a => a.closed_at).map(format_date_month)
     let data = results.map((x, i) => [x, dates[i]])
     
     // Groups results by day
@@ -152,7 +152,7 @@ const mutations = {
 
     // Makes the cumulative sum start with 0
     let startDate = lastPortfolio.created_at
-    startDate = format_date(startDate).split(' ')[0]
+    startDate = format_date_month(startDate).split(' ')[0]
     state.stats.currentResults.unshift(0)
     state.stats.currentDates.unshift(startDate)
   },

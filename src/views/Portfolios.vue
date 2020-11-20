@@ -187,9 +187,9 @@
 import { mapGetters, mapState } from 'vuex'
 import { format_currency, format_percent, format_date } from '../utils'
 
-import ClosePositionForm from '../components/ClosePositionForm'
-import PositionForm from '../components/PositionForm'
-import PositionTable from '../components/PositionTable'
+import ClosePositionForm from '../components/forms/ClosePositionForm'
+import PositionForm from '../components/forms/PositionForm'
+import PositionTable from '../components/tables/PositionTable'
 
 export default {
   name: 'Portfolios',
@@ -349,7 +349,7 @@ export default {
 
     get_stock_prices() {
       let promises = []
-      let base_url = 'https://query2.finance.yahoo.com/v10/'
+      const base_url = 'https://query2.finance.yahoo.com/v10/'
       this.is_processing = true
       this.has_error = false
       

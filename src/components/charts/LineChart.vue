@@ -73,6 +73,30 @@ export default {
           line: {
             borderWidth: 2
           }
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              callback: function (value, index, values) {
+                index, values /* Unused */
+                return 'R$ ' + value
+              }
+            },
+            gridLines: {
+              display: true
+            }
+          }]
+        },
+        tooltips: {
+          enabled: true,
+          mode: 'single',
+          callbacks: {
+            label: function (tooltipItems, data) {
+              data /* Unused */
+              return ' R$ ' + tooltipItems.yLabel
+            }
+          }
         }
       }
     });

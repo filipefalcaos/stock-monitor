@@ -184,7 +184,7 @@
 import { mapGetters, mapState } from 'vuex'
 import { format_currency, format_percent, format_date } from '../utils'
 import LineChart from '../components/charts/LineChart'
-import PositionTable from "../components/PositionTable"
+import PositionTable from '../components/tables/PositionTable'
 
 export default {
   name: 'Dashboard',
