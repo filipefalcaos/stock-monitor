@@ -1,64 +1,6 @@
 <template>
   <div>
-    <!-- <CRow>
-      <CCol md="12">
-        <CCard>
-          <CCardBody>
-            <CRow>
-              <CCol sm="5">
-                <h4
-                  id="traffic"
-                  class="card-title mb-0"
-                >
-                  Visão Geral
-                </h4>
-              </CCol>
-            </CRow>
-            
-            <CRow>
-              <CCol
-                sm="12"
-                lg="6"
-              >
-                <CRow>
-                  <CCol sm="6">
-                    <CCallout color="info">
-                      <small class="text-muted">Operações - Ações</small><br>
-                      <strong class="h4">--</strong>
-                    </CCallout>
-                  </CCol>
-                  <CCol sm="6">
-                    <CCallout color="danger">
-                      <small class="text-muted">Operações - Opções</small><br>
-                      <strong class="h4">--</strong>
-                    </CCallout>
-                  </CCol>
-                </CRow>
-              </CCol>
-              <CCol
-                sm="12"
-                lg="6"
-              >
-                <CRow>
-                  <CCol sm="6">
-                    <CCallout color="warning">
-                      <small class="text-muted">CAGR - Ações</small><br>
-                      <strong class="h4">--</strong>
-                    </CCallout>
-                  </CCol>
-                  <CCol sm="6">
-                    <CCallout color="success">
-                      <small class="text-muted">CAGR - Opções</small><br>
-                      <strong class="h4">--</strong>
-                    </CCallout>
-                  </CCol>
-                </CRow>
-              </CCol>
-            </CRow>
-          </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow> -->
+    <b-loading v-model="isLoading" />
 
     <CCard>
       <CCardBody>
@@ -97,8 +39,8 @@
         
         <line-chart
           v-if="!isEmpty"
-          :data="stats.currentResults"
-          :labels="stats.currentDates"
+          :data="cumulativeSum.currentResults"
+          :labels="cumulativeSum.currentDates"
           :title="lastPortfolio.name"
           style="height: 300px; margin-top: 20px;"
         />
@@ -108,54 +50,6 @@
       </CCardBody>
     </CCard>
 
-    <!-- <CCard>
-      <CCardBody>
-        <CRow>
-          <CCol sm="10">
-            <h4
-              id="traffic"
-              class="card-title mb-0"
-            >
-              P&L - Opções
-            </h4>
-          </CCol>
-          
-          <CCol
-            sm="2"
-            class="d-none d-md-block"
-          >
-            <div style="float: right;">
-              <b-select
-                v-model="portfolioData.last_portfolio"
-                placeholder="Carteira"
-                expanded
-                @input="load_portfolio"
-              >
-                <option
-                  v-for="option in portfolioData.portfolios"
-                  :key="option.id"
-                  :value="option.id"
-                >
-                  {{ option.name }}
-                </option>
-              </b-select>
-            </div>
-          </CCol>
-        </CRow>
-
-        <line-chart
-          v-if="!isEmpty"
-          :data="stats.currentResults"
-          :labels="stats.currentDates"
-          title="P&L - Opções"
-          style="height:300px; margin-top: 20px;"
-        />
-        <h6 v-else>
-          Sem informações disponíveis.
-        </h6>
-      </CCardBody>
-    </CCard> -->
-    
     <CCard>
       <CCardBody>
         <CRow>
@@ -194,34 +88,41 @@ export default {
   
   data() {
     return {
-      selected: 'Month'
+      isLoading: true
     }
   },
 
   computed: {
     ...mapState({
-      stats: state => state.portfolios.stats,
+      cumulativeSum: state => state.stats.cumulativeSum,
+      currentPositions: state => state.portfolios.currentPositions,
       portfolioData: state => state.portfolios.portfolioData
     }),
     
     ...mapGetters({
+      isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
-      lastPositions: 'lastPositions',
-      isEmpty: 'isEmpty'
+      lastPositions: 'lastPositions'
     })
   },
 
   // Computes the statistics on the portfolios/options data when the component
   // is created
   created() {
-    this.$store.commit('computeCumSum')
+    this.computeStats()
+    setTimeout(() => this.isLoading = false, 1000)
   },
 
   methods: {
+    computeStats() {
+      let payload = {currentPositions: this.currentPositions, lastPortfolio: this.lastPortfolio}
+      this.$store.commit('computeCumSum', payload) // Updates the stats
+    },
+
     load_portfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.$store.commit('computeCumSum') // Updates the stats
+      this.computeStats()
     },
   }
 }

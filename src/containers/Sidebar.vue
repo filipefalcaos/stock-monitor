@@ -28,12 +28,8 @@ export default {
   name: 'Sidebar',
   nav,
   computed: {
-    show() {
-      return this.$store.state.containers.sidebarShow 
-    },
-    minimize() {
-      return this.$store.state.containers.sidebarMinimize 
-    }
+    show() { return this.$store.state.sidebarShow },
+    minimize() { return this.$store.state.sidebarMinimize }
   }
 }
 </script>

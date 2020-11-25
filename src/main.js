@@ -3,27 +3,38 @@ import axios from 'axios'
 import CoreuiVue from '@coreui/vue'
 import Vue from 'vue'
 
-import { Select, Table, Sidebar, Menu } from 'buefy'
-import { Notification, Dialog, Modal } from 'buefy'
-import { Field, Input, Radio } from 'buefy'
-
 import App from './App.vue'
 import router from './router'
 import store from './store'
 import { utils } from './utils'
 import { iconsSet as icons } from './assets/icons/icons.js'
 
+import {
+  Dialog,
+  Field,
+  Input,
+  Loading,
+  Menu,
+  Modal,
+  Notification,
+  Radio,
+  Select,
+  Sidebar,
+  Table
+} from 'buefy'
+
 // Buefy config
-Vue.use(Select)
-Vue.use(Table)
-Vue.use(Sidebar)
-Vue.use(Menu)
-Vue.use(Notification)
 Vue.use(Dialog)
-Vue.use(Modal)
 Vue.use(Field)
 Vue.use(Input)
+Vue.use(Loading)
+Vue.use(Menu)
+Vue.use(Modal)
+Vue.use(Notification)
 Vue.use(Radio)
+Vue.use(Select)
+Vue.use(Sidebar)
+Vue.use(Table)
 
 // Vue config
 Vue.prototype.$utils = utils
