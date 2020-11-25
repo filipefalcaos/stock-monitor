@@ -182,7 +182,6 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { format_currency, format_percent, format_date } from '../utils'
 import LineChart from '../components/charts/LineChart'
 import PositionTable from '../components/tables/PositionTable'
 
@@ -215,27 +214,14 @@ export default {
   // Computes the statistics on the portfolios/options data when the component
   // is created
   created() {
-    this.$store.commit('computeStats')
+    this.$store.commit('computeCumSum')
   },
 
   methods: {
-    format_currency(num) {
-      return format_currency(num)
-    },
-
-    format_percent(num) {
-      return format_percent(num)
-    },
-
-    format_date(timestamp) {
-      return format_date(timestamp)
-    },
-
     load_portfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.$store.commit('computeStats') // Updates the stats
-      //this.$forceUpdate()
+      this.$store.commit('computeCumSum') // Updates the stats
     },
   }
 }

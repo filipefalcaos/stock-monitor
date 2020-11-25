@@ -1,5 +1,7 @@
+import { add, isBefore, format, parse, sub } from 'date-fns'
+
 // Formats a given number to a currency
-function format_currency(num) {
+function formatCurrency(num) {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -9,7 +11,7 @@ function format_currency(num) {
 }
 
 // Formats a given number to percentage
-function format_percent(num) {
+function formatPercent(num) {
   return new Intl.NumberFormat('pt-BR', {
     style: 'percent',
     minimumFractionDigits: 2,
@@ -17,31 +19,55 @@ function format_percent(num) {
   }).format(num)
 }
 
-// Formats a given timestamp (in milliseconds) to the format 'DD-MM-YY HH:mm'
-function format_date(timestamp) {
-  let timestampDate = new Date(timestamp)
-  let day = timestampDate.getDate().toString().padStart(2, '0')
-  let month = (timestampDate.getMonth() + 1).toString().padStart(2, '0')
-  let hour = timestampDate.getHours().toString().padStart(2, '0')
-  let minute = timestampDate.getMinutes().toString().padStart(2, '0')
-
-  let date = day + '-' + month + '-' + timestampDate.getFullYear()
-  let time = hour + ':' + minute
-  return date + ' ' + time
+// Formats a given timestamp (in milliseconds) to the format 'dd-MM-yyyy HH:mm'
+function defaulFormat(timestamp) {
+  let date = new Date(timestamp)
+  return format(date, 'dd-MM-yyyy HH:mm')
 }
 
-// Formats a given timestamp (in milliseconds) to the format 'MMMM-YY'
-function format_date_month(timestamp) {
-  let months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 
-                'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+// Formats a given timestamp (in milliseconds) to the format 'MMM-yyyy'
+function monthYearFormat(timestamp) {
+  let date = new Date(timestamp)
+  return format(date, 'MMM-yyyy')
+}
+
+// Formats a given timestamp (in milliseconds) to a format specified by each available 
+// formatting mode
+// Available modes: 'default', 'month-year'
+function formatDate(timestamp, mode = 'default') {
+  switch (mode) {
+    case 'month-year':
+      return monthYearFormat(timestamp)
+    case 'default':
+      return defaulFormat(timestamp)
+    default:
+      return defaulFormat(timestamp)
+  }
+}
+
+// Retrieves the months between two given date strings in the format 'MMM-yyyy'
+// The start and end months are not included
+function monthsBetDates(date1, date2) {
+  let initialDate = parse(date1, 'MMM-yyyy', new Date())
+  let finalDate = parse(date2, 'MMM-yyyy', new Date())
+
+  if (isBefore(finalDate, initialDate)) {
+    return []
+  }
+
+  let months = []
+  finalDate = sub(finalDate, {months: 1})
+  while (isBefore(initialDate, finalDate)) {
+    initialDate = add(initialDate, {months: 1})
+    months.push(format(initialDate, 'MMM-yyyy'))
+  }
   
-  let timestampDate = new Date(timestamp)
-  return months[timestampDate.getMonth()] + '-' + timestampDate.getFullYear()
+  return months
 }
 
-module.exports = {
-  format_currency: format_currency,
-  format_percent: format_percent,
-  format_date: format_date,
-  format_date_month: format_date_month
+export const utils = {
+  formatCurrency: formatCurrency,
+  formatPercent: formatPercent,
+  formatDate: formatDate,
+  monthsBetDates: monthsBetDates
 }

@@ -1,6 +1,6 @@
 import { remote } from 'electron'
 import { nanoid } from 'nanoid'
-import { format_date_month } from '../../utils'
+import { utils } from '../../utils'
 
 import path from 'path'
 const fs = require('fs')
@@ -113,7 +113,7 @@ const mutations = {
     state.currentPositions = positions
   },
 
-  computeStats(state) {
+  computeCumSum(state) {
     let lastPortfolio = state.portfolioData.portfolios.find(portfolio => {
       return portfolio.id == state.portfolioData.last_portfolio
     })
@@ -121,12 +121,12 @@ const mutations = {
     let closed = state.currentPositions.filter(position => position.closed)
     closed.sort((a, b) => a.closed_at - b.closed_at)
 
-    // Computes the cumulative sum
+    // Computes the monthly cumulative sum
     let results = closed.map(a => parseInt(a.result)).map(cumulativeSum(0))
-    let dates = closed.map(a => a.closed_at).map(format_date_month)
+    let dates = closed.map(a => a.closed_at).map((x) => utils.formatDate(x, 'month-year'))
     let data = results.map((x, i) => [x, dates[i]])
     
-    // Groups results by day
+    // Groups results by date
     const groupedResults = data.reduce((groups, result) => {
       const date = result[1].split(' ')[0]
       if (!groups[date]) groups[date] = []
@@ -141,20 +141,38 @@ const mutations = {
       }
     })
 
-    let dailyResults = [], finalDates = []
+    let finalResults = [], finalDates = []
     groupArrays.forEach(x => {
-      dailyResults.push(x.results[x.results.length - 1][0])
+      finalResults.push(x.results[x.results.length - 1][0])
       finalDates.push(x.date)
     })
 
-    state.stats.currentResults = dailyResults
-    state.stats.currentDates = finalDates
-
     // Makes the cumulative sum start with 0
     let startDate = lastPortfolio.created_at
-    startDate = format_date_month(startDate).split(' ')[0]
-    state.stats.currentResults.unshift(0)
-    state.stats.currentDates.unshift(startDate)
+    startDate = utils.formatDate(startDate, 'month-year').split(' ')[0]
+    finalResults.unshift(0)
+    finalDates.unshift(startDate)
+
+    // Fills the time gaps
+    let finalResultsAux = [], finalDatesAux = []
+    finalDates.forEach((date, index) => {
+      finalResultsAux.push(finalResults[index])
+      
+      if (index !== (finalDates.length - 1)) {
+        let newDates = utils.monthsBetDates(date, finalDates[index + 1]) // Looks for time gaps
+        if (newDates.length > 0) {
+          newDates.forEach(newDate => {
+            finalResultsAux.push(finalResults[index])
+            finalDatesAux.push(newDate)
+          })
+        }
+      }
+
+      finalDatesAux.push(finalDates[index])
+    })
+
+    state.stats.currentResults = finalResultsAux
+    state.stats.currentDates = finalDatesAux
   },
 
   newPortfolio(state, portfolioName) {

@@ -10,6 +10,7 @@ import { Field, Input, Radio } from 'buefy'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import { utils } from './utils'
 import { iconsSet as icons } from './assets/icons/icons.js'
 
 // Buefy config
@@ -25,6 +26,7 @@ Vue.use(Input)
 Vue.use(Radio)
 
 // Vue config
+Vue.prototype.$utils = utils
 Vue.http = Vue.prototype.$http = axios
 Vue.config.performance = true
 Vue.use(CoreuiVue)

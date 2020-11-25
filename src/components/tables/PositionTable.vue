@@ -21,7 +21,7 @@
         sortable
       >
         <span v-if="props.row.created_at">
-          {{ $parent.format_date(props.row.created_at) }}
+          {{ $utils.formatDate(props.row.created_at) }}
         </span>
         <span v-else>--</span>
       </b-table-column>
@@ -33,7 +33,7 @@
         sortable
       >
         <span v-if="props.row.closed_at">
-          {{ $parent.format_date(props.row.closed_at) }}
+          {{ $utils.formatDate(props.row.closed_at) }}
         </span>
         <span v-else>--</span>
       </b-table-column>
@@ -54,7 +54,7 @@
         sortable
         numeric
       >
-        {{ $parent.format_currency(props.row.initial_price) }}
+        {{ $utils.formatCurrency(props.row.initial_price) }}
       </b-table-column>
 
       <b-table-column
@@ -76,7 +76,7 @@
       >
         <span
           v-if="props.row.current_price"
-        >{{ $parent.format_currency(props.row.current_price) }}</span>
+        >{{ $utils.formatCurrency(props.row.current_price) }}</span>
         <span v-else>--</span>
       </b-table-column>
 
@@ -89,7 +89,7 @@
       >
         <span
           v-if="props.row.var"
-        >{{ $parent.format_currency(props.row.var) }} ({{ $parent.format_percent(props.row.varpct) }})</span>
+        >{{ $utils.formatCurrency(props.row.var) }} ({{ $utils.formatPercent(props.row.varpct) }})</span>
         <span v-else>--</span>
       </b-table-column>
 
@@ -102,7 +102,7 @@
       >
         <span
           v-if="props.row.result !== undefined"
-        >{{ $parent.format_currency(props.row.result) }} ({{ $parent.format_percent(props.row.resultpct) }})</span>
+        >{{ $utils.formatCurrency(props.row.result) }} ({{ $utils.formatPercent(props.row.resultpct) }})</span>
         <span v-else>--</span>
       </b-table-column>
 

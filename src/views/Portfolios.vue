@@ -23,12 +23,8 @@
         class="d-none d-md-block"
       >
         <h5 style="float: right; font-size: 1rem; margin-bottom: 0;">
-          <b>Total: </b>
-          <span style="margin-right: 0.5rem;">{{ format_currency(investment) }}</span>
-          <span>|</span>
-
-          <b style="margin-left: 0.5rem;">Ativo: </b>
-          <span style="margin-right: 0.5rem;">{{ format_currency(activeInvestment) }}</span>
+          <b>Ativo: </b>
+          <span style="margin-right: 0.5rem;">{{ $utils.formatCurrency(activeInvestment) }}</span>
           <span>|</span>
 
           <b
@@ -39,7 +35,7 @@
           </b>
           <span v-else>
             <b style="margin-left: 0.5rem;">Resultado:</b>
-            {{ format_currency(final_result) }} ({{ format_percent(percent_result) }})
+            {{ $utils.formatCurrency(final_result) }} ({{ $utils.formatPercent(percent_result) }})
           </span>
         </h5>
       </CCol>
@@ -185,8 +181,6 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { format_currency, format_percent, format_date } from '../utils'
-
 import ClosePositionForm from '../components/forms/ClosePositionForm'
 import PositionForm from '../components/forms/PositionForm'
 import PositionTable from '../components/tables/PositionTable'
@@ -238,18 +232,6 @@ export default {
   },
 
   methods: {
-    format_currency(num) {
-      return format_currency(num)
-    },
-
-    format_percent(num) {
-      return format_percent(num)
-    },
-
-    format_date(timestamp) {
-      return format_date(timestamp)
-    },
-
     load_portfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)

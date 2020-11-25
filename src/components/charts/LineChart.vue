@@ -46,7 +46,7 @@ export default {
   },
 
   mounted() {
-    var ctx = document.getElementById(this.chartId).getContext('2d');
+    let ctx = document.getElementById(this.chartId).getContext('2d')
     this.chart = new Chart(ctx, {
       type: 'line',
       data: {
