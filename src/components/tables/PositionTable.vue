@@ -136,14 +136,14 @@
           class="buttons"
         >
           <CButton
-            v-if="checkedRows.length === 1 && !checkedRows[0].closed"
+            v-if="showAllOptions"
             color="warning"
             @click="close_position"
           >
             <CIcon name="cil-ban" />&nbsp;Encerrar
           </CButton>
           <CButton
-            style="margin-left: 12px;"
+            :style="[showAllOptions ? {'margin-left': '12px'} : {}]"
             color="danger"
             @click="delete_positions"
           >
@@ -176,6 +176,12 @@ export default {
   data() {
     return {
       checkedRows: []
+    }
+  },
+
+  computed: {
+    showAllOptions() {
+      return this.checkedRows.length === 1 && !this.checkedRows[0].closed
     }
   },
   
