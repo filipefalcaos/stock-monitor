@@ -6,6 +6,9 @@ import stats from './modules/stats'
 
 // Root initial state
 const state = () => ({
+  isLoading: false,
+  hasNewData: false,
+  hasError: false,
   sidebarShow: 'responsive',
   sidebarMinimize: true
 })

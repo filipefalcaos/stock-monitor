@@ -6,7 +6,7 @@
           v-model="portfolioData.last_portfolio"
           placeholder="Carteira"
           expanded
-          @input="load_portfolio"
+          @input="loadPortfolio"
         >
           <option
             v-for="option in portfolioData.portfolios"
@@ -28,14 +28,14 @@
           <span>|</span>
 
           <b
-            v-if="has_error"
+            v-if="hasError"
             style="margin-left: 0.5rem; text-align: justify;"
           >
             Resultados indisponíveis
           </b>
           <span v-else>
             <b style="margin-left: 0.5rem;">Resultado:</b>
-            {{ $utils.formatCurrency(final_result) }} ({{ $utils.formatPercent(percent_result) }})
+            {{ $utils.formatCurrency(finalResult) }} ({{ $utils.formatPercent(0) }})
           </span>
         </h5>
       </CCol>
@@ -52,11 +52,11 @@
         <div style="float: left;">
           <CButton
             color="info"
-            :disabled="is_processing"
-            @click="get_stock_prices"
+            :disabled="isLoading"
+            @click="getStockPrices"
           >
             <CIcon name="cil-sync" />&nbsp;
-            <span v-if="is_processing">Atualizando...</span>
+            <span v-if="isLoading">Atualizando...</span>
             <span v-else>Atualizar</span>
           </CButton>
         </div>
@@ -80,13 +80,13 @@
             toggler-text="Ações" 
             color="secondary"
           >
-            <CDropdownItem @click="add_portfolio_dialog">
+            <CDropdownItem @click="addPortfolioDialog">
               Nova Carteira
             </CDropdownItem>
-            <CDropdownItem @click="edit_portfolio_dialog">
+            <CDropdownItem @click="editPortfolioDialog">
               Editar Carteira
             </CDropdownItem>
-            <CDropdownItem @click="delete_portfolio_dialog">
+            <CDropdownItem @click="deletePortfolioDialog">
               Excluir Carteira
             </CDropdownItem>
           </CDropdown>
@@ -111,9 +111,9 @@
         <position-table
           class="mt-3"
           :position-data="openPositions"
-          :has-new-data="has_new_data"
-          @close-position="close_position_dialog"
-          @delete-positions="delete_positions"
+          :has-new-data="hasNewData"
+          @close-position="closePositionDialog"
+          @delete-positions="deletePositions"
         />
       </CCardBody>
     </CCard>
@@ -135,9 +135,9 @@
         <position-table
           class="mt-3"
           :position-data="closedPositions"
-          :has-new-data="has_new_data"
-          @close-position="close_position_dialog"
-          @delete-positions="delete_positions"
+          :has-new-data="hasNewData"
+          @close-position="closePositionDialog"
+          @delete-positions="deletePositions"
         />
       </CCardBody>
     </CCard>
@@ -150,7 +150,7 @@
       aria-role="dialog"
       aria-modal
     >
-      <position-form @submit-position="add_position" />
+      <position-form @submit-position="addPosition" />
     </b-modal>
 
     <!-- Modal to close positions -->
@@ -163,7 +163,7 @@
     >
       <close-position-form
         :to-close="position_to_close"
-        @update-position="close_position"
+        @update-position="closePosition"
       />
     </b-modal>
   </div>
@@ -172,7 +172,7 @@
     <h5>Não há carteiras cadastradas. Cadastre sua primeira carteira utilizando o botão abaixo.</h5>
     <CButton
       color="success"
-      @click="add_portfolio_dialog"
+      @click="addPortfolioDialog"
     >
       Nova Carteira
     </CButton>
@@ -195,58 +195,55 @@ export default {
 
   data() {
     return {
-      has_new_data: false,
-      is_processing: false,
       modal_add_active: false,
       modal_close_active: false,
-      has_error: false,
       show_open: true,
       show_closed: false,
-      final_result: 0,
-      percent_result: 0,
       position_to_close: null
     }
   },
 
   computed: {
     ...mapState({
+      currentPositions: state => state.portfolios.currentPositions,
       dataFileName: state => state.portfolios.dataFileName,
-      portfolioData: state => state.portfolios.portfolioData,
-      currentPositions: state => state.portfolios.currentPositions
+      finalResult: state => state.portfolios.finalResult,
+      hasError: state => state.hasError,
+      hasNewData: state => state.hasNewData,
+      isLoading: state => state.isLoading,
+      portfolioData: state => state.portfolios.portfolioData
     }),
     
     ...mapGetters({
-      lastPortfolio: 'lastPortfolio',
-      investment: 'investment',
       activeInvestment: 'activeInvestment',
-      openPositions: 'openPositions',
       closedPositions: 'closedPositions',
-      isEmpty: 'isEmpty'
+      isEmpty: 'isEmpty',
+      lastPortfolio: 'lastPortfolio',
+      openPositions: 'openPositions'
     })
   },
   
   // Gets the latest stock prices when the component is created and initializes 
   // the portfolios UI
   async created() {
-    if (!this.isEmpty) this.get_stock_prices()
+    if (!this.isEmpty) this.getStockPrices()
   },
 
   methods: {
-    load_portfolio() {
+    loadPortfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.get_stock_prices()
+      this.getStockPrices()
     },
 
-    create_portfolio(portfolio_name) {
-      this.final_result = 0
+    createPortfolio(portfolio_name) {
       this.percent_result = 0
       this.$store.commit('newPortfolio', portfolio_name)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
     },
 
-    add_portfolio_dialog() {
+    addPortfolioDialog() {
       this.$buefy.dialog.prompt({
         message: 'Forneça um nome para a nova carteira.',
         inputAttrs: {
@@ -257,17 +254,17 @@ export default {
         cancelText: 'Cancelar',
         trapFocus: true,
         type: 'is-info',
-        onConfirm: value => this.create_portfolio(value)
+        onConfirm: value => this.createPortfolio(value)
       })
     },
 
-    edit_portfolio(portfolio_id, portfolio_name) {
+    editPortfolio(portfolio_id, portfolio_name) {
       let payload = {id: portfolio_id, name: portfolio_name}
       this.$store.commit('editPortfolio', payload)
       this.$store.commit('updateDataFile')
     },
 
-    edit_portfolio_dialog() {
+    editPortfolioDialog() {
       this.$buefy.dialog.prompt({
         message: 'Forneça um nome para a carteira.',
         inputAttrs: {
@@ -279,128 +276,58 @@ export default {
         cancelText: 'Cancelar',
         trapFocus: true,
         type: 'is-info',
-        onConfirm: value => this.edit_portfolio(this.lastPortfolio.id, value)
+        onConfirm: value => this.editPortfolio(this.lastPortfolio.id, value)
       })
     },
 
-    delete_portfolio(portfolio_id) {
+    deletePortfolio(portfolio_id) {
       this.$store.commit('deletePortfolio', portfolio_id)
       this.$store.commit('updateDataFile')
 
       if (!this.isEmpty) {
         this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-        this.get_stock_prices()
+        this.getStockPrices()
       }
     },
 
-    delete_portfolio_dialog() {
+    deletePortfolioDialog() {
       this.$buefy.dialog.confirm({
         message: 'Tem certeza que gostaria de excluir a carteira? Isto não poderá ser desfeito.',
         confirmText: 'Excluir',
         cancelText: 'Cancelar',
         type: 'is-danger',
-        onConfirm: () => this.delete_portfolio(this.lastPortfolio.id)
+        onConfirm: () => this.deletePortfolio(this.lastPortfolio.id)
       })
     },
 
-    add_position(newPosition) {
+    addPosition(newPosition) {
       this.$store.commit('addPosition', newPosition)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.get_stock_prices()
+      this.getStockPrices()
     },
 
-    close_position(closeObj) {
+    closePosition(closeObj) {
       this.$store.commit('closePosition', closeObj)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.get_stock_prices()
+      this.getStockPrices()
     },
 
-    close_position_dialog(position) {
+    closePositionDialog(position) {
       this.position_to_close = position
       this.modal_close_active = true
     },
 
-    delete_positions(positions) {
+    deletePositions(positions) {
       this.$store.commit('deletePosition', positions)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.get_stock_prices()
+      this.getStockPrices()
     },
 
-    get_stock_prices() {
-      let promises = []
-      const base_url = 'https://query2.finance.yahoo.com/v10/'
-      this.is_processing = true
-      this.has_error = false
-      
-      // Gets the most recent price of each stock
-      this.currentPositions.forEach(position => {
-        promises.push(
-          this.$http
-            .get(base_url + 'finance/quoteSummary/' + position.stock + '?modules=price')
-            .then(response => {
-              position.aux_price = response.data.quoteSummary.result[0].price.regularMarketPrice.raw
-              position.aux_var = response.data.quoteSummary.result[0].price.regularMarketChange.raw
-              position.aux_varpct = response.data.quoteSummary.result[0].price.regularMarketChangePercent.raw * 100
-            })
-        )
-      })
-      
-      // After all prices are collected, update the UI
-      Promise.all(promises)
-        .then(() => {
-          this.currentPositions.forEach(position => {
-            if (position.closed) {
-              position.current_price = position.close_price
-            } else {
-              position.current_price = position.aux_price
-            }
-            
-            position.var = position.aux_var
-            position.varpct = position.aux_varpct / 100
-          })
-          
-          this.update_stock_prices()
-          this.has_new_data = true
-          this.is_processing = false
-          setTimeout(() => { this.has_new_data = false }, 2000)
-        })
-        .catch(error => {
-          error /* Unused */
-          this.has_error = true
-          if (this.is_processing) this.is_processing = false
-          
-          // Display an error message
-          this.$buefy.notification.open({
-            duration: 5000,
-            message: 'Falha ao se conectar ao servidor. Por favor, cheque sua conexão.',
-            position: 'is-bottom-right',
-            type: 'is-danger'
-          })
-        })
-    },
-
-    update_stock_prices() {
-      let sum = 0
-      this.currentPositions.forEach(position => {
-        if (position.type === 'long') {
-          position.result = (position.current_price - position.initial_price) * position.amount
-        } else {
-          position.result = (position.initial_price - position.current_price) * position.amount
-        }
-        
-        position.resultpct = position.result / (position.initial_price * position.amount)
-        sum += parseFloat(position.result)
-      });
-      
-      this.final_result = parseFloat(sum)
-      if (this.investment === 0) {
-        this.percent_result = 0
-      } else {
-        this.percent_result = sum / this.investment
-      }
+    getStockPrices() {
+      this.$store.dispatch('getStockPrices')
     }
   }
 }

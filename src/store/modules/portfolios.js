@@ -1,14 +1,17 @@
 import { remote } from 'electron'
 import { nanoid } from 'nanoid'
+import { Notification } from 'buefy'
+import axios from 'axios'
 
 import path from 'path'
 const fs = require('fs')
 
 // Initial state
 const state = () => ({
+  currentPositions: [],
   dataFileName: '',
-  portfolioData: {},
-  currentPositions: []
+  finalResult: 0,
+  portfolioData: {}
 })
 
 // Getters
@@ -19,22 +22,10 @@ const getters = {
     })
   },
 
-  investment: (state, getters) => {
-    state /* Unused */
-    return getters.lastPortfolio.positions.reduce((total, position) => {
-      return total + position.initial_price * position.amount
-    }, 0)
-  },
-
   activeInvestment: (state, getters) => {
     state /* Unused */
-
-    return getters.investment - getters.lastPortfolio.positions.reduce((total, position) => {
-      if (position.closed) {
-        return total + position.initial_price * position.amount
-      } else {
-        return total
-      }
+    return getters.openPositions.reduce((total, position) => {
+      return total + position.initial_price * position.amount
     }, 0)
   },
 
@@ -57,7 +48,47 @@ const getters = {
 }
 
 // Actions
-const actions = {}
+const actions = {
+  getStockPrices({ commit, state }) {
+    commit('set', ['isLoading', true])
+    commit('set', ['hasError', false])
+    
+    // Gets the most recent price of each stock from Yahoo Finance
+    const base_url = 'https://query2.finance.yahoo.com/v10/'
+    const uniqueStocks = [...new Set(state.currentPositions.map(p => p.stock))]
+    
+    let promises = []
+    uniqueStocks.forEach(s => {
+      promises.push(
+        axios
+          .get(base_url + 'finance/quoteSummary/' + s + '?modules=price')
+          .then(response => response.data)
+      )
+    })
+
+    // Updates the prices
+    Promise.all(promises)
+      .then(responses => {
+        commit('updatePrices', responses)
+        commit('set', ['isLoading', false])
+        commit('set', ['hasNewData', true])
+        setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
+      })
+      .catch(error => {
+        error /* Unused */
+        commit('set', ['hasError', true])
+        if (state.isLoading) commit('set', ['isLoading', false])
+        
+        // Display an error message
+        Notification.open({
+          duration: 5000,
+          message: 'Falha ao se conectar ao servidor. Por favor, cheque sua conexão.',
+          position: 'is-bottom-right',
+          type: 'is-danger'
+        })
+      })
+  }
+}
 
 // Mutations
 const mutations = {
@@ -107,10 +138,6 @@ const mutations = {
     fs.writeFileSync(state.dataFileName, JSON.stringify(portfolioCopy, null, 2))
   },
 
-  setCurrentPositions(state, positions) {
-    state.currentPositions = positions
-  },
-
   newPortfolio(state, portfolioName) {
     state.portfolioData.last_portfolio = nanoid()
     state.portfolioData.portfolios.push({
@@ -137,6 +164,10 @@ const mutations = {
     } else {
       state.portfolioData.last_portfolio = null
     }
+  },
+
+  setCurrentPositions(state, positions) {
+    state.currentPositions = positions
   },
 
   addPosition(state, postionData) {
@@ -204,6 +235,33 @@ const mutations = {
     })
 
     lastPortfolio.positions = state.currentPositions.filter(position => !positions.includes(position))
+  },
+
+  updatePrices(state, priceData) {
+    let results = {}
+    priceData.forEach(r => {
+      results[r.quoteSummary.result[0].price.symbol] = {
+        price: r.quoteSummary.result[0].price.regularMarketPrice.raw,
+        var: r.quoteSummary.result[0].price.regularMarketChange.raw,
+        varpct: r.quoteSummary.result[0].price.regularMarketChangePercent.raw
+      }
+    })
+
+    // Updates the prices for each position
+    let sum = 0
+    state.currentPositions.forEach(p => {
+      p.var = results[p.stock].var
+      p.varpct = results[p.stock].varpct
+      p.current_price = p.closed ? p.close_price : results[p.stock].price
+      
+      // Compute the position result
+      let diff = p.current_price - p.initial_price
+      p.result = (p.type === 'long') ? diff * p.amount : -diff * p.amount
+      p.resultpct = p.result / (p.initial_price * p.amount)
+      sum += parseFloat(p.result)
+    })
+
+    state.finalResult = parseFloat(sum)
   }
 }
 
