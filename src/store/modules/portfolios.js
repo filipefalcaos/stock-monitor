@@ -70,12 +70,16 @@ const actions = {
     Promise.all(promises)
       .then(responses => {
         commit('updatePrices', responses)
+        commit('computeCumSum', state.currentPositions, { root: true })
+        
+        // Updates the UI state
         commit('set', ['isLoading', false])
         commit('set', ['hasNewData', true])
         setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
       })
       .catch(error => {
         error /* Unused */
+        console.log(error)
         commit('set', ['hasError', true])
         commit('set', ['isLoading', false])
         

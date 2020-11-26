@@ -106,9 +106,7 @@ export default {
   // Computes the statistics on the portfolios/options data when the component
   // is created
   created() {
-    this.$store.dispatch('getStockPrices').then(() => {
-      this.computeStats()
-    })
+    this.$store.dispatch('getStockPrices')
   },
 
   methods: {

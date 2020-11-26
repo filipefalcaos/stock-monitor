@@ -13,13 +13,13 @@ const actions = {}
 
 // Mutations
 const mutations = {
-  computeCumSum(state, payload) {
-    let closed = payload.currentPositions.filter(position => position.closed)
-    closed.sort((a, b) => a.closed_at - b.closed_at)
+  computeCumSum(state, currentPositions) {
+    currentPositions.forEach(p => p.closed ? null : p.closed_at = Date.now())
+    currentPositions.sort((a, b) => a.closed_at - b.closed_at)
 
     // Computes the monthly cumulative sum
-    let results = closed.map(a => parseInt(a.result)).map(cumulativeSum(0))
-    let dates = closed.map(a => a.closed_at).map((x) => utils.formatDate(x, 'month-year'))
+    let results = currentPositions.map(a => a.result).map(cumulativeSum(0))
+    let dates = currentPositions.map(a => a.closed_at).map((x) => utils.formatDate(x, 'month-year'))
     let data = results.map((x, i) => [x, dates[i]])
     
     // Groups results by date
@@ -43,12 +43,6 @@ const mutations = {
       finalDates.push(x.date)
     })
 
-    // Makes the cumulative sum start with 0
-    let startDate = payload.lastPortfolio.created_at
-    startDate = utils.formatDate(startDate, 'month-year').split(' ')[0]
-    finalResults.unshift(0)
-    finalDates.unshift(startDate)
-
     // Fills the time gaps
     let finalResultsAux = [], finalDatesAux = []
     finalDates.forEach((date, index) => {
@@ -69,6 +63,11 @@ const mutations = {
 
     state.cumulativeSum.currentResults = finalResultsAux
     state.cumulativeSum.currentDates = finalDatesAux
+
+    // Remove the 'closed_at' property from the open positions
+    currentPositions.forEach(p => {
+      if (!p.closed) delete p.closed_at
+    })
   }
 }
 

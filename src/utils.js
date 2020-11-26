@@ -1,4 +1,5 @@
 import { add, isBefore, format, parse, sub } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 // Formats a given number to a currency
 function formatCurrency(num) {
@@ -28,7 +29,7 @@ function defaulFormat(timestamp) {
 // Formats a given timestamp (in milliseconds) to the format 'MMM-yyyy'
 function monthYearFormat(timestamp) {
   let date = new Date(timestamp)
-  return format(date, 'MMM-yyyy')
+  return format(date, 'MMM-yyyy', {locale: ptBR})
 }
 
 // Formats a given timestamp (in milliseconds) to a format specified by each available 
@@ -48,8 +49,8 @@ function formatDate(timestamp, mode = 'default') {
 // Retrieves the months between two given date strings in the format 'MMM-yyyy'
 // The start and end months are not included
 function monthsBetDates(date1, date2) {
-  let initialDate = parse(date1, 'MMM-yyyy', new Date())
-  let finalDate = parse(date2, 'MMM-yyyy', new Date())
+  let initialDate = parse(date1, 'MMM-yyyy', new Date(), {locale: ptBR})
+  let finalDate = parse(date2, 'MMM-yyyy', new Date(), {locale: ptBR})
 
   if (isBefore(finalDate, initialDate)) {
     return []
@@ -59,7 +60,7 @@ function monthsBetDates(date1, date2) {
   finalDate = sub(finalDate, {months: 1})
   while (isBefore(initialDate, finalDate)) {
     initialDate = add(initialDate, {months: 1})
-    months.push(format(initialDate, 'MMM-yyyy'))
+    months.push(format(initialDate, 'MMM-yyyy', {locale: ptBR}))
   }
   
   return months

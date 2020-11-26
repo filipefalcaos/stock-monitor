@@ -7,6 +7,7 @@
 <script>
 import Chart from 'chart.js'
 import { nanoid } from 'nanoid'
+import { utils } from '../../utils'
 
 export default {
   name: 'LineChart',
@@ -80,7 +81,7 @@ export default {
               beginAtZero: true,
               callback: function (value, index, values) {
                 index, values /* Unused */
-                return 'R$ ' + value
+                return utils.formatCurrency(value)
               }
             },
             gridLines: {
@@ -94,7 +95,7 @@ export default {
           callbacks: {
             label: function (tooltipItems, data) {
               data /* Unused */
-              return ' R$ ' + tooltipItems.yLabel
+              return utils.formatCurrency(tooltipItems.yLabel)
             }
           }
         }
