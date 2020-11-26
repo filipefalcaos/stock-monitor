@@ -53,7 +53,7 @@
           <CButton
             color="info"
             :disabled="isLoading"
-            @click="getStockPrices"
+            @click="$store.dispatch('getStockPrices')"
           >
             <CIcon name="cil-sync" />&nbsp;
             <span v-if="isLoading">Atualizando...</span>
@@ -226,14 +226,14 @@ export default {
   // Gets the latest stock prices when the component is created and initializes 
   // the portfolios UI
   async created() {
-    if (!this.isEmpty) this.getStockPrices()
+    if (!this.isEmpty) this.$store.dispatch('getStockPrices')
   },
 
   methods: {
     loadPortfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.getStockPrices()
+      this.$store.dispatch('getStockPrices')
     },
 
     createPortfolio(portfolio_name) {
@@ -286,7 +286,7 @@ export default {
 
       if (!this.isEmpty) {
         this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-        this.getStockPrices()
+        this.$store.dispatch('getStockPrices')
       }
     },
 
@@ -304,14 +304,14 @@ export default {
       this.$store.commit('addPosition', newPosition)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.getStockPrices()
+      this.$store.dispatch('getStockPrices')
     },
 
     closePosition(closeObj) {
       this.$store.commit('closePosition', closeObj)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.getStockPrices()
+      this.$store.dispatch('getStockPrices')
     },
 
     closePositionDialog(position) {
@@ -323,10 +323,6 @@ export default {
       this.$store.commit('deletePosition', positions)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.getStockPrices()
-    },
-
-    getStockPrices() {
       this.$store.dispatch('getStockPrices')
     }
   }

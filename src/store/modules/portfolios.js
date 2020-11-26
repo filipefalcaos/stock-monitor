@@ -1,6 +1,6 @@
 import { remote } from 'electron'
 import { nanoid } from 'nanoid'
-import { Notification } from 'buefy'
+import { NotificationProgrammatic } from 'buefy'
 import axios from 'axios'
 
 import path from 'path'
@@ -77,10 +77,10 @@ const actions = {
       .catch(error => {
         error /* Unused */
         commit('set', ['hasError', true])
-        if (state.isLoading) commit('set', ['isLoading', false])
+        commit('set', ['isLoading', false])
         
         // Display an error message
-        Notification.open({
+        NotificationProgrammatic.open({
           duration: 5000,
           message: 'Falha ao se conectar ao servidor. Por favor, cheque sua conexão.',
           position: 'is-bottom-right',

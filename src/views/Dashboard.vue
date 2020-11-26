@@ -67,6 +67,7 @@
         <position-table
           class="mt-3"
           :position-data="lastPositions"
+          :has-new-data="hasNewData"
           :has-actions="false"
         />
       </CCardBody>
@@ -85,17 +86,13 @@ export default {
     LineChart,
     PositionTable
   },
-  
-  data() {
-    return {
-      isLoading: true
-    }
-  },
 
   computed: {
     ...mapState({
       cumulativeSum: state => state.stats.cumulativeSum,
       currentPositions: state => state.portfolios.currentPositions,
+      hasNewData: state => state.hasNewData,
+      isLoading: state => state.isLoading,
       portfolioData: state => state.portfolios.portfolioData
     }),
     
@@ -109,8 +106,9 @@ export default {
   // Computes the statistics on the portfolios/options data when the component
   // is created
   created() {
-    this.computeStats()
-    setTimeout(() => this.isLoading = false, 1000)
+    this.$store.dispatch('getStockPrices').then(() => {
+      this.computeStats()
+    })
   },
 
   methods: {
