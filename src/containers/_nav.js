@@ -9,30 +9,16 @@ export default [
         icon: 'cil-graph'
       },
       {
-        _name: 'CSidebarNavTitle',
-        _children: ['Operações']
-      },
-      {
         _name: 'CSidebarNavItem',
-        name: 'Carteiras',
+        name: 'Carteiras de Ações',
         to: '/portfolios',
         icon: 'cil-wallet'
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Opções',
+        name: 'Operação em Opções',
         to: '/options',
         icon: 'cil-cash'
-      },
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Relatórios']
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Relatórios',
-        to: '/res-report',
-        icon: 'cil-chart-pie'
       },
       {
         _name: 'CSidebarNavItem',
