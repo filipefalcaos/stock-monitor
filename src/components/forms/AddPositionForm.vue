@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="submit_position">
+  <form @submit.prevent="submitPosition">
     <div
       class="modal-card"
       style="width: 450px;"
@@ -77,7 +77,7 @@
 
 <script>
 export default {
-  name: 'PositionForm',
+  name: 'AddPositionForm',
   data() {
     return {
       stock: '',
@@ -88,7 +88,7 @@ export default {
   },
   
   methods: {
-    submit_position() {
+    submitPosition() {
       let newPosition = {
         stock: this.stock.toUpperCase(),
         amount: this.amount,

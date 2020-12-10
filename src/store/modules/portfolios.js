@@ -17,9 +17,7 @@ const state = () => ({
 // Getters
 const getters = {
   lastPortfolio: (state) => {
-    return state.portfolioData.portfolios.find(portfolio => {
-      return portfolio.id == state.portfolioData.last_portfolio
-    })
+    return findPortfolio(state, state.portfolioData.last_portfolio)
   },
 
   activeInvestment: (state, getters) => {
@@ -79,7 +77,6 @@ const actions = {
       })
       .catch(error => {
         error /* Unused */
-        console.log(error)
         commit('set', ['hasError', true])
         commit('set', ['isLoading', false])
         
@@ -153,10 +150,7 @@ const mutations = {
   },
 
   editPortfolio(state, payload) {
-    let currPortfolio = state.portfolioData.portfolios.find(portfolio => {
-      return portfolio.id == payload.id
-    })
-
+    let currPortfolio = findPortfolio(state, payload.id)
     currPortfolio.name = payload.name
   },
 
@@ -175,10 +169,7 @@ const mutations = {
   },
 
   addPosition(state, postionData) {
-    let lastPortfolio = state.portfolioData.portfolios.find(portfolio => {
-      return portfolio.id == state.portfolioData.last_portfolio
-    })
-
+    let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
     lastPortfolio.positions.push({
       id: nanoid(),
       stock: postionData.stock,
@@ -191,9 +182,7 @@ const mutations = {
   },
 
   closePosition(state, closeObj) {
-    let lastPortfolio = state.portfolioData.portfolios.find(portfolio => {
-      return portfolio.id == state.portfolioData.last_portfolio
-    })
+    let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
 
     // Checks if a new position must be created and closed (partial closing), or just close
     // the existing one
@@ -234,11 +223,15 @@ const mutations = {
   },
 
   deletePosition(state, positions) {
-    let lastPortfolio = state.portfolioData.portfolios.find(portfolio => {
-      return portfolio.id == state.portfolioData.last_portfolio
-    })
-
+    let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
     lastPortfolio.positions = state.currentPositions.filter(position => !positions.includes(position))
+  },
+
+  movePosition(state, moveObj) {
+    let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
+    let newPortfolio = findPortfolio(state, moveObj.portfolio)
+    newPortfolio.positions.push(moveObj.position)
+    lastPortfolio.positions = state.currentPositions.filter(position => ![moveObj.position].includes(position))
   },
 
   updatePrices(state, priceData) {
@@ -267,6 +260,14 @@ const mutations = {
 
     state.finalResult = parseFloat(sum)
   }
+}
+
+// Finds a portfolio of a given ID on the list of portfolios stored
+// in the Vuex state
+function findPortfolio(state, id) {
+  return state.portfolioData.portfolios.find(portfolio => {
+    return portfolio.id == id
+  })
 }
 
 export default {

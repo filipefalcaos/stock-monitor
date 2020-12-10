@@ -135,20 +135,39 @@
           v-if="checkedRows.length > 0"
           class="buttons"
         >
-          <CButton
-            v-if="showAllOptions"
-            color="warning"
-            @click="close_position"
-          >
-            <CIcon name="cil-ban" />&nbsp;Encerrar
-          </CButton>
-          <CButton
-            :style="[showAllOptions ? {'margin-left': '12px'} : {}]"
-            color="danger"
-            @click="delete_positions"
-          >
-            <CIcon name="cil-trash" />&nbsp;Excluir
-          </CButton>
+          <CButtonToolbar>
+            <CButtonGroup
+              v-if="showAllOptions"
+              class="mx-1 d-sm-down-none"
+            >
+              <CButton
+                v-if="showAllOptions"
+                color="info"
+                @click="movePosition"
+              >
+                <CIcon name="cil-arrow-circle-right" />&nbsp;Mover
+              </CButton>
+            </CButtonGroup>
+            <CButtonGroup
+              v-if="showAllOptions"
+              class="mx-1 d-sm-down-none"
+            >
+              <CButton
+                color="warning"
+                @click="closePosition"
+              >
+                <CIcon name="cil-ban" />&nbsp;Encerrar
+              </CButton>
+            </CButtonGroup>
+            <CButtonGroup class="mx-1 d-sm-down-none">
+              <CButton
+                color="danger"
+                @click="deletePositions"
+              >
+                <CIcon name="cil-trash" />&nbsp;Excluir
+              </CButton>
+            </CButtonGroup>
+          </CButtonToolbar>
         </div>
       </template>
     </b-table>
@@ -194,12 +213,17 @@ export default {
   },
   
   methods: {
-    close_position() {
+    closePosition() {
       this.$emit('close-position', this.checkedRows[0])
       this.checkedRows = []
     },
+
+    movePosition() {
+      this.$emit('move-position', this.checkedRows[0])
+      this.checkedRows = []
+    },
     
-    delete_positions() {
+    deletePositions() {
       this.$buefy.dialog.confirm({
         message: 'Tem certeza que gostaria de excluir as ações selecionadas? Isto não poderá ser desfeito.',
         confirmText: 'Excluir',

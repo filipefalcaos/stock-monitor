@@ -1,12 +1,12 @@
 <template>
-  <form @submit.prevent="close_position">
+  <form @submit.prevent="closePosition">
     <div
       class="modal-card"
       style="width: 450px;"
     >
       <section class="modal-card-body modal-border-top">
         <b-field label="Ação">
-          {{ toClose.stock }}
+          {{ position.stock }}
         </b-field>
 
         <b-field label="Quantidade">
@@ -15,7 +15,7 @@
             placeholder="100"
             type="number"
             min="0"
-            :max="toClose.amount"
+            :max="position.amount"
             required
           />
         </b-field>
@@ -55,7 +55,7 @@
 export default {
   name: 'ClosePositionForm',
   props: {
-    toClose: {
+    position: {
       type: Object,
       default: () => {}
     }
@@ -69,12 +69,12 @@ export default {
   },
   
   methods: {
-    close_position() {
+    closePosition() {
       this.$parent.close()
       this.$emit('update-position', {
         new_amount: this.amount,
         close_price: this.close_price,
-        old_position: JSON.parse(JSON.stringify(this.toClose))
+        old_position: JSON.parse(JSON.stringify(this.position))
       })
     }
   }

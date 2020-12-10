@@ -23,7 +23,7 @@
                 v-model="portfolioData.last_portfolio"
                 placeholder="Carteira"
                 expanded
-                @input="load_portfolio"
+                @input="loadPortfolio"
               >
                 <option
                   v-for="option in portfolioData.portfolios"
@@ -115,7 +115,7 @@ export default {
       this.$store.commit('computeCumSum', payload) // Updates the stats
     },
 
-    load_portfolio() {
+    loadPortfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
       this.computeStats()

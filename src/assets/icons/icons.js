@@ -1,5 +1,6 @@
 import {
   cilAccountLogout,
+  cilArrowCircleRight,
   cilBan,
   cilBank,
   cilBell,
@@ -16,6 +17,7 @@ export const iconsSet = Object.assign(
   {},
   {
     cilAccountLogout,
+    cilArrowCircleRight,
     cilBan,
     cilBank,
     cilBell,

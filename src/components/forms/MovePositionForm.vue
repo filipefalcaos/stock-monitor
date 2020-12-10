@@ -1,0 +1,85 @@
+<template>
+  <form @submit.prevent="movePosition">
+    <div
+      class="modal-card"
+      style="width: 450px;"
+    >
+      <section class="modal-card-body modal-border-top">
+        <label class="label">Detalhes</label>
+        <p><b>Ação:</b> {{ position.stock }}</p>
+        <p><b>Quantidade:</b> {{ position.amount }}</p>
+        <p><b>Preço Inicial:</b> {{ $utils.formatCurrency(position.initial_price) }}</p>
+        <p style="margin-bottom: 1em">
+          <b>Carteira:</b> {{ lastPortfolio.name }}
+        </p>
+
+        <b-field label="Nova Carteira">
+          <b-select
+            v-model="selected_portfolio"
+            placeholder="Carteira"
+            expanded
+          >
+            <option
+              v-for="option in portfolioData.portfolios"
+              :key="option.id"
+              :value="option.id"
+            >
+              {{ option.name }}
+            </option>
+          </b-select>
+        </b-field>
+      </section>
+
+      <footer class="modal-card-foot">
+        <button
+          class="button"
+          type="button"
+          @click="$parent.close()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="button is-info"
+        >
+          Mover
+        </button>
+      </footer>
+    </div>
+  </form>
+</template>
+
+<script>
+import { mapGetters, mapState } from 'vuex'
+
+export default {
+  name: 'MovePositionForm',
+  props: {
+    position: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  
+  data() {
+    return {
+      selected_portfolio: null
+    }
+  },
+
+  computed: {
+    ...mapState({ portfolioData: state => state.portfolios.portfolioData }),
+    ...mapGetters({ lastPortfolio: 'lastPortfolio' })
+  },
+  
+  methods: {
+    movePosition() {
+      this.$parent.close()
+      this.$emit('move-position', {
+        portfolio: this.selected_portfolio,
+        position: this.position
+      })
+    }
+  }
+}
+</script>

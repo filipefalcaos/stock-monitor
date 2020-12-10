@@ -70,7 +70,7 @@
           <CButton
             style="margin-right: 12px;"
             color="success"
-            @click="modal_add_active = true"
+            @click="modalAddActive = true"
           >
             Novo Ativo
           </CButton>
@@ -113,6 +113,7 @@
           :position-data="openPositions"
           :has-new-data="hasNewData"
           @close-position="closePositionDialog"
+          @move-position="movePositionDialog"
           @delete-positions="deletePositions"
         />
       </CCardBody>
@@ -136,7 +137,7 @@
           class="mt-3"
           :position-data="closedPositions"
           :has-new-data="hasNewData"
-          @close-position="closePositionDialog"
+          @move-position="movePositionDialog"
           @delete-positions="deletePositions"
         />
       </CCardBody>
@@ -144,26 +145,39 @@
 
     <!-- Modal to add positions -->
     <b-modal
-      :active.sync="modal_add_active"
+      :active.sync="modalAddActive"
       has-modal-card
       trap-focus
       aria-role="dialog"
       aria-modal
     >
-      <position-form @submit-position="addPosition" />
+      <add-position-form @submit-position="addPosition" />
     </b-modal>
 
     <!-- Modal to close positions -->
     <b-modal
-      :active.sync="modal_close_active"
+      :active.sync="modalCloseActive"
       has-modal-card
       trap-focus
       aria-role="dialog"
       aria-modal
     >
       <close-position-form
-        :to-close="position_to_close"
+        :position="selectedPosition"
         @update-position="closePosition"
+      />
+    </b-modal>
+
+    <b-modal
+      :active.sync="modalMoveActive"
+      has-modal-card
+      trap-focus
+      aria-role="dialog"
+      aria-modal
+    >
+      <move-position-form
+        :position="selectedPosition"
+        @move-position="movePosition"
       />
     </b-modal>
   </div>
@@ -181,25 +195,26 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import AddPositionForm from '../components/forms/AddPositionForm'
 import ClosePositionForm from '../components/forms/ClosePositionForm'
-import PositionForm from '../components/forms/PositionForm'
+import MovePositionForm from '../components/forms/MovePositionForm'
 import PositionTable from '../components/tables/PositionTable'
 
 export default {
   name: 'Portfolios',
   components: {
+    AddPositionForm,
     ClosePositionForm,
-    PositionForm,
+    MovePositionForm,
     PositionTable
   },
 
   data() {
     return {
-      modal_add_active: false,
-      modal_close_active: false,
-      show_open: true,
-      show_closed: false,
-      position_to_close: null
+      modalAddActive: false,
+      modalCloseActive: false,
+      modalMoveActive: false,
+      selectedPosition: null
     }
   },
 
@@ -315,8 +330,20 @@ export default {
     },
 
     closePositionDialog(position) {
-      this.position_to_close = position
-      this.modal_close_active = true
+      this.selectedPosition = position
+      this.modalCloseActive = true
+    },
+
+    movePosition(moveObj) {
+      this.$store.commit('movePosition', moveObj)
+      this.$store.commit('updateDataFile')
+      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
+      this.$store.dispatch('getStockPrices')
+    },
+
+    movePositionDialog(position) {
+      this.selectedPosition = position
+      this.modalMoveActive = true
     },
 
     deletePositions(positions) {

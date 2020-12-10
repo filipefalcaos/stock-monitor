@@ -3,16 +3,12 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'App',
 
   computed: {
-    ...mapState({
-      stats: state => state.portfolios.stats
-    }),
-    
     ...mapGetters({
       lastPortfolio: 'lastPortfolio',
       isEmpty: 'isEmpty'
