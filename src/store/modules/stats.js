@@ -49,7 +49,7 @@ const mutations = {
       finalResultsAux.push(finalResults[index])
       
       if (index !== (finalDates.length - 1)) {
-        let newDates = utils.monthsBetDates(date, finalDates[index + 1]) // Looks for time gaps
+        let newDates = utils.monthsInInterval(date, finalDates[index + 1]) // Looks for time gaps
         if (newDates.length > 0) {
           newDates.forEach(newDate => {
             finalResultsAux.push(finalResults[index])

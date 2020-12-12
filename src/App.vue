@@ -1,14 +1,18 @@
 <template>
-  <router-view />
+  <div>
+    <b-loading v-model="isLoading" />
+    <router-view />
+  </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'App',
 
   computed: {
+    ...mapState({ isLoading: state => state.isLoading }),
     ...mapGetters({
       lastPortfolio: 'lastPortfolio',
       isEmpty: 'isEmpty'

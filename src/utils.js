@@ -1,4 +1,4 @@
-import { add, isBefore, format, parse, sub } from 'date-fns'
+import { add, isBefore, isWithinInterval, format, parse, sub } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 // Formats a given number to a currency
@@ -33,8 +33,7 @@ function monthYearFormat(timestamp) {
 }
 
 // Formats a given timestamp (in milliseconds) to a format specified by each available 
-// formatting mode
-// Available modes: 'default', 'month-year'
+// formatting mode. Available modes: 'default', 'month-year'
 function formatDate(timestamp, mode = 'default') {
   switch (mode) {
     case 'month-year':
@@ -46,9 +45,9 @@ function formatDate(timestamp, mode = 'default') {
   }
 }
 
-// Retrieves the months between two given date strings in the format 'MMM-yyyy'
-// The start and end months are not included
-function monthsBetDates(date1, date2) {
+// Retrieves the months in the interval of two given date strings in the format 
+// 'MMM-yyyy'. The start and end months are not included
+function monthsInInterval(date1, date2) {
   let initialDate = parse(date1, 'MMM-yyyy', new Date(), {locale: ptBR})
   let finalDate = parse(date2, 'MMM-yyyy', new Date(), {locale: ptBR})
 
@@ -66,9 +65,19 @@ function monthsBetDates(date1, date2) {
   return months
 }
 
+// Checks if a given date in the format 'dd/MM/yyyy' is in the interval of two 
+// given timestamps (in milliseconds)
+function isInInterval(date, date1, date2) {
+  let toTest = parse(date, 'dd/MM/yyyy', new Date())
+  let initialDate = new Date(date1)
+  let finalDate = new Date(date2)
+  return isWithinInterval(toTest, { start: initialDate, end: finalDate })
+}
+
 export const utils = {
   formatCurrency: formatCurrency,
   formatPercent: formatPercent,
   formatDate: formatDate,
-  monthsBetDates: monthsBetDates
+  monthsInInterval: monthsInInterval,
+  isInInterval: isInInterval
 }

@@ -1,6 +1,7 @@
 import { remote } from 'electron'
 import { nanoid } from 'nanoid'
 import { NotificationProgrammatic } from 'buefy'
+import { utils } from '../../utils'
 import axios from 'axios'
 
 import path from 'path'
@@ -11,7 +12,9 @@ const state = () => ({
   currentPositions: [],
   dataFileName: '',
   finalResult: 0,
-  portfolioData: {}
+  finalDividends: 0,
+  portfolioData: {},
+  dividendsData: {}
 })
 
 // Getters
@@ -68,6 +71,44 @@ const actions = {
     Promise.all(promises)
       .then(responses => {
         commit('updatePrices', responses)
+      })
+      .catch(error => {
+        error /* Unused */
+        commit('set', ['hasError', true])
+        commit('set', ['isLoading', false])
+        
+        // Display an error message
+        NotificationProgrammatic.open({
+          duration: 5000,
+          message: 'Falha ao se conectar ao servidor. Por favor, cheque sua conexão.',
+          position: 'is-bottom-right',
+          type: 'is-danger'
+        })
+      })
+  },
+
+  getDividendsHistory({ commit, state }) {
+    commit('set', ['isLoading', true])
+    commit('set', ['hasError', false])
+    
+    // Gets the history of dividends for each stock from Status Invest
+    const base_url = 'https://statusinvest.com.br/acoes/'
+    const uniqueStocks = [...new Set(state.currentPositions.map(p => p.stock))]
+
+    let promises = []
+    uniqueStocks.forEach(s => {
+      promises.push(
+        axios
+          .get(base_url + s.replace('.SA', ''))
+          .then(response => { return { stock: s, data: response.data } })
+      )
+    })
+
+    // Sets the history of dividends
+    Promise.all(promises)
+      .then(responses => {
+        commit('setDividends', responses)
+        commit('updatePricesDividends')
         commit('computeCumSum', state.currentPositions, { root: true })
         
         // Updates the UI state
@@ -259,6 +300,40 @@ const mutations = {
     })
 
     state.finalResult = parseFloat(sum)
+  },
+
+  setDividends(state, dividendsData) {
+    dividendsData.forEach(d => {
+      let parser = new DOMParser()
+      let doc = parser.parseFromString(d.data, 'text/html')
+      let results = JSON.parse(doc.getElementById('results').value)
+      
+      let dividends = []
+      results.forEach(r => dividends.push({ ed: r.ed, pd: r.pd, value: r.v, type: r.etd }))
+      state.dividendsData[d.stock] = dividends
+    })
+  },
+
+  updatePricesDividends(state) {
+    state.finalDividends = 0
+    state.currentPositions.forEach(p => {
+      let dividendData = state.dividendsData[p.stock]
+      p.dividends = 0
+      
+      // Updates the profit of the position with the dividends
+      dividendData.forEach(d => {
+        let finalDate = p.closed ? p.closed_at : Date.now()  
+        if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
+          p.dividends += p.amount * d.value
+        }
+      })
+
+      p.result += p.dividends
+      p.resultpct = p.result / (p.initial_price * p.amount)
+      state.finalDividends += p.dividends
+    })
+
+    state.finalResult += state.finalDividends
   }
 }
 

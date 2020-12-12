@@ -1,7 +1,5 @@
 <template>
   <div>
-    <b-loading v-model="isLoading" />
-
     <CCard>
       <CCardBody>
         <CRow>
@@ -92,7 +90,6 @@ export default {
       cumulativeSum: state => state.stats.cumulativeSum,
       currentPositions: state => state.portfolios.currentPositions,
       hasNewData: state => state.hasNewData,
-      isLoading: state => state.isLoading,
       portfolioData: state => state.portfolios.portfolioData
     }),
     
@@ -105,8 +102,9 @@ export default {
 
   // Computes the statistics on the portfolios/options data when the component
   // is created
-  created() {
-    this.$store.dispatch('getStockPrices')
+  async created() {
+    await this.$store.dispatch('getStockPrices')
+    await this.$store.dispatch('getDividendsHistory')
   },
 
   methods: {

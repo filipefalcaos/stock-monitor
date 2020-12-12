@@ -35,7 +35,10 @@
           </b>
           <span v-else>
             <b style="margin-left: 0.5rem;">Resultado:</b>
-            {{ $utils.formatCurrency(finalResult) }} ({{ $utils.formatPercent(0) }})
+            {{ $utils.formatCurrency(finalResult) }}
+            <span>|</span>
+            <b style="margin-left: 0.5rem;">Proventos:</b>
+            {{ $utils.formatCurrency(finalDividends) }} ({{ $utils.formatPercent(finalDividends / finalResult) }})
           </span>
         </h5>
       </CCol>
@@ -223,6 +226,7 @@ export default {
       currentPositions: state => state.portfolios.currentPositions,
       dataFileName: state => state.portfolios.dataFileName,
       finalResult: state => state.portfolios.finalResult,
+      finalDividends: state => state.portfolios.finalDividends,
       hasError: state => state.hasError,
       hasNewData: state => state.hasNewData,
       isLoading: state => state.isLoading,
@@ -241,14 +245,18 @@ export default {
   // Gets the latest stock prices when the component is created and initializes 
   // the portfolios UI
   async created() {
-    if (!this.isEmpty) this.$store.dispatch('getStockPrices')
+    if (!this.isEmpty) {
+      await this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getDividendsHistory')
+    }
   },
 
   methods: {
-    loadPortfolio() {
+    async loadPortfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getDividendsHistory')
     },
 
     createPortfolio(portfolio_name) {
@@ -295,13 +303,14 @@ export default {
       })
     },
 
-    deletePortfolio(portfolio_id) {
+    async deletePortfolio(portfolio_id) {
       this.$store.commit('deletePortfolio', portfolio_id)
       this.$store.commit('updateDataFile')
 
       if (!this.isEmpty) {
         this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-        this.$store.dispatch('getStockPrices')
+        await this.$store.dispatch('getStockPrices')
+        await this.$store.dispatch('getDividendsHistory')
       }
     },
 
@@ -315,18 +324,20 @@ export default {
       })
     },
 
-    addPosition(newPosition) {
+    async addPosition(newPosition) {
       this.$store.commit('addPosition', newPosition)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getDividendsHistory')
     },
 
-    closePosition(closeObj) {
+    async closePosition(closeObj) {
       this.$store.commit('closePosition', closeObj)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getDividendsHistory')
     },
 
     closePositionDialog(position) {
@@ -334,11 +345,12 @@ export default {
       this.modalCloseActive = true
     },
 
-    movePosition(moveObj) {
+    async movePosition(moveObj) {
       this.$store.commit('movePosition', moveObj)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getDividendsHistory')
     },
 
     movePositionDialog(position) {
@@ -346,11 +358,12 @@ export default {
       this.modalMoveActive = true
     },
 
-    deletePositions(positions) {
+    async deletePositions(positions) {
       this.$store.commit('deletePosition', positions)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getDividendsHistory')
     }
   }
 }
