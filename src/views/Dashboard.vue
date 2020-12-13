@@ -56,6 +56,28 @@
               id="traffic"
               class="card-title mb-0"
             >
+              Últimos Proventos
+            </h4>
+          </CCol>
+        </CRow>
+
+        <!-- Table of last dividends -->
+        <dividend-table
+          class="mt-3"
+          :dividend-data="lastDividends"
+          :has-new-data="hasNewData"
+        />
+      </CCardBody>
+    </CCard>
+
+    <CCard>
+      <CCardBody>
+        <CRow>
+          <CCol sm="5">
+            <h4
+              id="traffic"
+              class="card-title mb-0"
+            >
               Últimas Operações
             </h4>
           </CCol>
@@ -76,12 +98,14 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import LineChart from '../components/charts/LineChart'
+import DividendTable from '../components/tables/DividendTable'
 import PositionTable from '../components/tables/PositionTable'
 
 export default {
   name: 'Dashboard',
   components: {
     LineChart,
+    DividendTable,
     PositionTable
   },
 
@@ -96,7 +120,8 @@ export default {
     ...mapGetters({
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
-      lastPositions: 'lastPositions'
+      lastPositions: 'lastPositions',
+      lastDividends: 'lastDividends'
     })
   },
 

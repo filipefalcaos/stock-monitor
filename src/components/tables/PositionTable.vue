@@ -1,7 +1,7 @@
 <template>
   <div>
     <h6 v-if="positionData.length == 0 || !positionData">
-      Sem ações listadas.
+      Sem posições listadas.
     </h6>
 
     <b-table
@@ -9,6 +9,8 @@
       :data="positionData"
       :checked-rows.sync="checkedRows"
       :checkable="hasActions"
+      :paginated="isPaginated"
+      :per-page="pages"
       :row-class="(row, index) => hasNewData && 'green-success'"
       mobile-cards
       hoverable
@@ -102,10 +104,10 @@
       >
         <span v-if="props.row.result !== undefined && props.row.dividends !== undefined">
           {{ $utils.formatCurrency(props.row.result) }} ({{ $utils.formatPercent(props.row.resultpct) }})
-          <CIcon
+          <!-- <CIcon
             v-c-tooltip.hover.click="$utils.formatCurrency(props.row.dividends).concat(' de proventos')"
             name="cil-info"
-          />
+          /> -->
         </span>
         <span v-else>--</span>
       </b-table-column>
@@ -198,11 +200,16 @@ export default {
 
   data() {
     return {
-      checkedRows: []
+      checkedRows: [],
+      pages: 10
     }
   },
 
   computed: {
+    isPaginated() {
+      return this.positionData.length > this.pages
+    },
+
     showAllOptions() {
       return this.checkedRows.length === 1 && !this.checkedRows[0].closed
     }

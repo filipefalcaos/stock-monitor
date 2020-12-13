@@ -10,6 +10,10 @@ p {
   margin: 0;
 }
 
+ul {
+  margin-bottom: 0;
+}
+
 // Changes Buefy purple default color
 .b-checkbox.checkbox input[type=checkbox]:checked + .check {
   background: #3399FF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' \
@@ -45,4 +49,13 @@ p {
 
 .b-radio.radio input[type=radio] + .check:before {
   background-color: #3399FF;
+}
+
+.pagination-link.is-current {
+  background-color: #3399FF;
+  border-color: #3399FF;
+}
+
+.pagination-link:focus {
+  border-color: #3399FF;
 }

@@ -75,6 +75,7 @@
             color="success"
             @click="modalAddActive = true"
           >
+            <CIcon name="cil-plus" />
             Novo Ativo
           </CButton>
 

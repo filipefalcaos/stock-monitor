@@ -30,12 +30,17 @@
       </CHeaderNavItem>
     </CHeaderNav>
     <CHeaderNav class="mr-4">
-      <CHeaderNavItem class="d-md-down-none mx-2">
+      <CHeaderNavItem class="d-md-down-none mx-1">
         <CHeaderNavLink>
           <CIcon name="cil-bell" />
         </CHeaderNavLink>
       </CHeaderNavItem>
-      <CHeaderNavItem class="d-md-down-none mx-2">
+      <CHeaderNavItem class="d-md-down-none mx-1">
+        <CHeaderNavLink>
+          <CIcon name="cil-settings" />
+        </CHeaderNavLink>
+      </CHeaderNavItem>
+      <CHeaderNavItem class="d-md-down-none mx-1">
         <CHeaderNavLink>
           <CIcon name="cil-account-logout" />
         </CHeaderNavLink>

@@ -14,7 +14,8 @@ const state = () => ({
   finalResult: 0,
   finalDividends: 0,
   portfolioData: {},
-  dividendsData: {}
+  dividendsData: {},
+  receivedDividends: []
 })
 
 // Getters
@@ -40,7 +41,12 @@ const getters = {
 
   lastPositions: (state) => {
     state.currentPositions.sort((a, b) => a.created_at - b.created_at)
-    return state.currentPositions.slice(1).slice(-10).reverse()
+    return state.currentPositions.slice(1).slice(-5).reverse()
+  },
+
+  lastDividends: (state) => {
+    state.receivedDividends.sort((a, b) => utils.toTimestamp(a.pd) - utils.toTimestamp(b.pd))
+    return state.receivedDividends.slice(1).slice(-5).reverse()
   },
 
   isEmpty: (state) => {
@@ -107,8 +113,8 @@ const actions = {
     // Sets the history of dividends
     Promise.all(promises)
       .then(responses => {
-        commit('setDividends', responses)
-        commit('updatePricesDividends')
+        commit('setDividendData', responses)
+        commit('setReceivedDividends')
         commit('computeCumSum', state.currentPositions, { root: true })
         
         // Updates the UI state
@@ -302,7 +308,7 @@ const mutations = {
     state.finalResult = parseFloat(sum)
   },
 
-  setDividends(state, dividendsData) {
+  setDividendData(state, dividendsData) {
     dividendsData.forEach(d => {
       let parser = new DOMParser()
       let doc = parser.parseFromString(d.data, 'text/html')
@@ -314,17 +320,26 @@ const mutations = {
     })
   },
 
-  updatePricesDividends(state) {
+  setReceivedDividends(state) {
     state.finalDividends = 0
+    state.receivedDividends = []
+
+    // Looks for positions that were open when dividends were announced
     state.currentPositions.forEach(p => {
       let dividendData = state.dividendsData[p.stock]
       p.dividends = 0
       
       // Updates the profit of the position with the dividends
       dividendData.forEach(d => {
-        let finalDate = p.closed ? p.closed_at : Date.now()  
+        let finalDate = p.closed ? p.closed_at : Date.now()
         if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
           p.dividends += p.amount * d.value
+          state.receivedDividends.push({
+            stock: p.stock,
+            amount: p.amount,
+            result: p.amount * d.value,
+            key: d.ed.concat(d.pd, p.stock, d.type.split(' ')[0]), // This combination represents a single dividend
+            ...d })
         }
       })
 
@@ -334,7 +349,30 @@ const mutations = {
     })
 
     state.finalResult += state.finalDividends
+
+    // Looks for repeated dividends (more than one position eligible for a dividend)
+    let finalDividends = []
+    let groupedDividends = groupBy(state.receivedDividends, 'key')
+    
+    for (const value of Object.entries(groupedDividends)) {
+      let amount = 0, result = 0, dividend = null
+      value[1].forEach(v => { amount += parseInt(v.amount); result += v.result })
+      dividend = JSON.parse(JSON.stringify(value[1][0]))
+      dividend.amount = amount
+      dividend.result = result
+      finalDividends.push(dividend)
+    }
+
+    state.receivedDividends = finalDividends
   }
+}
+
+// Groups an array of objects by a given key
+function groupBy(xs, key) {
+  return xs.reduce(function(rv, x) {
+    (rv[x[key]] = rv[x[key]] || []).push(x)
+    return rv
+  }, {})
 }
 
 // Finds a portfolio of a given ID on the list of portfolios stored

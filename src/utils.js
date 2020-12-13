@@ -1,13 +1,13 @@
-import { add, isBefore, isWithinInterval, format, parse, sub } from 'date-fns'
+import { add, format, getTime, isBefore, isWithinInterval, parse, sub } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 // Formats a given number to a currency
-function formatCurrency(num) {
+function formatCurrency(num, precision = 2) {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision
   }).format(num)
 }
 
@@ -20,16 +20,16 @@ function formatPercent(num) {
   }).format(num)
 }
 
-// Formats a given timestamp (in milliseconds) to the format 'dd-MM-yyyy HH:mm'
+// Formats a given timestamp (in milliseconds) to the format 'dd/MM/yyyy HH:mm'
 function defaulFormat(timestamp) {
   let date = new Date(timestamp)
-  return format(date, 'dd-MM-yyyy HH:mm')
+  return format(date, 'dd/MM/yyyy HH:mm')
 }
 
-// Formats a given timestamp (in milliseconds) to the format 'MMM-yyyy'
+// Formats a given timestamp (in milliseconds) to the format 'MMM/yyyy'
 function monthYearFormat(timestamp) {
   let date = new Date(timestamp)
-  return format(date, 'MMM-yyyy', {locale: ptBR})
+  return format(date, 'MMM/yyyy', {locale: ptBR})
 }
 
 // Formats a given timestamp (in milliseconds) to a format specified by each available 
@@ -45,11 +45,17 @@ function formatDate(timestamp, mode = 'default') {
   }
 }
 
+// Converts a given date in the format 'dd/MM/yyyy' to a timestamp (in milliseconds)
+function toTimestamp(date) {
+  let toConvert = parse(date, 'dd/MM/yyyy', new Date())
+  return getTime(toConvert)
+}
+
 // Retrieves the months in the interval of two given date strings in the format 
-// 'MMM-yyyy'. The start and end months are not included
+// 'MMM/yyyy'. The start and end months are not included
 function monthsInInterval(date1, date2) {
-  let initialDate = parse(date1, 'MMM-yyyy', new Date(), {locale: ptBR})
-  let finalDate = parse(date2, 'MMM-yyyy', new Date(), {locale: ptBR})
+  let initialDate = parse(date1, 'MMM/yyyy', new Date(), {locale: ptBR})
+  let finalDate = parse(date2, 'MMM/yyyy', new Date(), {locale: ptBR})
 
   if (isBefore(finalDate, initialDate)) {
     return []
@@ -59,7 +65,7 @@ function monthsInInterval(date1, date2) {
   finalDate = sub(finalDate, {months: 1})
   while (isBefore(initialDate, finalDate)) {
     initialDate = add(initialDate, {months: 1})
-    months.push(format(initialDate, 'MMM-yyyy', {locale: ptBR}))
+    months.push(format(initialDate, 'MMM/yyyy', {locale: ptBR}))
   }
   
   return months
@@ -78,6 +84,7 @@ export const utils = {
   formatCurrency: formatCurrency,
   formatPercent: formatPercent,
   formatDate: formatDate,
+  toTimestamp: toTimestamp,
   monthsInInterval: monthsInInterval,
   isInInterval: isInInterval
 }
