@@ -8,7 +8,7 @@
               id="traffic"
               class="card-title mb-0"
             >
-              P&L - Ações
+              P&L - Carteiras de ações
             </h4>
           </CCol>
           
@@ -56,16 +56,17 @@
               id="traffic"
               class="card-title mb-0"
             >
-              Últimos Proventos
+              Últimas operações
             </h4>
           </CCol>
         </CRow>
 
-        <!-- Table of last dividends -->
-        <dividend-table
+        <!-- Table of last opened positions -->
+        <position-table
           class="mt-3"
-          :dividend-data="lastDividends"
+          :position-data="lastPositions"
           :has-new-data="hasNewData"
+          :has-actions="false"
         />
       </CCardBody>
     </CCard>
@@ -78,17 +79,16 @@
               id="traffic"
               class="card-title mb-0"
             >
-              Últimas Operações
+              Últimos proventos
             </h4>
           </CCol>
         </CRow>
 
-        <!-- Table of last opened positions -->
-        <position-table
+        <!-- Table of last dividends -->
+        <dividend-table
           class="mt-3"
-          :position-data="lastPositions"
+          :dividend-data="lastDividends"
           :has-new-data="hasNewData"
-          :has-actions="false"
         />
       </CCardBody>
     </CCard>

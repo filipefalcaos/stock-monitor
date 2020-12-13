@@ -356,11 +356,12 @@ const mutations = {
     let groupedDividends = groupBy(state.receivedDividends, 'key')
     
     for (const value of Object.entries(groupedDividends)) {
-      let amount = 0, result = 0, dividend = null
+      let [amount, result, dividend] = [0, 0, null]
       value[1].forEach(v => { amount += parseInt(v.amount); result += v.result })
       dividend = JSON.parse(JSON.stringify(value[1][0]))
       dividend.amount = amount
       dividend.result = result
+      dividend.positions = value[1].length
       finalDividends.push(dividend)
     }
 

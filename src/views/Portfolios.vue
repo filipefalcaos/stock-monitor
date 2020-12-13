@@ -106,7 +106,7 @@
               id="traffic"
               class="card-title mb-0"
             >
-              Em aberto
+              Posições em aberto
             </h4>
           </CCol>
         </CRow>
@@ -131,7 +131,7 @@
               id="traffic"
               class="card-title mb-0"
             >
-              Encerradas
+              Posições encerradas
             </h4>
           </CCol>
         </CRow>

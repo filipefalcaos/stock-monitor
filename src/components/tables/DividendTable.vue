@@ -63,6 +63,16 @@
 
       <b-table-column
         v-slot="props"
+        field="positions"
+        label="Posições"
+        sortable
+        numeric
+      >
+        {{ props.row.positions }}
+      </b-table-column>
+
+      <b-table-column
+        v-slot="props"
         field="result"
         label="Rendimento Total"
         sortable
@@ -118,7 +128,7 @@ export default {
   data() {
     return {
       checkedRows: [],
-      pages: 10
+      pages: 6
     }
   },
 
