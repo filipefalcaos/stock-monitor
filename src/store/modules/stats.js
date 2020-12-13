@@ -49,16 +49,18 @@ const mutations = {
       finalResultsAux.push(finalResults[index])
       
       if (index !== (finalDates.length - 1)) {
+        finalDatesAux.push(finalDates[index])
         let newDates = utils.monthsInInterval(date, finalDates[index + 1]) // Looks for time gaps
+        
         if (newDates.length > 0) {
           newDates.forEach(newDate => {
             finalResultsAux.push(finalResults[index])
             finalDatesAux.push(newDate)
           })
         }
+      } else {
+        finalDatesAux.push(finalDates[finalDates.length - 1])
       }
-
-      finalDatesAux.push(finalDates[index])
     })
 
     state.cumulativeSum.currentResults = finalResultsAux

@@ -1,4 +1,4 @@
-import { add, format, getTime, isBefore, isWithinInterval, parse, sub } from 'date-fns'
+import { eachMonthOfInterval, format, getTime, isWithinInterval, parse } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 // Formats a given number to a currency
@@ -56,19 +56,11 @@ function toTimestamp(date) {
 function monthsInInterval(date1, date2) {
   let initialDate = parse(date1, 'MMM/yyyy', new Date(), {locale: ptBR})
   let finalDate = parse(date2, 'MMM/yyyy', new Date(), {locale: ptBR})
-
-  if (isBefore(finalDate, initialDate)) {
-    return []
-  }
-
-  let months = []
-  finalDate = sub(finalDate, {months: 1})
-  while (isBefore(initialDate, finalDate)) {
-    initialDate = add(initialDate, {months: 1})
-    months.push(format(initialDate, 'MMM/yyyy', {locale: ptBR}))
-  }
-  
-  return months
+  let months = eachMonthOfInterval({ start: initialDate, end: finalDate })
+  let formatted = Object.values(months.map(m => format(m, 'MMM/yyyy', {locale: ptBR})))
+  formatted.shift()
+  formatted.pop()
+  return formatted
 }
 
 // Checks if a given date in the format 'dd/MM/yyyy' is in the interval of two 

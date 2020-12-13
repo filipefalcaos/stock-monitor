@@ -123,6 +123,7 @@ const actions = {
         setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
       })
       .catch(error => {
+        console.log(error)
         error /* Unused */
         commit('set', ['hasError', true])
         commit('set', ['isLoading', false])
