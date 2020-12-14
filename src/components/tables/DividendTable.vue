@@ -137,7 +137,7 @@ export default {
       return this.dividendData.length > this.pages
     }
   }
-};
+}
 </script>
 
 <style>

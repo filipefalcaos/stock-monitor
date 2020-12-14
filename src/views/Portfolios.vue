@@ -38,7 +38,10 @@
             {{ $utils.formatCurrency(finalResult) }}
             <span>|</span>
             <b style="margin-left: 0.5rem;">Proventos:</b>
-            {{ $utils.formatCurrency(finalDividends) }} ({{ $utils.formatPercent(finalDividends / finalResult) }})
+            {{ $utils.formatCurrency(finalDividends) }} 
+            <span v-if="finalResult > 0">
+              ({{ $utils.formatPercent(finalDividends / finalResult) }})
+            </span>
           </span>
         </h5>
       </CCol>

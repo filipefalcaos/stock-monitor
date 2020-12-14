@@ -34,6 +34,27 @@
           />
         </b-field>
 
+        <b-field label="Tipo de Ativo">
+          <div class="block">
+            <b-radio
+              v-model="asset"
+              name="asset"
+              native-value="stock"
+              required
+            >
+              Ação
+            </b-radio>
+            <b-radio
+              v-model="asset"
+              name="asset"
+              native-value="fii"
+              required
+            >
+              Fundo Imobiliário
+            </b-radio>
+          </div>
+        </b-field>
+
         <b-field label="Posição">
           <div class="block">
             <b-radio
@@ -83,6 +104,7 @@ export default {
       stock: '',
       amount: null,
       initial_price: null,
+      asset: null,
       type: null
     }
   },
@@ -93,6 +115,7 @@ export default {
         stock: this.stock.toUpperCase(),
         amount: this.amount,
         initial_price: this.initial_price,
+        asset: this.asset,
         type: this.type
       }
       
