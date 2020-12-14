@@ -133,15 +133,10 @@ export default {
   },
 
   methods: {
-    computeStats() {
-      let payload = {currentPositions: this.currentPositions, lastPortfolio: this.lastPortfolio}
-      this.$store.commit('computeCumSum', payload) // Updates the stats
-    },
-
     loadPortfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.computeStats()
+      this.$store.commit('computeCumSum', this.currentPositions)
     },
   }
 }
