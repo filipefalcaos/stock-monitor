@@ -56,7 +56,7 @@ const getters = {
 
 // Actions
 const actions = {
-  getStockPrices({ commit, state }) {
+  getStockPrices({ commit, state }, singleAction = false) {
     commit('set', ['isLoading', true])
     commit('set', ['hasError', false])
     
@@ -77,6 +77,11 @@ const actions = {
     Promise.all(promises)
       .then(responses => {
         commit('updatePrices', responses)
+        if (singleAction) {
+          commit('set', ['isLoading', false])
+          commit('set', ['hasNewData', true])
+          setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
+        }
       })
       .catch(error => {
         error /* Unused */
@@ -86,7 +91,7 @@ const actions = {
         // Display an error message
         NotificationProgrammatic.open({
           duration: 5000,
-          message: 'Falha ao se conectar ao servidor. Por favor, cheque sua conexão.',
+          message: 'Falha ao obter as cotações de ações. Por favor, cheque sua conexão.',
           position: 'is-bottom-right',
           type: 'is-danger'
         })
@@ -119,8 +124,6 @@ const actions = {
         commit('setDividendData', responses)
         commit('setReceivedDividends')
         commit('computeCumSum', state.currentPositions, { root: true })
-        
-        // Updates the UI state
         commit('set', ['isLoading', false])
         commit('set', ['hasNewData', true])
         setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
@@ -134,7 +137,7 @@ const actions = {
         // Display an error message
         NotificationProgrammatic.open({
           duration: 5000,
-          message: 'Falha ao se conectar ao servidor. Por favor, cheque sua conexão.',
+          message: 'Falha ao obter os históricos de proventos. Por favor, cheque sua conexão.',
           position: 'is-bottom-right',
           type: 'is-danger'
         })

@@ -36,7 +36,7 @@
           <span v-else>
             <b style="margin-left: 0.5rem;">Resultado:</b>
             {{ $utils.formatCurrency(finalResult) }}
-            <span>|</span>
+            <span style="margin-left: 0.25rem;">|</span>
             <b style="margin-left: 0.5rem;">Proventos:</b>
             {{ $utils.formatCurrency(finalDividends) }} 
             <span v-if="finalResult > 0">
@@ -59,7 +59,7 @@
           <CButton
             color="info"
             :disabled="isLoading"
-            @click="$store.dispatch('getStockPrices')"
+            @click="$store.dispatch('getStockPrices', true)"
           >
             <CIcon name="cil-sync" />&nbsp;
             <span v-if="isLoading">Atualizando...</span>
