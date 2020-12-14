@@ -41,12 +41,12 @@ const getters = {
 
   lastPositions: (state) => {
     state.currentPositions.sort((a, b) => a.created_at - b.created_at)
-    return state.currentPositions.slice(1).slice(-5).reverse()
+    return state.currentPositions.slice(-5).reverse()
   },
 
   lastDividends: (state) => {
     state.receivedDividends.sort((a, b) => utils.toTimestamp(a.pd) - utils.toTimestamp(b.pd))
-    return state.receivedDividends.slice(1).slice(-5).reverse()
+    return state.receivedDividends.slice(-5).reverse()
   },
 
   isEmpty: (state) => {
@@ -98,15 +98,18 @@ const actions = {
     commit('set', ['hasError', false])
     
     // Gets the history of dividends for each stock from Status Invest
-    const base_url = 'https://statusinvest.com.br/acoes/'
-    const uniqueStocks = [...new Set(state.currentPositions.map(p => p.stock))]
+    const base_url = 'https://statusinvest.com.br/'
+    const uniqueStocks = [...new Set(state.currentPositions.map(p => {
+      return { stock: p.stock, asset: p.asset }
+    }))]
 
     let promises = []
     uniqueStocks.forEach(s => {
+      let url = base_url + (s.asset === 'fii' ? 'fundos-imobiliarios/' : 'acoes/')
       promises.push(
         axios
-          .get(base_url + s.replace('.SA', ''))
-          .then(response => { return { stock: s, data: response.data } })
+          .get(url + s.stock.replace('.SA', ''))
+          .then(response => { return { stock: s.stock, data: response.data } })
       )
     })
 
@@ -216,14 +219,15 @@ const mutations = {
     state.currentPositions = positions
   },
 
-  addPosition(state, postionData) {
+  addPosition(state, positionData) {
     let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
     lastPortfolio.positions.push({
       id: nanoid(),
-      stock: postionData.stock,
-      initial_price: postionData.initial_price,
-      amount: postionData.amount,
-      type: postionData.type,
+      stock: positionData.stock,
+      initial_price: positionData.initial_price,
+      amount: positionData.amount,
+      asset: positionData.asset,
+      type: positionData.type,
       created_at: Date.now(),
       closed: false
     })
