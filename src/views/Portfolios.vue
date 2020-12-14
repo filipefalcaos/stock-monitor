@@ -202,10 +202,10 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import AddPositionForm from '../components/forms/AddPositionForm'
-import ClosePositionForm from '../components/forms/ClosePositionForm'
-import MovePositionForm from '../components/forms/MovePositionForm'
-import PositionTable from '../components/tables/PositionTable'
+import AddPositionForm from '../components/AddPositionForm'
+import ClosePositionForm from '../components/ClosePositionForm'
+import MovePositionForm from '../components/MovePositionForm'
+import PositionTable from '../components/PositionTable'
 
 export default {
   name: 'Portfolios',

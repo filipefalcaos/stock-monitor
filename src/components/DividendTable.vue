@@ -96,13 +96,13 @@
         </span>
         <span
           v-else-if="props.row.type === 'Juros Sobre Capital Próprio'"
-          class="tag is-info"
+          class="tag is-warning"
         >
           Juros (JCP)
         </span>
         <span
           v-else
-          class="tag is-warning"
+          class="tag is-dark"
         >
           {{ props.row.type }}
         </span>

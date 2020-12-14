@@ -14,17 +14,21 @@ ul {
   margin-bottom: 0;
 }
 
+.no-pb .card-body {
+  padding-bottom: 0!important;
+}
+
 // Changes Buefy purple default color
 .b-checkbox.checkbox input[type=checkbox]:checked + .check {
-  background: #3399FF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' \
+  background: #4f5d73 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' \
   viewBox='0 0 1 1'%3E%3Cpath style='fill:%23fff' d='M 0.04038059,0.6267767 0.14644661,0.52071068 \
   0.42928932,0.80355339 0.3232233,0.90961941 z M 0.21715729,0.80355339 0.85355339,0.16715729 \
   0.95961941,0.2732233 0.3232233,0.90961941 z'%3E%3C/path%3E%3C/svg%3E") no-repeat center center;
-  border-color: #3399FF;
+  border-color: #4f5d73;
 }
 
 .b-checkbox.checkbox:hover input[type=checkbox]:not(:disabled) + .check {
-  border-color: #3399FF;
+  border-color: #4f5d73;
 }
 
 .select select:focus, .taginput .taginput-container.is-focusable:focus, .textarea:focus, .input:focus, 
@@ -32,23 +36,23 @@ ul {
 .is-focused.input, .select select:active, .taginput .taginput-container.is-focusable:active, 
 .textarea:active, .input:active, .select select.is-active, .taginput .is-active.taginput-container.is-focusable, 
 .is-active.textarea, .is-active.input {
-  border-color: #3399FF;
+  border-color: #4f5d73;
 }
 
 .select:not(.is-multiple):not(.is-loading)::after {
-  border-color: #3399FF;
+  border-color: #4f5d73;
 }
 
 .b-radio.radio:hover input[type=radio]:not(:disabled) + .check {
-  border-color: #3399FF;
+  border-color: #4f5d73;
 }
 
 .b-radio.radio input[type=radio]:checked + .check {
-  border-color: #3399FF;
+  border-color: #4f5d73;
 }
 
 .b-radio.radio input[type=radio] + .check:before {
-  background-color: #3399FF;
+  background-color: #4f5d73;
 }
 
 .pagination-link.is-current {

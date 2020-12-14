@@ -104,10 +104,12 @@
       >
         <span v-if="props.row.result !== undefined && props.row.dividends !== undefined">
           {{ $utils.formatCurrency(props.row.result) }} ({{ $utils.formatPercent(props.row.resultpct) }})
-          <CIcon
-            v-c-tooltip.hover.click="$utils.formatCurrency(props.row.dividends).concat(' de proventos')"
-            name="cil-info"
-          />
+          <b-tooltip 
+            type="is-light"
+            :label="$utils.formatCurrency(props.row.dividends).concat(' de proventos')"
+          >
+            <CIcon name="cil-info" />
+          </b-tooltip>
         </span>
         <span v-else>--</span>
       </b-table-column>

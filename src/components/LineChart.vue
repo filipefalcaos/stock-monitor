@@ -7,7 +7,7 @@
 <script>
 import Chart from 'chart.js'
 import { nanoid } from 'nanoid'
-import { utils } from '../../utils'
+import { utils } from '../utils'
 
 export default {
   name: 'LineChart',

@@ -1,5 +1,36 @@
 <template>
   <div>
+    <CRow>
+      <CCol lg="3">
+        <CWidgetSimple
+          class="no-pb"
+          header="Operações Realizadas"
+          text="--"
+        />
+      </CCol>
+      <CCol lg="3">
+        <CWidgetSimple
+          class="no-pb"
+          header="Resultados - Carteiras de Ações"
+          text="--"
+        />
+      </CCol>
+      <CCol lg="3">
+        <CWidgetSimple
+          class="no-pb"
+          header="Resultados - Operações em Opções"
+          text="--"
+        />
+      </CCol>
+      <CCol lg="3">
+        <CWidgetSimple
+          class="no-pb"
+          header="Rendimentos de Dividendos"
+          text="--"
+        />  
+      </CCol>
+    </CRow>
+
     <CCard>
       <CCardBody>
         <CRow>
@@ -97,9 +128,9 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import LineChart from '../components/charts/LineChart'
-import DividendTable from '../components/tables/DividendTable'
-import PositionTable from '../components/tables/PositionTable'
+import LineChart from '../components/LineChart'
+import DividendTable from '../components/DividendTable'
+import PositionTable from '../components/PositionTable'
 
 export default {
   name: 'Dashboard',
@@ -133,11 +164,12 @@ export default {
   },
 
   methods: {
-    loadPortfolio() {
+    async loadPortfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      this.$store.commit('computeCumSum', this.currentPositions)
-    },
+      await this.$store.dispatch('getStockPrices')
+      await this.$store.dispatch('getDividendsHistory')
+    }
   }
 }
 </script>
