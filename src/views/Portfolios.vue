@@ -59,7 +59,7 @@
           <CButton
             color="info"
             :disabled="isLoading"
-            @click="updatePrices"
+            @click="getLastData"
           >
             <CIcon name="cil-sync" />&nbsp;
             <span v-if="isLoading">Atualizando...</span>
@@ -363,14 +363,7 @@ export default {
     },
 
     async getLastData() {
-      await this.$store.dispatch('getStockPrices', { stocks: this.activeStocksList })
-      await this.$store.dispatch('getDividendsHistory', { stocks: this.activeStocksList })
-      this.$store.dispatch('updateUI')
-    },
-
-    updatePrices() {
-      this.$store.dispatch('getStockPrices', { stocks: this.activeStocksList })
-      this.$store.dispatch('updateUI')
+      await this.$store.dispatch('getStocksData', this.activeStocksList)
     }
   }
 }

@@ -138,10 +138,8 @@ export default {
   // Computes the statistics on the portfolios/options data when the component
   // is created
   async created() {
-    await this.$store.dispatch('getStockPrices', { stocks: this.stocksList })
-    await this.$store.dispatch('getDividendsHistory', { stocks: this.stocksList })
+    await this.$store.dispatch('getStocksData', this.stocksList)
     this.$store.commit('computeCumSum', this.currentPositions)
-    this.$store.dispatch('updateUI')
   }
 }
 </script>

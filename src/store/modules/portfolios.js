@@ -69,13 +69,13 @@ const getters = {
 
 // Actions
 const actions = {
-  getStockPrices({ commit }, payload) {
+  getStockPrices({ commit }, stocksList) {
     commit('set', ['isLoading', true])
     commit('set', ['hasError', false])
     
     // Gets the most recent price of each stock from Yahoo Finance
     let promises = []    
-    payload.stocks.forEach(s => {
+    stocksList.forEach(s => {
       let parsed = JSON.parse(s)
       promises.push(
         axios
@@ -84,34 +84,16 @@ const actions = {
       )
     })
 
-    // Updates the prices
-    Promise.all(promises)
-      .then(responses => {
-        commit('setStocksData', responses)
-        commit('setStockPrices', responses)
-      })
-      .catch(error => {
-        error /* Unused */
-        commit('set', ['hasError', true])
-        commit('set', ['isLoading', false])
-        
-        // Display an error message
-        NotificationProgrammatic.open({
-          duration: 5000,
-          message: 'Falha ao obter as cotações de ações. Por favor, cheque sua conexão.',
-          position: 'is-bottom-right',
-          type: 'is-danger'
-        })
-      })
+    return Promise.all(promises)
   },
 
-  getDividendsHistory({ commit }, payload) {
+  getDividendsHistory({ commit }, stocksList) {
     commit('set', ['isLoading', true])
     commit('set', ['hasError', false])
     
     // Gets the history of dividends for each stock from Status Invest
     let promises = []
-    payload.stocks.forEach(s => {
+    stocksList.forEach(s => {
       let parsed = JSON.parse(s)
       let url = 'https://statusinvest.com.br/' + (parsed.asset === 'fii' ? 'fundos-imobiliarios/' : 'acoes/')
       promises.push(
@@ -121,26 +103,34 @@ const actions = {
       )
     })
 
-    // Sets the history of dividends
-    Promise.all(promises)
-      .then(responses => {
-        commit('setDividendData', responses)
-        commit('setReceivedDividends')
+    return Promise.all(promises)
+  },
+
+  async getStocksData({ commit, dispatch }, stocksList) {
+    let priceData, dividendData
+    
+    try {
+      priceData = await dispatch('getStockPrices', stocksList)
+      dividendData = await dispatch('getDividendsHistory', stocksList)
+
+      // Updates the data in the global state
+      commit('setStocksData', priceData)
+      commit('setStockPrices')
+      commit('setDividendData', dividendData)
+      commit('setReceivedDividends')
+      dispatch('updateUI') // Updates the UI
+    } catch (err) {
+      commit('set', ['hasError', true])
+      commit('set', ['isLoading', false])
+      
+      // Display an error message
+      NotificationProgrammatic.open({
+        duration: 5000,
+        message: 'Falha ao obter as cotações de ações ou registros de dividendos. Por favor, cheque sua conexão.',
+        position: 'is-bottom-right',
+        type: 'is-danger'
       })
-      .catch(error => {
-        console.log(error)
-        error /* Unused */
-        commit('set', ['hasError', true])
-        commit('set', ['isLoading', false])
-        
-        // Display an error message
-        NotificationProgrammatic.open({
-          duration: 5000,
-          message: 'Falha ao obter os históricos de proventos. Por favor, cheque sua conexão.',
-          position: 'is-bottom-right',
-          type: 'is-danger'
-        })
-      })
+    }
   },
 
   updateUI({ commit }) {
