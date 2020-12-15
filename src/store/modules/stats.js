@@ -2,7 +2,7 @@ import { utils } from '../../utils'
 
 // Initial state
 const state = () => ({
-  cumulativeSum: {}
+  cumulativeSum: {} // The cumulative sum of the results (all portfolios)
 })
 
 // Getters

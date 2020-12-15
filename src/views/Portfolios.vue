@@ -59,7 +59,7 @@
           <CButton
             color="info"
             :disabled="isLoading"
-            @click="$store.dispatch('getStockPrices', true)"
+            @click="updatePrices"
           >
             <CIcon name="cil-sync" />&nbsp;
             <span v-if="isLoading">Atualizando...</span>
@@ -242,25 +242,22 @@ export default {
       closedPositions: 'closedPositions',
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
-      openPositions: 'openPositions'
+      openPositions: 'openPositions',
+      stocksList: 'stocksList'
     })
   },
   
   // Gets the latest stock prices when the component is created and initializes 
   // the portfolios UI
-  async created() {
-    if (!this.isEmpty) {
-      await this.$store.dispatch('getStockPrices')
-      await this.$store.dispatch('getDividendsHistory')
-    }
+  created() {
+    if (!this.isEmpty) this.getLastData()
   },
 
   methods: {
-    async loadPortfolio() {
+    loadPortfolio() {
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      await this.$store.dispatch('getStockPrices')
-      await this.$store.dispatch('getDividendsHistory')
+      this.getLastData()
     },
 
     createPortfolio(portfolio_name) {
@@ -307,14 +304,13 @@ export default {
       })
     },
 
-    async deletePortfolio(portfolio_id) {
+    deletePortfolio(portfolio_id) {
       this.$store.commit('deletePortfolio', portfolio_id)
       this.$store.commit('updateDataFile')
 
       if (!this.isEmpty) {
         this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-        await this.$store.dispatch('getStockPrices')
-        await this.$store.dispatch('getDividendsHistory')
+        this.getLastData()
       }
     },
 
@@ -328,20 +324,18 @@ export default {
       })
     },
 
-    async addPosition(newPosition) {
+    addPosition(newPosition) {
       this.$store.commit('addPosition', newPosition)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      await this.$store.dispatch('getStockPrices')
-      await this.$store.dispatch('getDividendsHistory')
+      this.getLastData()
     },
 
-    async closePosition(closeObj) {
+    closePosition(closeObj) {
       this.$store.commit('closePosition', closeObj)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      await this.$store.dispatch('getStockPrices')
-      await this.$store.dispatch('getDividendsHistory')
+      this.getLastData()
     },
 
     closePositionDialog(position) {
@@ -349,12 +343,11 @@ export default {
       this.modalCloseActive = true
     },
 
-    async movePosition(moveObj) {
+    movePosition(moveObj) {
       this.$store.commit('movePosition', moveObj)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      await this.$store.dispatch('getStockPrices')
-      await this.$store.dispatch('getDividendsHistory')
+      this.getLastData()
     },
 
     movePositionDialog(position) {
@@ -362,12 +355,22 @@ export default {
       this.modalMoveActive = true
     },
 
-    async deletePositions(positions) {
+    deletePositions(positions) {
       this.$store.commit('deletePosition', positions)
       this.$store.commit('updateDataFile')
       this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      await this.$store.dispatch('getStockPrices')
-      await this.$store.dispatch('getDividendsHistory')
+      this.getLastData()
+    },
+
+    async getLastData() {
+      await this.$store.dispatch('getStockPrices', { stocks: this.stocksList })
+      await this.$store.dispatch('getDividendsHistory', { stocks: this.stocksList })
+      this.$store.dispatch('updateUI')
+    },
+
+    updatePrices() {
+      this.$store.dispatch('getStockPrices', { stocks: this.stocksList })
+      this.$store.dispatch('updateUI')
     }
   }
 }

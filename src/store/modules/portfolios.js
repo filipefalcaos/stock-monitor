@@ -9,19 +9,30 @@ const fs = require('fs')
 
 // Initial state
 const state = () => ({
-  currentPositions: [],
-  dataFileName: '',
-  finalResult: 0,
-  finalDividends: 0,
-  portfolioData: {},
-  dividendsData: {},
-  receivedDividends: []
+  dataFileName: '',     // The data filename
+  finalResult: 0,       // Sum of results (+ dividends received) on the selected portfolio
+  finalDividends: 0,    // Sum of dividends received on the selected portfolio
+  portfolioData: {},    // Data loaded from the data file
+  dividendsData: {},    // Latest history of dividends (all portfolios)
+  stocksData: {},       // Latest prices of stocks (all portfolios)
+  currentPositions: [], // Current positions on the selected portfolio
+  receivedDividends: [] // Dividends received on the selected portfolio
 })
 
 // Getters
 const getters = {
   lastPortfolio: (state) => {
     return findPortfolio(state, state.portfolioData.last_portfolio)
+  },
+
+  stocksList: (state) => {
+    let stocks = new Set()
+    state.portfolioData.portfolios.forEach(p => { 
+      p.positions.forEach(po => {
+        return stocks.add({ stock: po.stock, asset: po.asset })
+      })
+    })
+    return stocks
   },
 
   activeInvestment: (state, getters) => {
@@ -56,19 +67,16 @@ const getters = {
 
 // Actions
 const actions = {
-  getStockPrices({ commit, state }, singleAction = false) {
+  getStockPrices({ commit }, payload) {
     commit('set', ['isLoading', true])
     commit('set', ['hasError', false])
     
     // Gets the most recent price of each stock from Yahoo Finance
-    const base_url = 'https://query2.finance.yahoo.com/v10/'
-    const uniqueStocks = [...new Set(state.currentPositions.map(p => p.stock))]
-    
     let promises = []
-    uniqueStocks.forEach(s => {
+    payload.stocks.forEach(s => {
       promises.push(
         axios
-          .get(base_url + 'finance/quoteSummary/' + s + '?modules=price')
+          .get('https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + s.stock + '?modules=price')
           .then(response => response.data)
       )
     })
@@ -76,12 +84,8 @@ const actions = {
     // Updates the prices
     Promise.all(promises)
       .then(responses => {
-        commit('updatePrices', responses)
-        if (singleAction) {
-          commit('set', ['isLoading', false])
-          commit('set', ['hasNewData', true])
-          setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
-        }
+        commit('setStocksData', responses)
+        commit('setStockPrices', responses)
       })
       .catch(error => {
         error /* Unused */
@@ -98,19 +102,14 @@ const actions = {
       })
   },
 
-  getDividendsHistory({ commit, state }) {
+  getDividendsHistory({ commit }, payload) {
     commit('set', ['isLoading', true])
     commit('set', ['hasError', false])
     
     // Gets the history of dividends for each stock from Status Invest
-    const base_url = 'https://statusinvest.com.br/'
-    const uniqueStocks = [...new Set(state.currentPositions.map(p => {
-      return { stock: p.stock, asset: p.asset }
-    }))]
-
     let promises = []
-    uniqueStocks.forEach(s => {
-      let url = base_url + (s.asset === 'fii' ? 'fundos-imobiliarios/' : 'acoes/')
+    payload.stocks.forEach(s => {
+      let url = 'https://statusinvest.com.br/' + (s.asset === 'fii' ? 'fundos-imobiliarios/' : 'acoes/')
       promises.push(
         axios
           .get(url + s.stock.replace('.SA', ''))
@@ -123,10 +122,6 @@ const actions = {
       .then(responses => {
         commit('setDividendData', responses)
         commit('setReceivedDividends')
-        commit('computeCumSum', state.currentPositions, { root: true })
-        commit('set', ['isLoading', false])
-        commit('set', ['hasNewData', true])
-        setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
       })
       .catch(error => {
         console.log(error)
@@ -142,6 +137,12 @@ const actions = {
           type: 'is-danger'
         })
       })
+  },
+
+  updateUI({ commit }) {
+    commit('set', ['isLoading', false])
+    commit('set', ['hasNewData', true])
+    setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
   }
 }
 
@@ -289,22 +290,22 @@ const mutations = {
     lastPortfolio.positions = state.currentPositions.filter(position => ![moveObj.position].includes(position))
   },
 
-  updatePrices(state, priceData) {
-    let results = {}
-    priceData.forEach(r => {
-      results[r.quoteSummary.result[0].price.symbol] = {
-        price: r.quoteSummary.result[0].price.regularMarketPrice.raw,
-        var: r.quoteSummary.result[0].price.regularMarketChange.raw,
-        varpct: r.quoteSummary.result[0].price.regularMarketChangePercent.raw
+  setStocksData(state, stocksData) {
+    stocksData.forEach(s => {
+      state.stocksData[s.quoteSummary.result[0].price.symbol] = {
+        price: s.quoteSummary.result[0].price.regularMarketPrice.raw,
+        var: s.quoteSummary.result[0].price.regularMarketChange.raw,
+        varpct: s.quoteSummary.result[0].price.regularMarketChangePercent.raw
       }
     })
+  },
 
-    // Updates the prices for each position
+  setStockPrices(state) {
     let sum = 0
     state.currentPositions.forEach(p => {
-      p.var = results[p.stock].var
-      p.varpct = results[p.stock].varpct
-      p.current_price = p.closed ? p.close_price : results[p.stock].price
+      p.var = state.stocksData[p.stock].var
+      p.varpct = state.stocksData[p.stock].varpct
+      p.current_price = p.closed ? p.close_price : state.stocksData[p.stock].price
       
       // Compute the position result
       let diff = p.current_price - p.initial_price

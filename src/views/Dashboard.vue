@@ -34,35 +34,13 @@
     <CCard>
       <CCardBody>
         <CRow>
-          <CCol sm="10">
+          <CCol sm="5">
             <h4
               id="traffic"
               class="card-title mb-0"
             >
               P&L - Carteiras de ações
             </h4>
-          </CCol>
-          
-          <CCol
-            sm="2"
-            class="d-none d-md-block"
-          >
-            <div style="float: right;">
-              <b-select
-                v-model="portfolioData.last_portfolio"
-                placeholder="Carteira"
-                expanded
-                @input="loadPortfolio"
-              >
-                <option
-                  v-for="option in portfolioData.portfolios"
-                  :key="option.id"
-                  :value="option.id"
-                >
-                  {{ option.name }}
-                </option>
-              </b-select>
-            </div>
           </CCol>
         </CRow>
         
@@ -152,24 +130,18 @@ export default {
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
       lastPositions: 'lastPositions',
-      lastDividends: 'lastDividends'
+      lastDividends: 'lastDividends',
+      stocksList: 'stocksList'
     })
   },
 
   // Computes the statistics on the portfolios/options data when the component
   // is created
   async created() {
-    await this.$store.dispatch('getStockPrices')
-    await this.$store.dispatch('getDividendsHistory')
-  },
-
-  methods: {
-    async loadPortfolio() {
-      this.$store.commit('updateDataFile')
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-      await this.$store.dispatch('getStockPrices')
-      await this.$store.dispatch('getDividendsHistory')
-    }
+    await this.$store.dispatch('getStockPrices', { stocks: this.stocksList })
+    await this.$store.dispatch('getDividendsHistory', { stocks: this.stocksList })
+    this.$store.commit('computeCumSum', this.currentPositions)
+    this.$store.dispatch('updateUI')
   }
 }
 </script>

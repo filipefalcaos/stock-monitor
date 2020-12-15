@@ -102,7 +102,7 @@
         </span>
         <span
           v-else
-          class="tag is-dark"
+          class="tag is-light"
         >
           {{ props.row.type }}
         </span>
