@@ -26,13 +26,15 @@ const getters = {
   },
 
   stocksList: (state) => {
-    let stocks = new Set()
-    state.portfolioData.portfolios.forEach(p => { 
-      p.positions.forEach(po => {
-        return stocks.add({ stock: po.stock, asset: po.asset })
-      })
-    })
-    return stocks
+    return [...new Set(state.portfolioData.portfolios.map(port => port.positions.map(p => {
+      return JSON.stringify({ stock: p.stock, asset: p.asset })
+    })).flat())]
+  },
+
+  activeStocksList: (state) => {
+    return [...new Set(state.currentPositions.map(p => {
+      return JSON.stringify({ stock: p.stock, asset: p.asset })
+    }))]
   },
 
   activeInvestment: (state, getters) => {
@@ -72,11 +74,12 @@ const actions = {
     commit('set', ['hasError', false])
     
     // Gets the most recent price of each stock from Yahoo Finance
-    let promises = []
+    let promises = []    
     payload.stocks.forEach(s => {
+      let parsed = JSON.parse(s)
       promises.push(
         axios
-          .get('https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + s.stock + '?modules=price')
+          .get('https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + parsed.stock + '?modules=price')
           .then(response => response.data)
       )
     })
@@ -109,11 +112,12 @@ const actions = {
     // Gets the history of dividends for each stock from Status Invest
     let promises = []
     payload.stocks.forEach(s => {
-      let url = 'https://statusinvest.com.br/' + (s.asset === 'fii' ? 'fundos-imobiliarios/' : 'acoes/')
+      let parsed = JSON.parse(s)
+      let url = 'https://statusinvest.com.br/' + (parsed.asset === 'fii' ? 'fundos-imobiliarios/' : 'acoes/')
       promises.push(
         axios
-          .get(url + s.stock.replace('.SA', ''))
-          .then(response => { return { stock: s.stock, data: response.data } })
+          .get(url + parsed.stock.replace('.SA', ''))
+          .then(response => { return { stock: parsed.stock, data: response.data } })
       )
     })
 
@@ -175,6 +179,7 @@ const mutations = {
     let portfolioCopy = JSON.parse(JSON.stringify(state.portfolioData))
 
     // Delete fields that should not be persisted
+    // Also, if there is no "asset" defined on the position, set it to "stock"
     portfolioCopy.portfolios.forEach(portfolio => {
       portfolio.positions.forEach(position => {
         delete position.aux_price
@@ -188,6 +193,8 @@ const mutations = {
           delete position.resultpct
           delete position.current_price
         }
+
+        if (!position.asset) position.asset = 'stock'
       })
     })
 

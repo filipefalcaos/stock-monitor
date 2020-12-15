@@ -243,7 +243,7 @@ export default {
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
       openPositions: 'openPositions',
-      stocksList: 'stocksList'
+      activeStocksList: 'activeStocksList'
     })
   },
   
@@ -363,13 +363,13 @@ export default {
     },
 
     async getLastData() {
-      await this.$store.dispatch('getStockPrices', { stocks: this.stocksList })
-      await this.$store.dispatch('getDividendsHistory', { stocks: this.stocksList })
+      await this.$store.dispatch('getStockPrices', { stocks: this.activeStocksList })
+      await this.$store.dispatch('getDividendsHistory', { stocks: this.activeStocksList })
       this.$store.dispatch('updateUI')
     },
 
     updatePrices() {
-      this.$store.dispatch('getStockPrices', { stocks: this.stocksList })
+      this.$store.dispatch('getStockPrices', { stocks: this.activeStocksList })
       this.$store.dispatch('updateUI')
     }
   }
