@@ -298,20 +298,24 @@ const mutations = {
   },
 
   setStockPrices(state) {
-    let sum = 0
-    state.currentPositions.forEach(p => {
-      p.var = state.stocksData[p.stock].var
-      p.varpct = state.stocksData[p.stock].varpct
-      p.current_price = p.closed ? p.close_price : state.stocksData[p.stock].price
-      
-      // Compute the position result
-      let diff = p.current_price - p.initial_price
-      p.result = (p.type === 'long') ? diff * p.amount : -diff * p.amount
-      p.resultpct = p.result / (p.initial_price * p.amount)
-      sum += parseFloat(p.result)
-    })
+    state.portfolioData.portfolios.forEach(portfolio => {
+      let sum = 0
+      portfolio.positions.forEach(p => {
+        p.var = state.stocksData[p.stock].var
+        p.varpct = state.stocksData[p.stock].varpct
+        p.current_price = p.closed ? p.close_price : state.stocksData[p.stock].price
+        
+        // Compute the position result
+        let diff = p.current_price - p.initial_price
+        p.result = (p.type === 'long') ? diff * p.amount : -diff * p.amount
+        p.resultpct = p.result / (p.initial_price * p.amount)
+        sum += parseFloat(p.result)
+      })
 
-    state.finalResult = parseFloat(sum)
+      // Sets the final result only for the current portfolio
+      if (portfolio.id === state.portfolioData.last_portfolio)
+        state.finalResult = parseFloat(sum)
+    })
   },
 
   setDividendData(state, dividendsData) {

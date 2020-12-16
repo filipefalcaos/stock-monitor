@@ -227,14 +227,14 @@ export default {
 
   computed: {
     ...mapState({
+      portfolioData: state => state.portfolios.portfolioData,
       currentPositions: state => state.portfolios.currentPositions,
       dataFileName: state => state.portfolios.dataFileName,
       finalResult: state => state.portfolios.finalResult,
       finalDividends: state => state.portfolios.finalDividends,
       hasError: state => state.hasError,
       hasNewData: state => state.hasNewData,
-      isLoading: state => state.isLoading,
-      portfolioData: state => state.portfolios.portfolioData
+      isLoading: state => state.isLoading
     }),
     
     ...mapGetters({

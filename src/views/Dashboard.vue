@@ -5,14 +5,14 @@
         <CWidgetSimple
           class="no-pb"
           header="Operações Realizadas"
-          text="--"
+          :text="operationsCount.toString()"
         />
       </CCol>
       <CCol lg="3">
         <CWidgetSimple
           class="no-pb"
           header="Resultados - Carteiras de Ações"
-          text="--"
+          :text="$utils.formatCurrency(overallResultPortfolios)"
         />
       </CCol>
       <CCol lg="3">
@@ -26,7 +26,7 @@
         <CWidgetSimple
           class="no-pb"
           header="Rendimentos de Dividendos"
-          text="--"
+          :text="overallDividends.toString()"
         />  
       </CCol>
     </CRow>
@@ -121,9 +121,13 @@ export default {
   computed: {
     ...mapState({
       cumulativeSum: state => state.stats.cumulativeSum,
+      operationsCount: state => state.stats.operationsCount,
+      overallResultPortfolios: state => state.stats.overallResultPortfolios,
+      overallDividends: state => state.stats.overallDividends,
+      overallResultOptions: state => state.stats.overallResultOptions,
+      portfolioData: state => state.portfolios.portfolioData,
       currentPositions: state => state.portfolios.currentPositions,
-      hasNewData: state => state.hasNewData,
-      portfolioData: state => state.portfolios.portfolioData
+      hasNewData: state => state.hasNewData
     }),
     
     ...mapGetters({
@@ -139,7 +143,15 @@ export default {
   // is created
   async created() {
     await this.$store.dispatch('getStocksData', this.stocksList)
-    this.$store.commit('computeCumSum', this.currentPositions)
+    this.computeStats()
+  },
+
+  methods: {
+    computeStats() {
+      this.$store.commit('computeCumSum', this.currentPositions)
+      this.$store.commit('getOperationsCount', this.portfolioData)
+      this.$store.commit('getOverallResultPortfolios', this.portfolioData)
+    }
   }
 }
 </script>

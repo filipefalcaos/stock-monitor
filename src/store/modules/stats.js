@@ -2,7 +2,11 @@ import { utils } from '../../utils'
 
 // Initial state
 const state = () => ({
-  cumulativeSum: {} // The cumulative sum of the results (all portfolios)
+  cumulativeSum: {},            // The cumulative sum of the results (all portfolios)
+  operationsCount: 0,           // The count of operations performed (all portfolios)
+  overallResultPortfolios: 0.0, // The cumulative result of all portfolios
+  overallDividends: 0.0,        // The cumulative dividends received on all portfolios
+  overallResultOptions: 0.0,    // The cumulative result of options operations
 })
 
 // Getters
@@ -70,8 +74,27 @@ const mutations = {
     currentPositions.forEach(p => {
       if (!p.closed) delete p.closed_at
     })
+  },
+
+  getOperationsCount(state, portfolioData) {
+    let ops = portfolioData.portfolios.map(p => p.positions.length).reduce((a, b) => a + b, 0)
+    state.operationsCount = ops
+  },
+
+  getOverallResultPortfolios(state, portfolioData) {
+    let res = 0
+    portfolioData.portfolios.forEach(portfolio => {
+      portfolio.positions.forEach(position => {
+        res += position.result
+      })
+    })
+
+    state.overallResultPortfolios = res.toFixed(2)
   }
 }
+
+// Computes the cumulative sum of a numerical array
+const cumulativeSum = (sum => value => sum += value)
 
 export default {
   state,
@@ -79,6 +102,3 @@ export default {
   actions,
   mutations
 }
-
-// Computes the cumulative sum of a numerical array
-const cumulativeSum = (sum => value => sum += value)
