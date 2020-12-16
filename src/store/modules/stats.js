@@ -2,11 +2,9 @@ import { utils } from '../../utils'
 
 // Initial state
 const state = () => ({
-  cumulativeSum: {},            // The cumulative sum of the results (all portfolios)
-  operationsCount: 0,           // The count of operations performed (all portfolios)
-  overallResultPortfolios: 0.0, // The cumulative result of all portfolios
-  overallDividends: 0.0,        // The cumulative dividends received on all portfolios
-  overallResultOptions: 0.0,    // The cumulative result of options operations
+  cumulativeSum: {},  // The cumulative sum of the results (all portfolios)
+  operationsCount: 0, // The count of operations performed (all portfolios)
+  overallResults: {}  // The cumulative result of all portfolios
 })
 
 // Getters
@@ -81,15 +79,19 @@ const mutations = {
     state.operationsCount = ops
   },
 
-  getOverallResultPortfolios(state, portfolioData) {
-    let res = 0
+  getOverallResults(state, portfolioData) {
+    let resStocks = 0
+    let resDividends = 0
+    
     portfolioData.portfolios.forEach(portfolio => {
       portfolio.positions.forEach(position => {
-        res += position.result
+        resStocks += position.result
+        resDividends += position.dividends
       })
     })
 
-    state.overallResultPortfolios = res.toFixed(2)
+    state.overallResults.stocks = resStocks.toFixed(2)
+    state.overallResults.dividends = resDividends.toFixed(2)
   }
 }
 

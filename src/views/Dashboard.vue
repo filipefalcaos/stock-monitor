@@ -12,21 +12,21 @@
         <CWidgetSimple
           class="no-pb"
           header="Resultados - Carteiras de Ações"
-          :text="$utils.formatCurrency(overallResultPortfolios)"
+          :text="$utils.formatCurrency(displayText(overallResults.stocks))"
         />
       </CCol>
       <CCol lg="3">
         <CWidgetSimple
           class="no-pb"
           header="Resultados - Operações em Opções"
-          text="--"
+          :text="$utils.formatCurrency(0)"
         />
       </CCol>
       <CCol lg="3">
         <CWidgetSimple
           class="no-pb"
           header="Rendimentos de Dividendos"
-          :text="overallDividends.toString()"
+          :text="$utils.formatCurrency(displayText(overallResults.dividends))"
         />  
       </CCol>
     </CRow>
@@ -94,11 +94,11 @@
         </CRow>
 
         <!-- Table of last dividends -->
-        <dividend-table
+        <!-- <dividend-table
           class="mt-3"
           :dividend-data="lastDividends"
           :has-new-data="hasNewData"
-        />
+        /> -->
       </CCardBody>
     </CCard>
   </div>
@@ -107,14 +107,14 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import LineChart from '../components/LineChart'
-import DividendTable from '../components/DividendTable'
+//import DividendTable from '../components/DividendTable'
 import PositionTable from '../components/PositionTable'
 
 export default {
   name: 'Dashboard',
   components: {
     LineChart,
-    DividendTable,
+    //DividendTable,
     PositionTable
   },
 
@@ -122,9 +122,7 @@ export default {
     ...mapState({
       cumulativeSum: state => state.stats.cumulativeSum,
       operationsCount: state => state.stats.operationsCount,
-      overallResultPortfolios: state => state.stats.overallResultPortfolios,
-      overallDividends: state => state.stats.overallDividends,
-      overallResultOptions: state => state.stats.overallResultOptions,
+      overallResults: state => state.stats.overallResults,
       portfolioData: state => state.portfolios.portfolioData,
       currentPositions: state => state.portfolios.currentPositions,
       hasNewData: state => state.hasNewData
@@ -150,7 +148,11 @@ export default {
     computeStats() {
       this.$store.commit('computeCumSum', this.currentPositions)
       this.$store.commit('getOperationsCount', this.portfolioData)
-      this.$store.commit('getOverallResultPortfolios', this.portfolioData)
+      this.$store.commit('getOverallResults', this.portfolioData)
+    },
+
+    displayText(num) {
+      return (!num) ? 0 : num
     }
   }
 }

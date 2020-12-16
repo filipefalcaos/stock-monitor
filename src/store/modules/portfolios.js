@@ -16,7 +16,6 @@ const state = () => ({
   dividendsData: {},    // Latest history of dividends (all portfolios)
   stocksData: {},       // Latest prices of stocks (all portfolios)
   currentPositions: [], // Current positions on the selected portfolio
-  receivedDividends: [] // Dividends received on the selected portfolio
 })
 
 // Getters
@@ -332,49 +331,54 @@ const mutations = {
 
   setReceivedDividends(state) {
     state.finalDividends = 0
-    state.receivedDividends = []
+    state.portfolioData.portfolios.forEach(portfolio => {
+      portfolio.dividendsReceived = []
+      portfolio.positions.forEach(p => {
+        let dividendData = state.dividendsData[p.stock]
+        p.dividends = 0
+        
+        // Updates the profit of the positions with the dividends
+        dividendData.forEach(d => {
+          let finalDate = p.closed ? p.closed_at : Date.now()
+          if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
+            p.dividends += p.amount * d.value
+            portfolio.dividendsReceived.push({
+              stock: p.stock,
+              amount: p.amount,
+              result: p.amount * d.value,
+              key: d.ed.concat(d.pd, p.stock, d.type.split(' ')[0]), // This combination represents a single dividend
+              ...d
+            })
+          }
+        })
 
-    // Looks for positions that were open when dividends were announced
-    state.currentPositions.forEach(p => {
-      let dividendData = state.dividendsData[p.stock]
-      p.dividends = 0
-      
-      // Updates the profit of the position with the dividends
-      dividendData.forEach(d => {
-        let finalDate = p.closed ? p.closed_at : Date.now()
-        if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
-          p.dividends += p.amount * d.value
-          state.receivedDividends.push({
-            stock: p.stock,
-            amount: p.amount,
-            result: p.amount * d.value,
-            key: d.ed.concat(d.pd, p.stock, d.type.split(' ')[0]), // This combination represents a single dividend
-            ...d })
-        }
+        p.result += p.dividends
+        p.resultpct = p.result / (p.initial_price * p.amount)
+
+        if (portfolio.id === state.portfolioData.last_portfolio)
+          state.finalDividends += p.dividends
       })
 
-      p.result += p.dividends
-      p.resultpct = p.result / (p.initial_price * p.amount)
-      state.finalDividends += p.dividends
+      // Sets the final result only for the current portfolio
+      if (portfolio.id === state.portfolioData.last_portfolio)
+        state.finalResult += state.finalDividends
+      
+      // Looks for repeated dividends (more than one position eligible for a dividend)
+      let finalDividends = []
+      let groupedDividends = groupBy(portfolio.dividendsReceived, 'key')
+      
+      for (const value of Object.entries(groupedDividends)) {
+        let [amount, result, dividend] = [0, 0, null]
+        value[1].forEach(v => { amount += parseInt(v.amount); result += v.result })
+        dividend = JSON.parse(JSON.stringify(value[1][0]))
+        dividend.amount = amount
+        dividend.result = result
+        dividend.positions = value[1].length
+        finalDividends.push(dividend)
+      }
+
+      portfolio.dividendsReceived = finalDividends
     })
-
-    state.finalResult += state.finalDividends
-
-    // Looks for repeated dividends (more than one position eligible for a dividend)
-    let finalDividends = []
-    let groupedDividends = groupBy(state.receivedDividends, 'key')
-    
-    for (const value of Object.entries(groupedDividends)) {
-      let [amount, result, dividend] = [0, 0, null]
-      value[1].forEach(v => { amount += parseInt(v.amount); result += v.result })
-      dividend = JSON.parse(JSON.stringify(value[1][0]))
-      dividend.amount = amount
-      dividend.result = result
-      dividend.positions = value[1].length
-      finalDividends.push(dividend)
-    }
-
-    state.receivedDividends = finalDividends
   }
 }
 
