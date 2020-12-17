@@ -12,38 +12,35 @@ import { utils } from '../utils'
 export default {
   name: 'LineChart',
   props: {
-    data: {
+    datasets: {
       type: Array,
       default: () => []
     },
     labels: {
       type: Array,
       default: () => []
-    },
-    title: {
-      type: String,
-      default: ''
     }
   },
 
   data() {
     return {
       chart: null,
-      chartId: ''
+      chartId: '',
+      parsedDatasets: []
     }
   },
 
   watch: {
-    data: function(newData, oldData) {
+    datasets: function(newData, oldData) {
       oldData /* Unused */
-      this.chart.data.labels = this.labels
-      this.chart.data.datasets[0].data = newData
+      this.parseDatasets()
       this.chart.update()
     }
   },
 
   created() {
     this.chartId = nanoid()
+    this.parseDatasets()
   },
 
   mounted() {
@@ -52,14 +49,7 @@ export default {
       type: 'line',
       data: {
         labels: this.labels,
-        datasets: [{
-          label: this.title,
-          borderColor: '#20A8D8',
-          backgroundColor: '#20A8D8',
-          cubicInterpolationMode: 'monotone',
-          data: this.data,
-          fill: false
-        }]
+        datasets: this.parsedDatasets
       },
       options: {
         responsive: true,
@@ -93,14 +83,30 @@ export default {
           enabled: true,
           mode: 'single',
           callbacks: {
-            label: function (tooltipItems, data) {
+            label: function (tooltipItem, data) {
               data /* Unused */
-              return utils.formatCurrency(tooltipItems.yLabel)
+              return utils.formatCurrency(tooltipItem.yLabel)
             }
           }
         }
       }
-    });
+    })
+  },
+
+  methods: {
+    parseDatasets() {
+      this.parsedDatasets = []
+      this.datasets.forEach(d => {
+        this.parsedDatasets.push({
+          label: d.title,
+          borderColor: '#20A8D8',
+          backgroundColor: '#20A8D8',
+          cubicInterpolationMode: 'monotone',
+          data: d.results,
+          fill: false
+        })
+      })
+    }
   }
 }
 </script>

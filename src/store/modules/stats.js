@@ -2,7 +2,8 @@ import { utils } from '../../utils'
 
 // Initial state
 const state = () => ({
-  cumulativeSum: {},  // The cumulative sum of the results (all portfolios)
+  cumulativeSum: [],  // The cumulative sum of the results (all portfolios)
+  chartLabels: [],    // The chart labels for cumulative sums
   operationsCount: 0, // The count of operations performed (all portfolios)
   overallResults: {}  // The cumulative result of all portfolios
 })
@@ -15,63 +16,92 @@ const actions = {}
 
 // Mutations
 const mutations = {
-  computeCumSum(state, currentPositions) {
-    currentPositions.forEach(p => p.closed ? null : p.closed_at = Date.now())
-    currentPositions.sort((a, b) => a.closed_at - b.closed_at)
+  computeCumSum(state, portfolioData) {
+    let allLabels = new Set()
+    state.cumulativeSum = []
 
-    // Computes the monthly cumulative sum
-    let results = currentPositions.map(a => a.result).map(cumulativeSum(0))
-    let dates = currentPositions.map(a => a.closed_at).map((x) => utils.formatDate(x, 'month-year'))
-    let data = results.map((x, i) => [x, dates[i]])
-    
-    // Groups results by date
-    const groupedResults = data.reduce((groups, result) => {
-      const date = result[1].split(' ')[0]
-      if (!groups[date]) groups[date] = []
-      groups[date].push(result)
-      return groups
-    }, {})
+    portfolioData.portfolios.forEach(portfolio => {
+      let currentPositions = portfolio.positions
+      currentPositions.forEach(p => p.closed ? null : p.closed_at = Date.now())
+      currentPositions.sort((a, b) => a.closed_at - b.closed_at)
 
-    const groupArrays = Object.keys(groupedResults).map((date) => {
-      return {
-        date,
-        results: groupedResults[date]
-      }
-    })
-
-    let finalResults = [], finalDates = []
-    groupArrays.forEach(x => {
-      finalResults.push(x.results[x.results.length - 1][0])
-      finalDates.push(x.date)
-    })
-
-    // Fills the time gaps
-    let finalResultsAux = [], finalDatesAux = []
-    finalDates.forEach((date, index) => {
-      finalResultsAux.push(finalResults[index])
+      // Computes the monthly cumulative sum
+      let results = currentPositions.map(a => a.result).map(cumulativeSum(0))
+      let dates = currentPositions.map(a => a.closed_at).map((x) => utils.formatDate(x, 'month-year'))
+      let data = results.map((x, i) => [x, dates[i]])
       
-      if (index !== (finalDates.length - 1)) {
-        finalDatesAux.push(finalDates[index])
-        let newDates = utils.monthsInInterval(date, finalDates[index + 1]) // Looks for time gaps
-        
-        if (newDates.length > 0) {
-          newDates.forEach(newDate => {
-            finalResultsAux.push(finalResults[index])
-            finalDatesAux.push(newDate)
-          })
+      // Groups results by date
+      const groupedResults = data.reduce((groups, result) => {
+        const date = result[1].split(' ')[0]
+        if (!groups[date]) groups[date] = []
+        groups[date].push(result)
+        return groups
+      }, {})
+
+      const groupArrays = Object.keys(groupedResults).map((date) => {
+        return {
+          date,
+          results: groupedResults[date]
         }
-      } else {
-        finalDatesAux.push(finalDates[finalDates.length - 1])
-      }
+      })
+
+      let finalResults = [], finalDates = []
+      groupArrays.forEach(x => {
+        finalResults.push(x.results[x.results.length - 1][0])
+        finalDates.push(x.date)
+      })
+
+      // Fills the time gaps
+      let finalResultsAux = [], finalDatesAux = []
+      finalDates.forEach((date, index) => {
+        finalResultsAux.push(finalResults[index])
+        
+        if (index !== (finalDates.length - 1)) {
+          finalDatesAux.push(finalDates[index])
+          let newDates = utils.monthsInInterval(date, finalDates[index + 1]) // Looks for time gaps
+          
+          if (newDates.length > 0) {
+            newDates.forEach(newDate => {
+              finalResultsAux.push(finalResults[index])
+              finalDatesAux.push(newDate)
+            })
+          }
+        } else {
+          finalDatesAux.push(finalDates[finalDates.length - 1])
+        }
+      })
+
+      // Set the cumulative sum of the portfolio
+      finalDatesAux.forEach(dt => allLabels.add(dt))
+      state.cumulativeSum.push({
+        results: finalResultsAux,
+        dates: finalDatesAux,
+        title: portfolio.name
+      })
+      
+      currentPositions.forEach(p => {
+        if (!p.closed) delete p.closed_at
+      })
     })
 
-    state.cumulativeSum.currentResults = finalResultsAux
-    state.cumulativeSum.currentDates = finalDatesAux
-
-    // Remove the 'closed_at' property from the open positions
-    currentPositions.forEach(p => {
-      if (!p.closed) delete p.closed_at
+    // Fills the data gaps in datasets
+    // A dataset that does not have all the labels of "state.chartLabels" will be 
+    // filled with null
+    state.cumulativeSum.forEach(cs => {
+      let currRes = [], count = 0
+      allLabels.forEach(l => {
+        if (cs.dates.includes(l)) {
+          currRes.push(cs.results[count])
+          count++
+        } else {
+          currRes.push(null)
+        }
+      })
+      
+      cs.results = currRes
     })
+
+    state.chartLabels = [...allLabels]
   },
 
   getOperationsCount(state, portfolioData) {

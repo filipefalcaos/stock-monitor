@@ -45,13 +45,15 @@
         </CRow>
         
         <line-chart
-          v-if="!isEmpty"
-          :data="cumulativeSum.currentResults"
-          :labels="cumulativeSum.currentDates"
-          :title="lastPortfolio.name"
+          v-if="!isEmpty && cumulativeSum.length > 0"
+          :datasets="cumulativeSum"
+          :labels="chartLabels"
           style="height: 300px; margin-top: 20px;"
         />
-        <h6 v-else>
+        <h6
+          v-else
+          style="margin-top: 0.5rem;"
+        >
           Sem informações disponíveis.
         </h6>
       </CCardBody>
@@ -71,12 +73,12 @@
         </CRow>
 
         <!-- Table of last opened positions -->
-        <position-table
+        <!-- <position-table
           class="mt-3"
           :position-data="lastPositions"
           :has-new-data="hasNewData"
           :has-actions="false"
-        />
+        /> -->
       </CCardBody>
     </CCard>
 
@@ -108,14 +110,14 @@
 import { mapGetters, mapState } from 'vuex'
 import LineChart from '../components/LineChart'
 //import DividendTable from '../components/DividendTable'
-import PositionTable from '../components/PositionTable'
+// import PositionTable from '../components/PositionTable'
 
 export default {
   name: 'Dashboard',
   components: {
     LineChart,
     //DividendTable,
-    PositionTable
+    // PositionTable
   },
 
   computed: {
@@ -123,9 +125,11 @@ export default {
       cumulativeSum: state => state.stats.cumulativeSum,
       operationsCount: state => state.stats.operationsCount,
       overallResults: state => state.stats.overallResults,
+      chartLabels: state => state.stats.chartLabels,
       portfolioData: state => state.portfolios.portfolioData,
       currentPositions: state => state.portfolios.currentPositions,
-      hasNewData: state => state.hasNewData
+      hasNewData: state => state.hasNewData,
+      isLoading: state => state.isLoading
     }),
     
     ...mapGetters({
@@ -146,7 +150,7 @@ export default {
 
   methods: {
     computeStats() {
-      this.$store.commit('computeCumSum', this.currentPositions)
+      this.$store.commit('computeCumSum', this.portfolioData)
       this.$store.commit('getOperationsCount', this.portfolioData)
       this.$store.commit('getOverallResults', this.portfolioData)
     },
