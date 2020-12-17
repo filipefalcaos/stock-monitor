@@ -9,6 +9,9 @@ import Chart from 'chart.js'
 import { nanoid } from 'nanoid'
 import { utils } from '../utils'
 
+import 'chartjs-plugin-colorschemes/src/plugins/plugin.colorschemes'
+import { Classic20 } from 'chartjs-plugin-colorschemes/src/colorschemes/colorschemes.tableau'
+
 export default {
   name: 'LineChart',
   props: {
@@ -30,73 +33,90 @@ export default {
     }
   },
 
+  watch: {
+    datasets: function(val) {
+      this.parseDatasets(val)
+      this.createChart()
+    }
+  },
+
   created() {
     this.chartId = nanoid()
-    this.parseDatasets()
+    this.parseDatasets(this.datasets)
   },
 
   mounted() {
-    let ctx = document.getElementById(this.chartId).getContext('2d')
-    this.chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: this.labels,
-        datasets: this.parsedDatasets
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        elements: {
-          point: {
-            radius: 2,
-            hitRadius: 10,
-            hoverRadius: 2,
-            hoverBorderWidth: 3
-          },
-          line: {
-            borderWidth: 2
-          }
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-              callback: function (value, index, values) {
-                index, values /* Unused */
-                return utils.formatCurrency(value)
-              }
-            },
-            gridLines: {
-              display: true
-            }
-          }]
-        },
-        tooltips: {
-          enabled: true,
-          mode: 'single',
-          callbacks: {
-            label: function (tooltipItem, data) {
-              data /* Unused */
-              return utils.formatCurrency(tooltipItem.yLabel)
-            }
-          }
-        }
-      }
-    })
+    this.createChart()
   },
 
   methods: {
-    parseDatasets() {
+    parseDatasets(datasets) {
       this.parsedDatasets = []
-      this.datasets.forEach(d => {
+      datasets.forEach(d => {
         this.parsedDatasets.push({
           label: d.title,
-          borderColor: '#20A8D8',
-          backgroundColor: '#20A8D8',
           cubicInterpolationMode: 'monotone',
           data: d.results,
           fill: false
         })
+      })
+    },
+
+    createChart() {
+      let ctx = document.getElementById(this.chartId).getContext('2d')
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.labels,
+          datasets: this.parsedDatasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          elements: {
+            point: {
+              radius: 2,
+              hitRadius: 10,
+              hoverRadius: 2,
+              hoverBorderWidth: 3
+            },
+            line: {
+              borderWidth: 2
+            }
+          },
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                callback: function (value, index, values) {
+                  index, values /* Unused */
+                  return utils.formatCurrency(value)
+                }
+              },
+              gridLines: {
+                display: true
+              }
+            }]
+          },
+          tooltips: {
+            enabled: true,
+            mode: 'single',
+            callbacks: {
+              label: function (tooltipItem, data) {
+                data /* Unused */
+                return utils.formatCurrency(tooltipItem.yLabel)
+              }
+            }
+          },
+          animation: {
+            duration: 0
+          },
+          plugins: {
+            colorschemes: {
+              scheme: Classic20
+            }
+          }
+        }
       })
     }
   }

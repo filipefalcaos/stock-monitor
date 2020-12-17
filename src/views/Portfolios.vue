@@ -23,7 +23,7 @@
         class="d-none d-md-block"
       >
         <h5 style="float: right; font-size: 1rem; margin-bottom: 0;">
-          <b>Ativo: </b>
+          <b>Investido: </b>
           <span style="margin-right: 0.5rem;">{{ $utils.formatCurrency(activeInvestment) }}</span>
           <span>|</span>
 
@@ -34,10 +34,10 @@
             Resultados indisponíveis
           </b>
           <span v-else>
-            <b style="margin-left: 0.5rem;">Resultado:</b>
+            <b style="margin-left: 0.5rem;">Res. Final:</b>
             {{ $utils.formatCurrency(finalResult) }}
             <span style="margin-left: 0.25rem;">|</span>
-            <b style="margin-left: 0.5rem;">Proventos:</b>
+            <b style="margin-left: 0.5rem;">Prov. Recebidos:</b>
             {{ $utils.formatCurrency(finalDividends) }}
           </span>
         </h5>
