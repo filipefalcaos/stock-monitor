@@ -337,7 +337,7 @@ const mutations = {
         let dividendData = state.dividendsData[p.stock]
         p.dividends = 0
         
-        // Updates the profit of the positions with the dividends
+        // Finds all the dividends received for the current position
         dividendData.forEach(d => {
           let finalDate = p.closed ? p.closed_at : Date.now()
           if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
@@ -352,16 +352,9 @@ const mutations = {
           }
         })
 
-        p.result += p.dividends
-        p.resultpct = p.result / (p.initial_price * p.amount)
-
         if (portfolio.id === state.portfolioData.last_portfolio)
           state.finalDividends += p.dividends
       })
-
-      // Sets the final result only for the current portfolio
-      if (portfolio.id === state.portfolioData.last_portfolio)
-        state.finalResult += state.finalDividends
       
       // Looks for repeated dividends (more than one position eligible for a dividend)
       let finalDividends = []

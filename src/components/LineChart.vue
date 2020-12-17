@@ -30,14 +30,6 @@ export default {
     }
   },
 
-  watch: {
-    datasets: function(newData, oldData) {
-      oldData /* Unused */
-      this.parseDatasets()
-      this.chart.update()
-    }
-  },
-
   created() {
     this.chartId = nanoid()
     this.parseDatasets()
