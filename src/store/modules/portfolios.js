@@ -191,7 +191,10 @@ const mutations = {
   },
 
   newPortfolio(state, portfolioName) {
+    state.finalResult = 0
+    state.finalDividends = 0
     state.portfolioData.last_portfolio = nanoid()
+    
     state.portfolioData.portfolios.push({
       id: state.portfolioData.last_portfolio,
       name: portfolioName,

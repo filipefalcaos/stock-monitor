@@ -101,8 +101,9 @@ export default {
           tooltips: {
             enabled: true,
             mode: 'single',
+            displayColors: false,
             callbacks: {
-              label: function (tooltipItem, data) {
+              label: function(tooltipItem, data) {
                 data /* Unused */
                 return utils.formatCurrency(tooltipItem.yLabel)
               }
