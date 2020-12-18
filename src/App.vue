@@ -6,24 +6,19 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'App',
 
   computed: {
-    ...mapState({ isLoading: state => state.isLoading }),
-    ...mapGetters({
-      lastPortfolio: 'lastPortfolio',
-      isEmpty: 'isEmpty'
-    })
+    ...mapState({ isLoading: state => state.isLoading })
   },
 
   // Gets the last state of the portfolios and options data when the app is created
   created() {
     this.$store.commit('setDataFileName')
     this.$store.commit('loadDataFile')
-    if (!this.isEmpty) this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
   }
 }
 </script>

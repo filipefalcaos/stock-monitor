@@ -147,6 +147,30 @@
       </CCardBody>
     </CCard>
 
+    <CCard class="mt-2">
+      <CCardBody>
+        <CRow>
+          <CCol sm="5">
+            <h4
+              id="traffic"
+              class="card-title mb-0"
+            >
+              Proventos recebidos
+            </h4>
+          </CCol>
+        </CRow>
+
+        <!-- Table of closed positions -->
+        <position-table
+          class="mt-3"
+          :position-data="closedPositions"
+          :has-new-data="hasNewData"
+          @move-position="movePositionDialog"
+          @delete-positions="deletePositions"
+        />
+      </CCardBody>
+    </CCard>
+
     <!-- Modal to add positions -->
     <b-modal
       :active.sync="modalAddActive"
@@ -225,7 +249,6 @@ export default {
   computed: {
     ...mapState({
       portfolioData: state => state.portfolios.portfolioData,
-      currentPositions: state => state.portfolios.currentPositions,
       dataFileName: state => state.portfolios.dataFileName,
       finalResult: state => state.portfolios.finalResult,
       finalDividends: state => state.portfolios.finalDividends,
@@ -240,7 +263,7 @@ export default {
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
       openPositions: 'openPositions',
-      activeStocksList: 'activeStocksList'
+      currentStocks: 'currentStocks'
     })
   },
   
@@ -253,15 +276,13 @@ export default {
   methods: {
     loadPortfolio() {
       this.$store.commit('updateDataFile')
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
       this.getLastData()
     },
 
-    createPortfolio(portfolio_name) {
+    addPortfolio(portfolio_name) {
       this.percent_result = 0
       this.$store.commit('newPortfolio', portfolio_name)
       this.$store.commit('updateDataFile')
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
     },
 
     addPortfolioDialog() {
@@ -275,7 +296,7 @@ export default {
         cancelText: 'Cancelar',
         trapFocus: true,
         type: 'is-info',
-        onConfirm: value => this.createPortfolio(value)
+        onConfirm: value => this.addPortfolio(value)
       })
     },
 
@@ -304,11 +325,7 @@ export default {
     deletePortfolio(portfolio_id) {
       this.$store.commit('deletePortfolio', portfolio_id)
       this.$store.commit('updateDataFile')
-
-      if (!this.isEmpty) {
-        this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
-        this.getLastData()
-      }
+      if (!this.isEmpty) this.getLastData()
     },
 
     deletePortfolioDialog() {
@@ -324,14 +341,12 @@ export default {
     addPosition(newPosition) {
       this.$store.commit('addPosition', newPosition)
       this.$store.commit('updateDataFile')
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
       this.getLastData()
     },
 
     closePosition(closeObj) {
       this.$store.commit('closePosition', closeObj)
       this.$store.commit('updateDataFile')
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
       this.getLastData()
     },
 
@@ -343,7 +358,6 @@ export default {
     movePosition(moveObj) {
       this.$store.commit('movePosition', moveObj)
       this.$store.commit('updateDataFile')
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
       this.getLastData()
     },
 
@@ -355,12 +369,11 @@ export default {
     deletePositions(positions) {
       this.$store.commit('deletePosition', positions)
       this.$store.commit('updateDataFile')
-      this.$store.commit('setCurrentPositions', this.lastPortfolio.positions)
       this.getLastData()
     },
 
     async getLastData() {
-      await this.$store.dispatch('getStocksData', this.activeStocksList)
+      await this.$store.dispatch('getStocksData', this.currentStocks)
     }
   }
 }

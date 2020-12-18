@@ -9,61 +9,39 @@ const fs = require('fs')
 
 // Initial state
 const state = () => ({
-  dataFileName: '',     // The data filename
-  finalResult: 0,       // Sum of results (+ dividends received) on the selected portfolio
-  finalDividends: 0,    // Sum of dividends received on the selected portfolio
-  portfolioData: {},    // Data loaded from the data file
-  dividendsData: {},    // Latest history of dividends (all portfolios)
-  stocksData: {},       // Latest prices of stocks (all portfolios)
-  currentPositions: [], // Current positions on the selected portfolio
+  dataFileName: '',  // The data filename
+  finalResult: 0,    // Sum of results (excluding dividends received) on the selected portfolio
+  finalDividends: 0, // Sum of dividends received on the selected portfolio
+  portfolioData: {}, // Data loaded from the data file
+  dividendsData: {}, // Latest history of dividends (all portfolios)
+  stocksData: {},    // Latest prices of stocks (all portfolios)
 })
 
 // Getters
 const getters = {
-  lastPortfolio: (state) => {
-    return findPortfolio(state, state.portfolioData.last_portfolio)
-  },
-
-  stocksList: (state) => {
+  allStocks: (state) => {
     return [...new Set(state.portfolioData.portfolios.map(port => port.positions.map(p => {
       return JSON.stringify({ stock: p.stock, asset: p.asset })
     })).flat())]
   },
 
-  activeStocksList: (state) => {
-    return [...new Set(state.currentPositions.map(p => {
+  currentStocks: (state, getters) => {
+    return [...new Set(getters.currentPositions.map(p => {
       return JSON.stringify({ stock: p.stock, asset: p.asset })
     }))]
   },
 
   activeInvestment: (state, getters) => {
-    state /* Unused */
     return getters.openPositions.reduce((total, position) => {
       return total + position.initial_price * position.amount
     }, 0)
   },
 
-  openPositions: (state) => {
-    return state.currentPositions.filter(position => !position.closed)
-  },
-
-  closedPositions: (state) => {
-    return state.currentPositions.filter(position => position.closed)
-  },
-
-  lastPositions: (state) => {
-    state.currentPositions.sort((a, b) => a.created_at - b.created_at)
-    return state.currentPositions.slice(-5).reverse()
-  },
-
-  lastDividends: (state) => {
-    state.receivedDividends.sort((a, b) => utils.toTimestamp(a.pd) - utils.toTimestamp(b.pd))
-    return state.receivedDividends.slice(-5).reverse()
-  },
-
-  isEmpty: (state) => {
-    return state.portfolioData.portfolios.length === 0
-  }
+  lastPortfolio: (state) => findPortfolio(state, state.portfolioData.last_portfolio),
+  currentPositions: (state, getters) => getters.lastPortfolio.positions,
+  openPositions: (state, getters) => getters.currentPositions.filter(position => !position.closed),
+  closedPositions: (state, getters) => getters.currentPositions.filter(position => position.closed),
+  isEmpty: (state) => state.portfolioData.portfolios.length === 0
 }
 
 // Actions
@@ -218,10 +196,6 @@ const mutations = {
     }
   },
 
-  setCurrentPositions(state, positions) {
-    state.currentPositions = positions
-  },
-
   addPosition(state, positionData) {
     let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
     lastPortfolio.positions.push({
@@ -242,7 +216,7 @@ const mutations = {
     // Checks if a new position must be created and closed (partial closing), or just close
     // the existing one
     if (closeObj.new_amount === closeObj.old_position.amount) {
-      state.currentPositions.forEach(position => {
+      lastPortfolio.positions.forEach(position => {
         if (position.id === closeObj.old_position.id) {
           position.closed = true
           position.close_price = closeObj.close_price
@@ -254,7 +228,7 @@ const mutations = {
       let diff = closeObj.old_position.amount - closeObj.new_amount
 
       // Updates the remaining amount
-      state.currentPositions.forEach(position => {
+      lastPortfolio.positions.forEach(position => {
         if (position.id === closeObj.old_position.id) {
           position.amount = diff
           return
@@ -279,14 +253,14 @@ const mutations = {
 
   deletePosition(state, positions) {
     let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
-    lastPortfolio.positions = state.currentPositions.filter(position => !positions.includes(position))
+    lastPortfolio.positions = lastPortfolio.positions.filter(position => !positions.includes(position))
   },
 
   movePosition(state, moveObj) {
     let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
     let newPortfolio = findPortfolio(state, moveObj.portfolio)
     newPortfolio.positions.push(moveObj.position)
-    lastPortfolio.positions = state.currentPositions.filter(position => ![moveObj.position].includes(position))
+    lastPortfolio.positions = lastPortfolio.positions.filter(position => ![moveObj.position].includes(position))
   },
 
   setStocksData(state, stocksData) {
@@ -303,15 +277,17 @@ const mutations = {
     state.portfolioData.portfolios.forEach(portfolio => {
       let sum = 0
       portfolio.positions.forEach(p => {
-        p.var = state.stocksData[p.stock].var
-        p.varpct = state.stocksData[p.stock].varpct
-        p.current_price = p.closed ? p.close_price : state.stocksData[p.stock].price
-        
-        // Compute the position result
-        let diff = p.current_price - p.initial_price
-        p.result = (p.type === 'long') ? diff * p.amount : -diff * p.amount
-        p.resultpct = p.result / (p.initial_price * p.amount)
-        sum += parseFloat(p.result)
+        if (p.stock in state.stocksData) {
+          p.var = state.stocksData[p.stock].var
+          p.varpct = state.stocksData[p.stock].varpct
+          p.current_price = p.closed ? p.close_price : state.stocksData[p.stock].price
+          
+          // Compute the position result
+          let diff = p.current_price - p.initial_price
+          p.result = (p.type === 'long') ? diff * p.amount : -diff * p.amount
+          p.resultpct = p.result / (p.initial_price * p.amount)
+          sum += parseFloat(p.result)
+        }
       })
 
       // Sets the final result only for the current portfolio
@@ -337,23 +313,25 @@ const mutations = {
     state.portfolioData.portfolios.forEach(portfolio => {
       portfolio.dividendsReceived = []
       portfolio.positions.forEach(p => {
-        let dividendData = state.dividendsData[p.stock]
-        p.dividends = 0
-        
-        // Finds all the dividends received for the current position
-        dividendData.forEach(d => {
-          let finalDate = p.closed ? p.closed_at : Date.now()
-          if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
-            p.dividends += p.amount * d.value
-            portfolio.dividendsReceived.push({
-              stock: p.stock,
-              amount: p.amount,
-              result: p.amount * d.value,
-              key: d.ed.concat(d.pd, p.stock, d.type.split(' ')[0]), // This combination represents a single dividend
-              ...d
-            })
-          }
-        })
+        if (p.stock in state.dividendsData) {
+          let dividendData = state.dividendsData[p.stock]
+          p.dividends = 0
+          
+          // Finds all the dividends received for the current position
+          dividendData.forEach(d => {
+            let finalDate = p.closed ? p.closed_at : Date.now()
+            if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
+              p.dividends += p.amount * d.value
+              portfolio.dividendsReceived.push({
+                stock: p.stock,
+                amount: p.amount,
+                result: p.amount * d.value,
+                key: d.ed.concat(d.pd, p.stock, d.type.split(' ')[0]), // This combination represents a single dividend
+                ...d
+              })
+            }
+          })
+        }
 
         if (portfolio.id === state.portfolioData.last_portfolio)
           state.finalDividends += p.dividends

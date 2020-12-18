@@ -76,7 +76,6 @@ export default {
       overallResults: state => state.stats.overallResults,
       chartLabels: state => state.stats.chartLabels,
       portfolioData: state => state.portfolios.portfolioData,
-      currentPositions: state => state.portfolios.currentPositions,
       hasNewData: state => state.hasNewData,
       isLoading: state => state.isLoading
     }),
@@ -84,16 +83,14 @@ export default {
     ...mapGetters({
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
-      lastPositions: 'lastPositions',
-      lastDividends: 'lastDividends',
-      stocksList: 'stocksList'
+      allStocks: 'allStocks'
     })
   },
 
   // Computes the statistics on the portfolios/options data when the component
   // is created
   async created() {
-    await this.$store.dispatch('getStocksData', this.stocksList)
+    await this.$store.dispatch('getStocksData', this.allStocks)
     this.computeStats()
   },
 
