@@ -114,7 +114,7 @@
               class="mb-0"
               style="text-align: center;"
             >
-              Posições abertas por tipo de ativo ($)
+              Posições abertas por tipo ($)
             </h4>
             
             <frequency-chart
