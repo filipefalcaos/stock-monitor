@@ -56,13 +56,10 @@
     </CCard>
 
     <CRow>
-      <CCol lg="6">
+      <CCol lg="4">
         <CCard>
           <CCardBody>
-            <h4
-              id="traffic"
-              class="card-title mb-0"
-            >
+            <h4 class="card-title mb-0">
               Número de operações por ativo
             </h4>
             
@@ -81,19 +78,39 @@
         </CCard>
       </CCol>
       
-      <CCol lg="6">
+      <CCol lg="4">
         <CCard>
           <CCardBody>
-            <h4
-              id="traffic"
-              class="card-title mb-0"
-            >
+            <h4 class="card-title mb-0">
               Valor investido por ativo
             </h4>
             
             <frequency-chart
               v-if="!isEmpty && cumulativeSum.length > 0"
               :frequencies="investmentPerStock"
+              :data-is-money="true"
+              style="margin-top: 20px;"
+            />
+            <h6
+              v-else
+              style="margin-top: 0.5rem;"
+            >
+              Sem informações disponíveis.
+            </h6>
+          </CCardBody>
+        </CCard>
+      </CCol>
+
+      <CCol lg="4">
+        <CCard>
+          <CCardBody>
+            <h4 class="card-title mb-0">
+              Valor investido por tipo de ativo
+            </h4>
+            
+            <frequency-chart
+              v-if="!isEmpty && cumulativeSum.length > 0"
+              :frequencies="investmentPerAsset"
               :data-is-money="true"
               style="margin-top: 20px;"
             />
@@ -127,6 +144,7 @@ export default {
       chartLabels: state => state.stats.chartLabels,
       operationsPerStock: state => state.stats.operationsPerStock,
       investmentPerStock: state => state.stats.investmentPerStock,
+      investmentPerAsset: state => state.stats.investmentPerAsset,
       portfolioData: state => state.portfolios.portfolioData,
       hasNewData: state => state.hasNewData,
       isLoading: state => state.isLoading

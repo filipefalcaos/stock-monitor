@@ -66,7 +66,7 @@ export default {
       this.labels = []
       selected.forEach(s => {
         this.data.push(s[1])
-        this.labels.push(s[0])
+        this.labels.push(s[0].replace('.SA', ''))
       })
 
       let sum = 0

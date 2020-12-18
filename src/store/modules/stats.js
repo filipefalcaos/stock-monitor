@@ -7,7 +7,8 @@ const state = () => ({
   operationsCount: 0,     // The count of operations performed (all portfolios)
   overallResults: {},     // The cumulative result of all portfolios
   operationsPerStock: {}, // The number of operations per stock (all portfolios)
-  investmentPerStock: {}  // The amount of money invested per stock (all portfolios)
+  investmentPerStock: {}, // The amount of money invested per stock (all portfolios)
+  investmentPerAsset: {}  // The amount of money invested per type of asset (all portfolios)
 })
 
 // Getters
@@ -134,20 +135,28 @@ const mutations = {
   },
 
   getDistData(state, portfolioData) {
-    let count = {}, values = {}
+    let stockCount = {}, stockValues = {}
+    let typeValues = {}
     
     portfolioData.portfolios.forEach(portfolio => {
       portfolio.positions.forEach(position => {
-        count[position.stock] = count[position.stock] + 1 || 1
+        stockCount[position.stock] = stockCount[position.stock] + 1 || 1
         if (!position.closed) {
           let value = position.amount * position.initial_price
-          values[position.stock] = values[position.stock] + value || value
+          stockValues[position.stock] = stockValues[position.stock] + value || value
+          
+          if (position.asset === 'fii') {
+            typeValues['FIIs'] = typeValues['FIIs'] + value || value
+          } else {
+            typeValues['Ações'] = typeValues['Ações'] + value || value
+          }
         }
       })
     })
 
-    state.operationsPerStock = count
-    state.investmentPerStock = values
+    state.operationsPerStock = stockCount
+    state.investmentPerStock = stockValues
+    state.investmentPerAsset = typeValues
   }
 }
 
