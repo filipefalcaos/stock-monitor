@@ -10,6 +10,8 @@
       :paginated="isPaginated"
       :per-page="pages"
       :row-class="(row, index) => hasNewData && 'green-success'"
+      default-sort="ed"
+      default-sort-direction="desc"
       mobile-cards
       hoverable
       striped
@@ -20,7 +22,7 @@
         label="Ex-dividendos"
         sortable
       >
-        {{ props.row.ed }}
+        {{ $utils.formatDate(props.row.ed) }}
       </b-table-column>
 
       <b-table-column
@@ -29,7 +31,7 @@
         label="Pagamento"
         sortable
       >
-        {{ props.row.pd }}
+        {{ $utils.formatDate(props.row.pd) }}
       </b-table-column>
 
       <b-table-column

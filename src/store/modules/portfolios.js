@@ -304,7 +304,13 @@ const mutations = {
       let results = JSON.parse(doc.getElementById('results').value)
       
       let dividends = []
-      results.forEach(r => dividends.push({ ed: r.ed, pd: r.pd, value: r.v, type: r.etd }))
+      results.forEach(r => dividends.push({
+        ed: utils.toTimestamp(r.ed),
+        pd: utils.toTimestamp(r.pd),
+        value: r.v,
+        type: r.etd
+      }))
+      
       state.dividendsData[d.stock] = dividends
     })
   },
@@ -321,13 +327,14 @@ const mutations = {
           // Finds all the dividends received for the current position
           dividendData.forEach(d => {
             let finalDate = p.closed ? p.closed_at : Date.now()
+            let key = d.ed.toString().concat(d.pd.toString(), p.stock, d.type.split(' ')[0]) // This combination represents a single dividend
             if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
               p.dividends += p.amount * d.value
               portfolio.dividendsReceived.push({
                 stock: p.stock,
                 amount: p.amount,
                 result: p.amount * d.value,
-                key: d.ed.concat(d.pd, p.stock, d.type.split(' ')[0]), // This combination represents a single dividend
+                key: key,
                 ...d
               })
             }

@@ -63,10 +63,10 @@ function monthsInInterval(date1, date2) {
   return formatted
 }
 
-// Checks if a given date in the format 'dd/MM/yyyy' is in the interval of two 
-// given timestamps (in milliseconds)
+// Checks if a given timestamp is in the interval of two other given timestamps 
+// (all in milliseconds)
 function isInInterval(date, date1, date2) {
-  let toTest = parse(date, 'dd/MM/yyyy', new Date())
+  let toTest = new Date(date)
   let initialDate = new Date(date1)
   let finalDate = new Date(date2)
   return isWithinInterval(toTest, { start: initialDate, end: finalDate })

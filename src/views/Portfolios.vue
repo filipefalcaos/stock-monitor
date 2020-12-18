@@ -141,6 +141,7 @@
           class="mt-3"
           :position-data="closedPositions"
           :has-new-data="hasNewData"
+          :sort-params="['closed_at', 'desc']"
           @move-position="movePositionDialog"
           @delete-positions="deletePositions"
         />

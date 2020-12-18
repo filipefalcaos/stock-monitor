@@ -12,6 +12,8 @@
       :paginated="isPaginated"
       :per-page="pages"
       :row-class="(row, index) => hasNewData && 'green-success'"
+      :default-sort="sortParams[0]"
+      :default-sort-direction="sortParams[1]"
       mobile-cards
       hoverable
       striped
@@ -197,6 +199,10 @@ export default {
     hasActions: {
       type: Boolean,
       default: true
+    },
+    sortParams: {
+      type: Array,
+      default: () => ['created_at', 'desc']
     }
   },
 
