@@ -37,7 +37,9 @@ export default {
   watch: {
     frequencies: function(val) {
       this.parseData(val)
-      this.createChart()
+      this.chart.data.labels = this.labels
+      this.chart.data.datasets[0].data = this.data
+      this.chart.update()
     }
   },
 
@@ -90,7 +92,8 @@ export default {
             callbacks: {
               label: function(tooltipItem, data) {
                 let val = data.datasets[0].data[tooltipItem.index]
-                return dataIsMoney ? utils.formatCurrency(val) : val
+                let label = data.labels[tooltipItem.index] + ': '
+                return dataIsMoney ? label + utils.formatCurrency(val).toString() : label + val.toString()
               }
             }
           }

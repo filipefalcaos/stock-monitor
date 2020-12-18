@@ -67,7 +67,7 @@
             </h4>
             
             <frequency-chart
-              v-if="!isEmpty"
+              v-if="!isEmpty && cumulativeSum.length > 0"
               :frequencies="operationsPerStock"
               style="margin-top: 20px;"
             />
@@ -92,7 +92,7 @@
             </h4>
             
             <frequency-chart
-              v-if="!isEmpty"
+              v-if="!isEmpty && cumulativeSum.length > 0"
               :frequencies="investmentPerStock"
               :data-is-money="true"
               style="margin-top: 20px;"

@@ -36,7 +36,9 @@ export default {
   watch: {
     datasets: function(val) {
       this.parseDatasets(val)
-      this.createChart()
+      this.chart.data.labels = this.labels
+      this.chart.data.datasets = this.parsedDatasets
+      this.chart.update()
     }
   },
 

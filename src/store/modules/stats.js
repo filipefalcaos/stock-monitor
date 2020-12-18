@@ -17,7 +17,7 @@ const getters = {}
 const actions = {
   computeStats({ commit }, portfolioData) {
     commit('computeCumSum', portfolioData)
-    commit('getOperationsPerStock', portfolioData)
+    commit('getDistData', portfolioData)
     commit('getOperationsCount', portfolioData)
     commit('getOverallResults', portfolioData)
   }
@@ -133,7 +133,7 @@ const mutations = {
     state.overallResults.dividends = resDividends.toFixed(2)
   },
 
-  getOperationsPerStock(state, portfolioData) {
+  getDistData(state, portfolioData) {
     let count = {}, values = {}
     
     portfolioData.portfolios.forEach(portfolio => {
