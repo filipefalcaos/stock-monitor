@@ -100,6 +100,11 @@ export default {
               }
             }]
           },
+          legend: {
+            labels: {
+              boxWidth: 20
+            }
+          },
           tooltips: {
             enabled: true,
             mode: 'single',

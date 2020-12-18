@@ -90,7 +90,11 @@ export default {
         options: {
           responsive: true,
           legend: {
-            position: 'left'
+            position: 'left',
+            labels: {
+              boxWidth: 20,
+              padding: 5
+            }
           },
           animation: {
             duration: 0

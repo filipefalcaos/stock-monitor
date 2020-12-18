@@ -34,8 +34,8 @@
     <CCard>
       <CCardBody>
         <h4
-          id="traffic"
-          class="card-title mb-0"
+          class="mb-0"
+          style="text-align: center;"
         >
           P&L - Carteiras de ações
         </h4>
@@ -59,8 +59,11 @@
       <CCol lg="4">
         <CCard>
           <CCardBody>
-            <h4 class="card-title mb-0">
-              Número de operações por ativo
+            <h4
+              class="mb-0"
+              style="text-align: center;"
+            >
+              Posições abertas por ativo (#)
             </h4>
             
             <frequency-chart
@@ -81,8 +84,11 @@
       <CCol lg="4">
         <CCard>
           <CCardBody>
-            <h4 class="card-title mb-0">
-              Valor investido por ativo
+            <h4
+              class="mb-0"
+              style="text-align: center;"
+            >
+              Posições abertas por ativo ($)
             </h4>
             
             <frequency-chart
@@ -104,8 +110,11 @@
       <CCol lg="4">
         <CCard>
           <CCardBody>
-            <h4 class="card-title mb-0">
-              Valor investido por tipo de ativo
+            <h4
+              class="mb-0"
+              style="text-align: center;"
+            >
+              Posições abertas por tipo de ativo ($)
             </h4>
             
             <frequency-chart
