@@ -41,6 +41,7 @@ const getters = {
   currentPositions: (state, getters) => getters.lastPortfolio.positions,
   openPositions: (state, getters) => getters.currentPositions.filter(position => !position.closed),
   closedPositions: (state, getters) => getters.currentPositions.filter(position => position.closed),
+  receivedDividends: (state, getters) => getters.lastPortfolio.dividendsReceived,
   isEmpty: (state) => state.portfolioData.portfolios.length === 0
 }
 

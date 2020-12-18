@@ -160,13 +160,11 @@
           </CCol>
         </CRow>
 
-        <!-- Table of closed positions -->
-        <position-table
+        <!-- Table of dividends received -->
+        <dividend-table
           class="mt-3"
-          :position-data="closedPositions"
+          :dividend-data="receivedDividends"
           :has-new-data="hasNewData"
-          @move-position="movePositionDialog"
-          @delete-positions="deletePositions"
         />
       </CCardBody>
     </CCard>
@@ -226,6 +224,7 @@ import { mapGetters, mapState } from 'vuex'
 import AddPositionForm from '../components/AddPositionForm'
 import ClosePositionForm from '../components/ClosePositionForm'
 import MovePositionForm from '../components/MovePositionForm'
+import DividendTable from '../components/DividendTable'
 import PositionTable from '../components/PositionTable'
 
 export default {
@@ -234,6 +233,7 @@ export default {
     AddPositionForm,
     ClosePositionForm,
     MovePositionForm,
+    DividendTable,
     PositionTable
   },
 
@@ -263,12 +263,12 @@ export default {
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
       openPositions: 'openPositions',
-      currentStocks: 'currentStocks'
+      currentStocks: 'currentStocks',
+      receivedDividends: 'receivedDividends'
     })
   },
   
-  // Gets the latest stock prices when the component is created and initializes 
-  // the portfolios UI
+  // Gets the latest stock prices when the component is created 
   created() {
     if (!this.isEmpty) this.getLastData()
   },
