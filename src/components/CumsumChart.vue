@@ -13,7 +13,7 @@ import 'chartjs-plugin-colorschemes/src/plugins/plugin.colorschemes'
 import { Classic20 } from 'chartjs-plugin-colorschemes/src/colorschemes/colorschemes.tableau'
 
 export default {
-  name: 'LineChart',
+  name: 'CumsumChart',
   props: {
     datasets: {
       type: Array,

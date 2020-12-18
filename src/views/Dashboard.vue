@@ -33,18 +33,14 @@
 
     <CCard>
       <CCardBody>
-        <CRow>
-          <CCol sm="5">
-            <h4
-              id="traffic"
-              class="card-title mb-0"
-            >
-              P&L - Carteiras de ações
-            </h4>
-          </CCol>
-        </CRow>
+        <h4
+          id="traffic"
+          class="card-title mb-0"
+        >
+          P&L - Carteiras de ações
+        </h4>
         
-        <line-chart
+        <cumsum-chart
           v-if="!isEmpty && cumulativeSum.length > 0"
           :datasets="cumulativeSum"
           :labels="chartLabels"
@@ -58,16 +54,70 @@
         </h6>
       </CCardBody>
     </CCard>
+
+    <CRow>
+      <CCol lg="6">
+        <CCard>
+          <CCardBody>
+            <h4
+              id="traffic"
+              class="card-title mb-0"
+            >
+              Número de operações por ativo
+            </h4>
+            
+            <frequency-chart
+              v-if="!isEmpty"
+              :frequencies="operationsPerStock"
+              style="margin-top: 20px;"
+            />
+            <h6
+              v-else
+              style="margin-top: 0.5rem;"
+            >
+              Sem informações disponíveis.
+            </h6>
+          </CCardBody>
+        </CCard>
+      </CCol>
+      
+      <CCol lg="6">
+        <CCard>
+          <CCardBody>
+            <h4
+              id="traffic"
+              class="card-title mb-0"
+            >
+              Valor investido por ativo
+            </h4>
+            
+            <frequency-chart
+              v-if="!isEmpty"
+              :frequencies="investmentPerStock"
+              :data-is-money="true"
+              style="margin-top: 20px;"
+            />
+            <h6
+              v-else
+              style="margin-top: 0.5rem;"
+            >
+              Sem informações disponíveis.
+            </h6>
+          </CCardBody>
+        </CCard>
+      </CCol>
+    </CRow>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import LineChart from '../components/LineChart'
+import CumsumChart from '../components/CumsumChart'
+import FrequencyChart from '../components/FrequencyChart'
 
 export default {
   name: 'Dashboard',
-  components: { LineChart },
+  components: { CumsumChart, FrequencyChart },
 
   computed: {
     ...mapState({
@@ -75,6 +125,8 @@ export default {
       operationsCount: state => state.stats.operationsCount,
       overallResults: state => state.stats.overallResults,
       chartLabels: state => state.stats.chartLabels,
+      operationsPerStock: state => state.stats.operationsPerStock,
+      investmentPerStock: state => state.stats.investmentPerStock,
       portfolioData: state => state.portfolios.portfolioData,
       hasNewData: state => state.hasNewData,
       isLoading: state => state.isLoading
@@ -91,16 +143,10 @@ export default {
   // is created
   async created() {
     await this.$store.dispatch('getStocksData', this.allStocks)
-    this.computeStats()
+    this.$store.dispatch('computeStats', this.portfolioData)
   },
 
   methods: {
-    computeStats() {
-      this.$store.commit('computeCumSum', this.portfolioData)
-      this.$store.commit('getOperationsCount', this.portfolioData)
-      this.$store.commit('getOverallResults', this.portfolioData)
-    },
-
     displayText(num) {
       return (!num) ? 0 : num
     }

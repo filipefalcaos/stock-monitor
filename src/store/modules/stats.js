@@ -2,17 +2,26 @@ import { utils } from '../../utils'
 
 // Initial state
 const state = () => ({
-  cumulativeSum: [],  // The cumulative sum of the results (all portfolios)
-  chartLabels: [],    // The chart labels for cumulative sums
-  operationsCount: 0, // The count of operations performed (all portfolios)
-  overallResults: {}  // The cumulative result of all portfolios
+  cumulativeSum: [],      // The cumulative sum of the results (all portfolios)
+  chartLabels: [],        // The chart labels for cumulative sums
+  operationsCount: 0,     // The count of operations performed (all portfolios)
+  overallResults: {},     // The cumulative result of all portfolios
+  operationsPerStock: {}, // The number of operations per stock (all portfolios)
+  investmentPerStock: {}  // The amount of money invested per stock (all portfolios)
 })
 
 // Getters
 const getters = {}
 
 // Actions
-const actions = {}
+const actions = {
+  computeStats({ commit }, portfolioData) {
+    commit('computeCumSum', portfolioData)
+    commit('getOperationsPerStock', portfolioData)
+    commit('getOperationsCount', portfolioData)
+    commit('getOverallResults', portfolioData)
+  }
+}
 
 // Mutations
 const mutations = {
@@ -122,6 +131,23 @@ const mutations = {
 
     state.overallResults.stocks = resStocks.toFixed(2)
     state.overallResults.dividends = resDividends.toFixed(2)
+  },
+
+  getOperationsPerStock(state, portfolioData) {
+    let count = {}, values = {}
+    
+    portfolioData.portfolios.forEach(portfolio => {
+      portfolio.positions.forEach(position => {
+        count[position.stock] = count[position.stock] + 1 || 1
+        if (!position.closed) {
+          let value = position.amount * position.initial_price
+          values[position.stock] = values[position.stock] + value || value
+        }
+      })
+    })
+
+    state.operationsPerStock = count
+    state.investmentPerStock = values
   }
 }
 
