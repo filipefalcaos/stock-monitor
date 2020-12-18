@@ -72,11 +72,23 @@ function isInInterval(date, date1, date2) {
   return isWithinInterval(toTest, { start: initialDate, end: finalDate })
 }
 
+// Suffles the items on a given array by using the Durstenfeld shuffle
+// Reference: https://stackoverflow.com/a/12646864
+function shuffleArray(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1))
+    var temp = array[i]
+    array[i] = array[j]
+    array[j] = temp
+  }
+}
+
 export const utils = {
   formatCurrency: formatCurrency,
   formatPercent: formatPercent,
   formatDate: formatDate,
   toTimestamp: toTimestamp,
   monthsInInterval: monthsInInterval,
-  isInInterval: isInInterval
+  isInInterval: isInInterval,
+  shuffleArray: shuffleArray
 }

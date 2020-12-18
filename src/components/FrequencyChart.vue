@@ -19,6 +19,10 @@ export default {
       type: Object,
       default: () => {}
     },
+    maxEntries: {
+      type: Number,
+      default: 15
+    },
     dataIsMoney: {
       type: Boolean,
       default: false
@@ -54,11 +58,22 @@ export default {
 
   methods: {
     parseData(frequencies) {
+      let sortedFrequencies = Object.entries(frequencies).sort(([, a],[, b]) => a - b)
+      let selected = sortedFrequencies.slice(-this.maxEntries)
+      let remaining = sortedFrequencies.slice(0, sortedFrequencies.length - this.maxEntries)
+
       this.data = []
       this.labels = []
-      for (let [key, value] of Object.entries(frequencies)) {
-        this.data.push(value)
-        this.labels.push(key)
+      selected.forEach(s => {
+        this.data.push(s[1])
+        this.labels.push(s[0])
+      })
+
+      let sum = 0
+      remaining.forEach(r => sum += r[1])
+      if (remaining.length > 0) {
+        this.data.push(sum)
+        this.labels.push('Outros')
       }
     },
 
