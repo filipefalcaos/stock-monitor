@@ -23,10 +23,6 @@
         class="d-none d-md-block"
       >
         <h5 style="float: right; font-size: 1rem; margin-bottom: 0;">
-          <b>Investido: </b>
-          <span style="margin-right: 0.5rem;">{{ $utils.formatCurrency(activeInvestment) }}</span>
-          <span>|</span>
-
           <b
             v-if="hasError"
             style="margin-left: 0.5rem; text-align: justify;"
@@ -208,14 +204,39 @@
     </b-modal>
   </div>
 
-  <div v-else>
-    <h5>Não há carteiras cadastradas. Cadastre sua primeira carteira utilizando o botão abaixo.</h5>
-    <CButton
-      color="success"
-      @click="newPortfolio"
-    >
-      Nova Carteira
-    </CButton>
+  <div 
+    v-else
+    style="min-height: 85vh; display: flex;"
+    class="flex-row align-items-center"
+  >
+    <CContainer>
+      <CRow class="justify-content-center">
+        <CCol
+          lg="6"
+          class="text-center"
+        >
+          <figure style="margin-bottom: 1.5rem;">
+            <img
+              width="150px"
+              src="../assets/stock-market.png"
+            >
+          </figure>
+
+          <h5 style="margin-bottom: 1.5rem;">
+            Ainda não há carteiras de ativos ou operações de opções cadastradas.
+            Comece agora a acompanhar seus investimentos!
+          </h5>
+
+          <CButton
+            color="success"
+            @click="newPortfolio"
+          >
+            <CIcon name="cil-plus" />
+            Nova Carteira
+          </CButton>
+        </CCol>
+      </CRow>
+    </CContainer>
   </div>
 </template>
 
@@ -291,7 +312,6 @@ export default {
         trapFocus: true,
         type: 'is-info',
         onConfirm: value => {
-          this.percent_result = 0
           this.$store.commit('newPortfolio', value)
           this.$store.commit('updateDataFile')
         }
