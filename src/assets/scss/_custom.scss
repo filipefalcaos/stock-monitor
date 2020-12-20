@@ -1,24 +1,3 @@
-p {
-  margin-bottom: 0;
-}
-
-.table thead th {
-  vertical-align: top;
-}
-
-.btn i, .btn .c-icon {
-  margin: 0;
-}
-
-ul {
-  margin-bottom: 0;
-}
-
-.no-pb .card-body {
-  padding-bottom: 0!important;
-}
-
-// Changes Buefy purple default color
 .b-checkbox.checkbox input[type=checkbox]:checked + .check {
   background: #4f5d73 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' \
   viewBox='0 0 1 1'%3E%3Cpath style='fill:%23fff' d='M 0.04038059,0.6267767 0.14644661,0.52071068 \

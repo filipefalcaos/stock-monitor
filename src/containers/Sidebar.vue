@@ -9,7 +9,7 @@
       <img
         style="height: 30px;"
         class="c-sidebar-brand-minimized"
-        src="../assets/logo-small.png"
+        src="../assets/img/logo-small.png"
         alt="stock-monitor logo"
       >
     </CSidebarBrand>

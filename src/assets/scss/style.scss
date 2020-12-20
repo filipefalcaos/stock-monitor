@@ -1,6 +1,31 @@
 @import "~@coreui/coreui/scss/coreui";
 @import "custom";
 
+p {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  vertical-align: top;
+}
+
+.btn i, .btn .c-icon {
+  margin: 0;
+}
+
+ul {
+  margin-bottom: 0;
+}
+
+.no-pb .card-body {
+  padding-bottom: 0!important;
+}
+
+.modal-border-top {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
 .card-header:not(.content-center) > .c-icon:first-child {
   margin-right: 0.1rem;
   margin-top: 0.1rem;

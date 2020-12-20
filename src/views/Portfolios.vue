@@ -204,53 +204,23 @@
     </b-modal>
   </div>
 
-  <div 
-    v-else
-    style="min-height: 85vh; display: flex;"
-    class="flex-row align-items-center"
-  >
-    <CContainer>
-      <CRow class="justify-content-center">
-        <CCol
-          lg="6"
-          class="text-center"
-        >
-          <figure style="margin-bottom: 1.5rem;">
-            <img
-              width="150px"
-              src="../assets/stock-market.png"
-            >
-          </figure>
-
-          <h5 style="margin-bottom: 1.5rem;">
-            Ainda não há carteiras de ativos ou operações de opções cadastradas.
-            Comece agora a acompanhar seus investimentos!
-          </h5>
-
-          <CButton
-            color="success"
-            @click="newPortfolio"
-          >
-            <CIcon name="cil-plus" />
-            Nova Carteira
-          </CButton>
-        </CCol>
-      </CRow>
-    </CContainer>
-  </div>
+  <!-- Displays the empty app message -->
+  <empty-app v-else />
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import EmptyApp from '../components/EmptyApp'
 import AddPositionForm from '../components/AddPositionForm'
 import ClosePositionForm from '../components/ClosePositionForm'
 import MovePositionForm from '../components/MovePositionForm'
 import DividendTable from '../components/DividendTable'
-import PositionTable from '../components/PositionTable' 
+import PositionTable from '../components/PositionTable'
 
 export default {
   name: 'Portfolios',
   components: {
+    EmptyApp,
     AddPositionForm,
     ClosePositionForm,
     MovePositionForm,
