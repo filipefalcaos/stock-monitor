@@ -210,22 +210,22 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import EmptyApp from '../components/EmptyApp'
-import AddPositionForm from '../components/AddPositionForm'
-import ClosePositionForm from '../components/ClosePositionForm'
-import MovePositionForm from '../components/MovePositionForm'
-import DividendTable from '../components/DividendTable'
-import PositionTable from '../components/PositionTable'
+import AddPositionForm from '../components/forms/AddPositionForm'
+import ClosePositionForm from '../components/forms/ClosePositionForm'
+import MovePositionForm from '../components/forms/MovePositionForm'
+import DividendTable from '../components/tables/DividendTable'
+import PositionTable from '../components/tables/PositionTable'
+import EmptyApp from '../components/utils/EmptyApp'
 
 export default {
   name: 'Portfolios',
   components: {
-    EmptyApp,
     AddPositionForm,
     ClosePositionForm,
     MovePositionForm,
     DividendTable,
-    PositionTable
+    PositionTable,
+    EmptyApp
   },
 
   data() {

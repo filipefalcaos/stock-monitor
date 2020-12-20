@@ -7,15 +7,15 @@
 <script>
 import Chart from 'chart.js'
 import { nanoid } from 'nanoid'
-import { utils } from '../utils'
+import { utils } from '../../utils'
 
 import 'chartjs-plugin-colorschemes/src/plugins/plugin.colorschemes'
 import { Classic20 } from 'chartjs-plugin-colorschemes/src/colorschemes/colorschemes.tableau'
 
 export default {
-  name: 'FrequencyChart',
+  name: 'DistChart',
   props: {
-    frequencies: {
+    dist: {
       type: Object,
       default: () => {}
     },
@@ -23,7 +23,7 @@ export default {
       type: Number,
       default: 15
     },
-    dataIsMoney: {
+    isCurrency: {
       type: Boolean,
       default: false
     }
@@ -39,7 +39,7 @@ export default {
   },
 
   watch: {
-    frequencies: function(val) {
+    dist: function(val) {
       this.parseData(val)
       this.chart.data.labels = this.labels
       this.chart.data.datasets[0].data = this.data
@@ -49,7 +49,7 @@ export default {
 
   created() {
     this.chartId = nanoid()
-    this.parseData(this.frequencies)
+    this.parseData(this.dist)
   },
 
   mounted() {
@@ -57,10 +57,10 @@ export default {
   },
 
   methods: {
-    parseData(frequencies) {
-      let sortedFrequencies = Object.entries(frequencies).sort(([, a],[, b]) => a - b)
-      let selected = sortedFrequencies.slice(-this.maxEntries)
-      let remaining = sortedFrequencies.slice(0, sortedFrequencies.length - this.maxEntries)
+    parseData(dist) {
+      let sortedDist = Object.entries(dist).sort(([, a],[, b]) => a - b)
+      let selected = sortedDist.slice(-this.maxEntries)
+      let remaining = sortedDist.slice(0, sortedDist.length - this.maxEntries)
 
       this.data = []
       this.labels = []
@@ -78,7 +78,7 @@ export default {
     },
 
     createChart() {
-      let dataIsMoney = this.dataIsMoney
+      let isCurrency = this.isCurrency
       let ctx = document.getElementById(this.chartId).getContext('2d')
       
       this.chart = new Chart(ctx, {
@@ -112,7 +112,7 @@ export default {
               label: function(tooltipItem, data) {
                 let val = data.datasets[0].data[tooltipItem.index]
                 let label = data.labels[tooltipItem.index] + ': '
-                return dataIsMoney ? label + utils.formatCurrency(val).toString() : label + val.toString()
+                return isCurrency ? label + utils.formatCurrency(val).toString() : label + val.toString()
               }
             }
           }

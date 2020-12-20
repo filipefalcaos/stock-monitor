@@ -59,8 +59,8 @@
               Ativos mais negociados
             </h4>
             
-            <frequency-chart
-              :frequencies="operationsPerStock"
+            <dist-chart
+              :dist="operationsPerStock"
               style="margin-top: 20px;"
             />
           </CCardBody>
@@ -77,9 +77,9 @@
               Posições em aberto por ativo
             </h4>
             
-            <frequency-chart
-              :frequencies="investmentPerStock"
-              :data-is-money="true"
+            <dist-chart
+              :dist="investmentPerStock"
+              :is-currency="true"
               style="margin-top: 20px;"
             />
           </CCardBody>
@@ -96,9 +96,9 @@
               Posições em aberto por tipo
             </h4>
             
-            <frequency-chart
-              :frequencies="investmentPerAsset"
-              :data-is-money="true"
+            <dist-chart
+              :dist="investmentPerAsset"
+              :is-currency="true"
               style="margin-top: 20px;"
             />
           </CCardBody>
@@ -113,16 +113,16 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import EmptyApp from '../components/EmptyApp'
-import CumsumChart from '../components/CumsumChart'
-import FrequencyChart from '../components/FrequencyChart'
+import CumsumChart from '../components/charts/CumsumChart'
+import DistChart from '../components/charts/DistChart'
+import EmptyApp from '../components/utils/EmptyApp'
 
 export default {
   name: 'Dashboard',
   components: {
-    EmptyApp,
     CumsumChart,
-    FrequencyChart
+    DistChart,
+    EmptyApp
   },
 
   computed: {

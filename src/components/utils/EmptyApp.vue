@@ -12,7 +12,7 @@
           <figure style="margin-bottom: 1.5rem;">
             <img
               width="150px"
-              src="../assets/img/stock-market.png"
+              src="../../assets/img/stock-market.png"
             >
           </figure>
 
