@@ -1,6 +1,6 @@
 # stock-monitor
 
-A Vue app on top of Electron that tracks the performance of equities portfolios and options operations.
+A Vue app on top of Electron that tracks the performance of equities portfolios and options operations. Currently supported equities for price data include all the available on Yahoo Finance. For dividend data, only Brazilian equities are supported at the moment.
 
 ## Features
 
