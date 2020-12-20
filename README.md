@@ -18,6 +18,7 @@ yarn electron:serve
 
 ### Compiles and minifies for production
 ```
+yarn electron:generate-icons
 yarn electron:build
 ```
 
