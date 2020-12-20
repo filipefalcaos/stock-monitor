@@ -6,6 +6,7 @@ import stats from './modules/stats'
 
 // Root initial state
 const state = () => ({
+  appCreated: false,
   isLoading: false,
   hasNewData: false,
   hasError: false,

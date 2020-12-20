@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!appCreated">
     <CRow>
       <CCol lg="3">
         <CWidgetSimple
@@ -156,7 +156,8 @@ export default {
       investmentPerAsset: state => state.stats.investmentPerAsset,
       portfolioData: state => state.portfolios.portfolioData,
       hasNewData: state => state.hasNewData,
-      isLoading: state => state.isLoading
+      isLoading: state => state.isLoading,
+      appCreated: state => state.appCreated
     }),
     
     ...mapGetters({

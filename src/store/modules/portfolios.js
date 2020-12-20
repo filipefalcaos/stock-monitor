@@ -111,7 +111,8 @@ const actions = {
     }
   },
 
-  updateUI({ commit }) {
+  updateUI({ commit, rootState }) {
+    if (rootState.appCreated) commit('set', ['appCreated', false], { root: true })
     commit('set', ['isLoading', false])
     commit('set', ['hasNewData', true])
     setTimeout(() => { commit('set', ['hasNewData', false]) }, 2000)
