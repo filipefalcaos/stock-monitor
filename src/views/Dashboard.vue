@@ -11,7 +11,7 @@
       <CCol lg="3">
         <CWidgetSimple
           class="no-pb"
-          header="Resultados - Carteiras de Ações"
+          header="Resultados - Carteiras de Ativos"
           :text="$utils.formatCurrency(displayText(overallResults.stocks))"
         />
       </CCol>
@@ -25,7 +25,7 @@
       <CCol lg="3">
         <CWidgetSimple
           class="no-pb"
-          header="Rendimentos de Dividendos"
+          header="Proventos Recebidos"
           :text="$utils.formatCurrency(displayText(overallResults.dividends))"
         />  
       </CCol>
@@ -37,7 +37,7 @@
           class="mb-0"
           style="text-align: center;"
         >
-          P&L - Carteiras de ações
+          P&L - Carteiras de ativos
         </h4>
         
         <cumsum-chart
@@ -48,7 +48,7 @@
         />
         <h6
           v-else
-          style="margin-top: 0.5rem;"
+          style="margin-top: 0.5rem; text-align: center;"
         >
           Sem informações disponíveis.
         </h6>
@@ -73,7 +73,7 @@
             />
             <h6
               v-else
-              style="margin-top: 0.5rem;"
+              style="margin-top: 0.5rem; text-align: center;"
             >
               Sem informações disponíveis.
             </h6>
@@ -99,7 +99,7 @@
             />
             <h6
               v-else
-              style="margin-top: 0.5rem;"
+              style="margin-top: 0.5rem; text-align: center;"
             >
               Sem informações disponíveis.
             </h6>
@@ -125,7 +125,7 @@
             />
             <h6
               v-else
-              style="margin-top: 0.5rem;"
+              style="margin-top: 0.5rem; text-align: center;"
             >
               Sem informações disponíveis.
             </h6>

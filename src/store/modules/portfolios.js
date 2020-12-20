@@ -14,7 +14,7 @@ const state = () => ({
   finalDividends: 0, // Sum of dividends received on the selected portfolio
   portfolioData: {}, // Data loaded from the data file
   dividendsData: {}, // Latest history of dividends (all portfolios)
-  stocksData: {},    // Latest prices of stocks (all portfolios)
+  stocksData: {}     // Latest prices of stocks (all portfolios)
 })
 
 // Getters

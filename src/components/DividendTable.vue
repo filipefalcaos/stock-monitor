@@ -37,7 +37,7 @@
       <b-table-column
         v-slot="props"
         field="stock"
-        label="Ação"
+        label="Ativo"
         sortable
       >
         {{ props.row.stock }}

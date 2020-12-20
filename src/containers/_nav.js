@@ -10,7 +10,7 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Carteiras de Ações',
+        name: 'Carteiras de Ativos',
         to: '/portfolios',
         icon: 'cil-wallet'
       },

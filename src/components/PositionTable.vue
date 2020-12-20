@@ -45,7 +45,7 @@
       <b-table-column
         v-slot="props"
         field="stock"
-        label="Ação"
+        label="Ativo"
         sortable
       >
         {{ props.row.stock }}
@@ -233,12 +233,14 @@ export default {
   
   methods: {
     closePosition() {
-      this.$emit('close-position', this.checkedRows[0])
+      this.$store.commit('set', ['selPosition', this.checkedRows[0]])
+      this.$emit('close-position')
       this.checkedRows = []
     },
 
     movePosition() {
-      this.$emit('move-position', this.checkedRows[0])
+      this.$store.commit('set', ['selPosition', this.checkedRows[0]])
+      this.$emit('move-position')
       this.checkedRows = []
     },
     
@@ -249,7 +251,8 @@ export default {
         cancelText: 'Cancelar',
         type: 'is-danger',
         onConfirm: () => {
-          this.$emit('delete-positions', this.checkedRows)
+          this.$store.commit('set', ['selPosition', this.checkedRows])
+          this.$emit('delete-positions')
           this.checkedRows = []
         },
         onCancel: () => (this.checkedRows = [])

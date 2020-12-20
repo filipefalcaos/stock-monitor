@@ -10,7 +10,8 @@ const state = () => ({
   hasNewData: false,
   hasError: false,
   sidebarShow: 'responsive',
-  sidebarMinimize: true
+  sidebarMinimize: true,
+  selPosition: null
 })
 
 // Root mutations

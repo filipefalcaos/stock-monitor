@@ -76,7 +76,7 @@
             @click="modalAddActive = true"
           >
             <CIcon name="cil-plus" />
-            Novo Ativo
+            Nova Posição
           </CButton>
 
           <CDropdown 
@@ -84,13 +84,13 @@
             toggler-text="Ações" 
             color="secondary"
           >
-            <CDropdownItem @click="addPortfolioDialog">
+            <CDropdownItem @click="newPortfolio">
               Nova Carteira
             </CDropdownItem>
-            <CDropdownItem @click="editPortfolioDialog">
+            <CDropdownItem @click="editPortfolio">
               Editar Carteira
             </CDropdownItem>
-            <CDropdownItem @click="deletePortfolioDialog">
+            <CDropdownItem @click="deletePortfolio">
               Excluir Carteira
             </CDropdownItem>
           </CDropdown>
@@ -116,8 +116,8 @@
           class="mt-3"
           :position-data="openPositions"
           :has-new-data="hasNewData"
-          @close-position="closePositionDialog"
-          @move-position="movePositionDialog"
+          @close-position="modalCloseActive = true"
+          @move-position="modalMoveActive = true"
           @delete-positions="deletePositions"
         />
       </CCardBody>
@@ -142,7 +142,7 @@
           :position-data="closedPositions"
           :has-new-data="hasNewData"
           :sort-params="['closed_at', 'desc']"
-          @move-position="movePositionDialog"
+          @move-position="modalMoveActive = true"
           @delete-positions="deletePositions"
         />
       </CCardBody>
@@ -170,7 +170,7 @@
       </CCardBody>
     </CCard>
 
-    <!-- Modal to add positions -->
+    <!-- Modals to add, move, and close positions -->
     <b-modal
       :active.sync="modalAddActive"
       has-modal-card
@@ -181,20 +181,6 @@
       <add-position-form @submit-position="addPosition" />
     </b-modal>
 
-    <!-- Modal to close positions -->
-    <b-modal
-      :active.sync="modalCloseActive"
-      has-modal-card
-      trap-focus
-      aria-role="dialog"
-      aria-modal
-    >
-      <close-position-form
-        :position="selectedPosition"
-        @update-position="closePosition"
-      />
-    </b-modal>
-
     <b-modal
       :active.sync="modalMoveActive"
       has-modal-card
@@ -203,8 +189,21 @@
       aria-modal
     >
       <move-position-form
-        :position="selectedPosition"
+        :position="selPosition"
         @move-position="movePosition"
+      />
+    </b-modal>
+
+    <b-modal
+      :active.sync="modalCloseActive"
+      has-modal-card
+      trap-focus
+      aria-role="dialog"
+      aria-modal
+    >
+      <close-position-form
+        :position="selPosition"
+        @update-position="closePosition"
       />
     </b-modal>
   </div>
@@ -213,7 +212,7 @@
     <h5>Não há carteiras cadastradas. Cadastre sua primeira carteira utilizando o botão abaixo.</h5>
     <CButton
       color="success"
-      @click="addPortfolioDialog"
+      @click="newPortfolio"
     >
       Nova Carteira
     </CButton>
@@ -226,7 +225,7 @@ import AddPositionForm from '../components/AddPositionForm'
 import ClosePositionForm from '../components/ClosePositionForm'
 import MovePositionForm from '../components/MovePositionForm'
 import DividendTable from '../components/DividendTable'
-import PositionTable from '../components/PositionTable'
+import PositionTable from '../components/PositionTable' 
 
 export default {
   name: 'Portfolios',
@@ -242,8 +241,7 @@ export default {
     return {
       modalAddActive: false,
       modalCloseActive: false,
-      modalMoveActive: false,
-      selectedPosition: null
+      modalMoveActive: false
     }
   },
 
@@ -253,6 +251,7 @@ export default {
       dataFileName: state => state.portfolios.dataFileName,
       finalResult: state => state.portfolios.finalResult,
       finalDividends: state => state.portfolios.finalDividends,
+      selPosition: state => state.selPosition,
       hasError: state => state.hasError,
       hasNewData: state => state.hasNewData,
       isLoading: state => state.isLoading
@@ -280,13 +279,7 @@ export default {
       this.getLastData()
     },
 
-    addPortfolio(portfolio_name) {
-      this.percent_result = 0
-      this.$store.commit('newPortfolio', portfolio_name)
-      this.$store.commit('updateDataFile')
-    },
-
-    addPortfolioDialog() {
+    newPortfolio() {
       this.$buefy.dialog.prompt({
         message: 'Forneça um nome para a nova carteira.',
         inputAttrs: {
@@ -297,17 +290,15 @@ export default {
         cancelText: 'Cancelar',
         trapFocus: true,
         type: 'is-info',
-        onConfirm: value => this.addPortfolio(value)
+        onConfirm: value => {
+          this.percent_result = 0
+          this.$store.commit('newPortfolio', value)
+          this.$store.commit('updateDataFile')
+        }
       })
     },
 
-    editPortfolio(portfolio_id, portfolio_name) {
-      let payload = {id: portfolio_id, name: portfolio_name}
-      this.$store.commit('editPortfolio', payload)
-      this.$store.commit('updateDataFile')
-    },
-
-    editPortfolioDialog() {
+    editPortfolio() {
       this.$buefy.dialog.prompt({
         message: 'Forneça um nome para a carteira.',
         inputAttrs: {
@@ -319,23 +310,25 @@ export default {
         cancelText: 'Cancelar',
         trapFocus: true,
         type: 'is-info',
-        onConfirm: value => this.editPortfolio(this.lastPortfolio.id, value)
+        onConfirm: value => {
+          let payload = {id: this.lastPortfolio.id, name: value}
+          this.$store.commit('editPortfolio', payload)
+          this.$store.commit('updateDataFile')
+        }
       })
     },
 
-    deletePortfolio(portfolio_id) {
-      this.$store.commit('deletePortfolio', portfolio_id)
-      this.$store.commit('updateDataFile')
-      if (!this.isEmpty) this.getLastData()
-    },
-
-    deletePortfolioDialog() {
+    deletePortfolio() {
       this.$buefy.dialog.confirm({
         message: 'Tem certeza que gostaria de excluir a carteira? Isto não poderá ser desfeito.',
         confirmText: 'Excluir',
         cancelText: 'Cancelar',
         type: 'is-danger',
-        onConfirm: () => this.deletePortfolio(this.lastPortfolio.id)
+        onConfirm: () => {
+          this.$store.commit('deletePortfolio', this.lastPortfolio.id)
+          this.$store.commit('updateDataFile')
+          if (!this.isEmpty) this.getLastData()
+        }
       })
     },
 
@@ -351,24 +344,14 @@ export default {
       this.getLastData()
     },
 
-    closePositionDialog(position) {
-      this.selectedPosition = position
-      this.modalCloseActive = true
-    },
-
     movePosition(moveObj) {
       this.$store.commit('movePosition', moveObj)
       this.$store.commit('updateDataFile')
       this.getLastData()
     },
 
-    movePositionDialog(position) {
-      this.selectedPosition = position
-      this.modalMoveActive = true
-    },
-
-    deletePositions(positions) {
-      this.$store.commit('deletePosition', positions)
+    deletePositions() {
+      this.$store.commit('deletePosition', this.selPosition)
       this.$store.commit('updateDataFile')
       this.getLastData()
     },
