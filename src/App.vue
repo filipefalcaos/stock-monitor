@@ -21,7 +21,7 @@ export default {
     })
   },
 
-  // Gets the last state of the portfolios and options data when the app is created
+  // Loads the portfolios data file when the component is created
   created() {
     this.$store.commit('set', ['appCreated', true])
     this.$store.commit('setDataFileName')

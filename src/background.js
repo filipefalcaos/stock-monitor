@@ -66,13 +66,11 @@ function createWindow() {
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL) // Load the dev server if in development mode
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
-    // Load the index.html when not in development
-    win.loadURL('app://./index.html')
+    win.loadURL('app://./index.html') // Load the index.html when not in development
   }
 
   createMenu(win)
