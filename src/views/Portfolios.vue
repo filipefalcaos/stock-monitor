@@ -259,17 +259,20 @@ export default {
     })
   },
   
-  // Gets the latest stock prices when the component is created 
+  // Gets the latest data on the current assets when the Portfolios views is created
   created() {
-    if (!this.isEmpty) this.getLastData()
+    this.getLastData()
   },
 
   methods: {
+    // Loads a selected portfolio into the application and gets the latest data on its assets
     loadPortfolio() {
       this.$store.commit('updateDataFile')
       this.getLastData()
     },
 
+    // Opens a dialog for the name of a new portfolio. If confirmed, the portfolio is created and
+    // then stored in the data file
     newPortfolio() {
       this.$buefy.dialog.prompt({
         message: 'Forneça um nome para a nova carteira.',
@@ -288,6 +291,8 @@ export default {
       })
     },
 
+    // Opens a dialog for editing the name of an existing portfolio. If confirmed, the portfolio's
+    // name is updated
     editPortfolio() {
       this.$buefy.dialog.prompt({
         message: 'Forneça um nome para a carteira.',
@@ -308,6 +313,8 @@ export default {
       })
     },
 
+    // Opens a dialog to confirm the deletion of an existing portfolio. If confirmed, the
+    // portfolio is delete
     deletePortfolio() {
       this.$buefy.dialog.confirm({
         message: 'Tem certeza que gostaria de excluir a carteira? Isto não poderá ser desfeito.',
@@ -322,30 +329,35 @@ export default {
       })
     },
 
+    // Adds a given position to the current portfolio
     addPosition(newPosition) {
       this.$store.commit('addPosition', newPosition)
       this.$store.commit('updateDataFile')
       this.getLastData()
     },
 
+    // Closes a given position on the current portfolio
     closePosition(closeObj) {
       this.$store.commit('closePosition', closeObj)
       this.$store.commit('updateDataFile')
       this.getLastData()
     },
 
+    // Moves a given position from the current portoflio to another existing portfolio
     movePosition(moveObj) {
       this.$store.commit('movePosition', moveObj)
       this.$store.commit('updateDataFile')
       this.getLastData()
     },
 
+    // Deletes the selected positions from the current portoflio
     deletePositions() {
       this.$store.commit('deletePosition', this.selPosition)
       this.$store.commit('updateDataFile')
       this.getLastData()
     },
 
+    // Gets the latest data on the assets of the current portfolio
     async getLastData() {
       await this.$store.dispatch('getStocksData', this.currentStocks)
     }

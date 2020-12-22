@@ -147,8 +147,8 @@ export default {
     })
   },
 
-  // Computes the statistics on the portfolios/options data when the component
-  // is created
+  // Gets the latest data on all assets when the Dashboard is created. Then, computes the
+  // statistics on the portfolios/options data
   async created() {
     await this.$store.dispatch('getStocksData', this.allStocks)
     this.$store.dispatch('computeStats', this.portfolioData)
