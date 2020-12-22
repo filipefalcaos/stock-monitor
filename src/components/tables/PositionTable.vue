@@ -223,8 +223,8 @@ export default {
     }
   },
   
-  // Converts all initial prices to float, ensuring that the table ordering
-  // works properly
+  // Converts all initial prices to float when the table is created, ensuring that the table
+  // ordering works properly
   created() {
     this.positionData.forEach(position => {
       position.initial_price = parseFloat(position.initial_price)
@@ -232,18 +232,24 @@ export default {
   },
   
   methods: {
+    // Triggers the "close-position" event to the parent component with the only checked row as
+    // payload
     closePosition() {
       this.$store.commit('set', ['selPosition', this.checkedRows[0]])
       this.$emit('close-position')
       this.checkedRows = []
     },
 
+    // Triggers the "move-position" event to the parent component with the only checked row as
+    // payload
     movePosition() {
       this.$store.commit('set', ['selPosition', this.checkedRows[0]])
       this.$emit('move-position')
       this.checkedRows = []
     },
     
+    // Triggers the "move-position" event to the parent component when the dialog is confirmed,
+    // with all checked rows as payload
     deletePositions() {
       this.$buefy.dialog.confirm({
         message: 'Tem certeza que gostaria de excluir as ações selecionadas? Isto não poderá ser desfeito.',

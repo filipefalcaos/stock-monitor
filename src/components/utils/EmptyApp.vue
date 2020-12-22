@@ -38,6 +38,8 @@
 export default {
   name: 'EmptyApp',
   methods: {
+    // Opens a dialog for the name of a new portfolio. If confirmed, the portfolio is created and
+    // then stored in the data file
     newPortfolio() {
       this.$buefy.dialog.prompt({
         message: 'Forneça um nome para a nova carteira.',

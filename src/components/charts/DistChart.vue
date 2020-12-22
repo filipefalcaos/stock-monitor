@@ -39,6 +39,9 @@ export default {
   },
 
   watch: {
+    // Watches for changes on the distribution data
+    // When changes are detected, the new data is parsed and then set in the existing chart to be
+    // updated
     dist: function(val) {
       this.parseData(val)
       this.chart.data.labels = this.labels
@@ -47,16 +50,22 @@ export default {
     }
   },
 
+  // Sets up an unique chart id and parses the distribution data when the chart component is
+  // created
   created() {
     this.chartId = nanoid()
     this.parseData(this.dist)
   },
 
+  // Creates the chart when the canvas element is already loaded
   mounted() {
     this.createChart()
   },
 
   methods: {
+    // Parses the distribution data to the format expect by ChartJS
+    // Only "maxEntries" entries are parsed to the final dataset. The remaining ones are grouped
+    // together into a "remaining" entry
     parseData(dist) {
       let sortedDist = Object.entries(dist).sort(([, a],[, b]) => a - b)
       let selected = sortedDist.slice(-this.maxEntries)
@@ -77,6 +86,8 @@ export default {
       }
     },
 
+    // Creates the ChartJS doughnut chart for distribution plotting with the specified options and
+    // parsed data
     createChart() {
       let isCurrency = this.isCurrency
       let ctx = document.getElementById(this.chartId).getContext('2d')

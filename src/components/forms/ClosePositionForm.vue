@@ -69,6 +69,8 @@ export default {
   },
   
   methods: {
+    // Triggers the "update-position" event to the parent component when the form is submitted,
+    // with the old position and the operation details as payload
     closePosition() {
       this.$parent.close()
       this.$emit('update-position', {

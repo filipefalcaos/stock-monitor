@@ -110,6 +110,8 @@ export default {
   },
   
   methods: {
+    // Triggers the "submit-position" event to the parent component when the form is submitted,
+    // with the new position as payload
     submitPosition() {
       let newPosition = {
         stock: this.stock.toUpperCase(),
@@ -119,7 +121,6 @@ export default {
         type: this.type
       }
       
-      // Closes the modal and sends the data to MainPage
       this.$parent.close()
       this.$emit('submit-position', newPosition)
     }

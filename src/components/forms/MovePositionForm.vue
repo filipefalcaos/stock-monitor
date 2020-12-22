@@ -73,6 +73,8 @@ export default {
   },
   
   methods: {
+    // Triggers the "move-position" event to the parent component when the form is submitted,
+    // with the position and the new portfolio as payload
     movePosition() {
       this.$parent.close()
       this.$emit('move-position', {
