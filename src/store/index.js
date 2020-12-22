@@ -4,7 +4,6 @@ import Vuex from 'vuex'
 import portfolios from './modules/portfolios'
 import stats from './modules/stats'
 
-// Root initial state
 const state = () => ({
   appCreated: false,
   isLoading: false,
@@ -15,7 +14,6 @@ const state = () => ({
   selPosition: null
 })
 
-// Root mutations
 const mutations = {
   toggleSidebarDesktop(state) {
     const sidebarOpened = [true, 'responsive'].includes(state.sidebarShow)

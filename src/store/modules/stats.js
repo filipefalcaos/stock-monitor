@@ -1,6 +1,5 @@
 import { utils } from '../../utils'
 
-// Initial state
 const state = () => ({
   cumulativeSum: [],      // The cumulative sum of the results (all portfolios)
   chartLabels: [],        // The chart labels for cumulative sums
@@ -11,11 +10,10 @@ const state = () => ({
   investmentPerAsset: {}  // The amount of money invested per type of asset (all portfolios)
 })
 
-// Getters
 const getters = {}
 
-// Actions
 const actions = {
+  // Computes all the statistics regarding the portfolios and options operations
   computeStats({ commit }, portfolioData) {
     commit('computeCumSum', portfolioData)
     commit('getDistData', portfolioData)
@@ -24,8 +22,10 @@ const actions = {
   }
 }
 
-// Mutations
 const mutations = {
+  // Computes the cumulative sum of the positions results for all the existing portfolios
+  // If there time gaps in the timeseries, they are automatically filled
+  // The open positions are considered closed in the current date just for plotting purposes
   computeCumSum(state, portfolioData) {
     let allLabels = new Set()
     state.cumulativeSum = []
@@ -95,8 +95,7 @@ const mutations = {
     })
 
     // Fills the data gaps in datasets
-    // A dataset that does not have all the labels of "state.chartLabels" will be 
-    // filled with null
+    // A dataset that does not have all the labels of "state.chartLabels" will be filled with null
     state.cumulativeSum.forEach(cs => {
       let currRes = [], count = 0
       allLabels.forEach(l => {
@@ -114,11 +113,13 @@ const mutations = {
     state.chartLabels = [...allLabels]
   },
 
+  // Gets the amount of positions opened in all portfolios
   getOperationsCount(state, portfolioData) {
     let ops = portfolioData.portfolios.map(p => p.positions.length).reduce((a, b) => a + b, 0)
     state.operationsCount = ops
   },
 
+  // Gets the sum of the ressults of all portfolios
   getOverallResults(state, portfolioData) {
     let resStocks = 0
     let resDividends = 0
@@ -134,6 +135,9 @@ const mutations = {
     state.overallResults.dividends = resDividends.toFixed(2)
   },
 
+  // Gets the following distribution data in all portfolios: (i) positions opened by asset;
+  // (ii) value of opened positions by asset; and (iii) value of opened positions by the type of
+  // the assets
   getDistData(state, portfolioData) {
     let stockCount = {}, stockValues = {}
     let typeValues = {}

@@ -3,11 +3,9 @@ import { nanoid } from 'nanoid'
 import { NotificationProgrammatic } from 'buefy'
 import { utils } from '../../utils'
 import axios from 'axios'
-
 import path from 'path'
 const fs = require('fs')
 
-// Initial state
 const state = () => ({
   dataFileName: '',  // The data filename
   finalResult: 0,    // Sum of results (excluding dividends received) on the selected portfolio
@@ -17,36 +15,50 @@ const state = () => ({
   stocksData: {}     // Latest prices of stocks (all portfolios)
 })
 
-// Getters
 const getters = {
+  // Gets all the stocks in any positions of any portfolio
   allStocks: (state) => {
     return [...new Set(state.portfolioData.portfolios.map(port => port.positions.map(p => {
       return JSON.stringify({ stock: p.stock, asset: p.asset })
     })).flat())]
   },
 
+  // Gets all the stocks in the current portoflio
   currentStocks: (state, getters) => {
     return [...new Set(getters.currentPositions.map(p => {
       return JSON.stringify({ stock: p.stock, asset: p.asset })
     }))]
   },
 
+  // Gets the current amount of capital invested (open positions)
   activeInvestment: (state, getters) => {
     return getters.openPositions.reduce((total, position) => {
       return total + position.initial_price * position.amount
     }, 0)
   },
 
+  // Gets the last portfolio used in the app
   lastPortfolio: (state) => findPortfolio(state, state.portfolioData.last_portfolio),
+
+  // Gets the positions of the current portfolio
   currentPositions: (state, getters) => getters.lastPortfolio.positions,
+
+  // Gets the open positions of the current portfolio
   openPositions: (state, getters) => getters.currentPositions.filter(position => !position.closed),
+
+  // Gets the closed positions of the current portfolio
   closedPositions: (state, getters) => getters.currentPositions.filter(position => position.closed),
+
+  // Gets the dividends received for the positions of the current portfolio
   receivedDividends: (state, getters) => getters.lastPortfolio.dividendsReceived,
+
+  // Gets whether the app is empty (no portfolios) or not
   isEmpty: (state) => state.portfolioData.portfolios.length === 0
 }
 
-// Actions
 const actions = {
+  // Gets, from Yahoo Finance, the latest price data of the given stocks
+  // Requests for every stock are made in parallel 
   getStockPrices({ commit }, stocksList) {
     commit('set', ['isLoading', true])
     commit('set', ['hasError', false])
@@ -65,6 +77,8 @@ const actions = {
     return Promise.all(promises)
   },
 
+  // Gets, from Status Invest, the latest history of dividends of the given stocks
+  // Requests for every stock are made in parallel 
   getDividendsHistory({ commit }, stocksList) {
     commit('set', ['isLoading', true])
     commit('set', ['hasError', false])
@@ -84,6 +98,7 @@ const actions = {
     return Promise.all(promises)
   },
 
+  // Gets the price and the dividends data of the given stocks
   async getStocksData({ commit, dispatch }, stocksList) {
     let priceData, dividendData
     
@@ -111,6 +126,7 @@ const actions = {
     }
   },
 
+  // Updates the UI to reflect that the app has successfully received stocks data
   updateUI({ commit, rootState }) {
     if (rootState.appCreated) commit('set', ['appCreated', false], { root: true })
     commit('set', ['isLoading', false])
@@ -119,15 +135,16 @@ const actions = {
   }
 }
 
-// Mutations
 const mutations = {
+  // Sets the default portfolios data filename
   setDataFileName(state) {
     const dataPath = '/portfolio-data.json'
     state.dataFileName = path.join(remote.app.getPath('userData'), dataPath)
   },
 
+  // Loads the content of the portfolios data file. If no file can be found, a new empty data file
+  // is created
   loadDataFile(state) {
-    state
     try {
       if (fs.existsSync(state.dataFileName)) {
         state.portfolioData = JSON.parse(fs.readFileSync(state.dataFileName))
@@ -144,6 +161,8 @@ const mutations = {
     }
   },
 
+  // Updates the content of the portfolios data file by completely overwritting it with the new
+  // portofios data
   updateDataFile(state) {
     let portfolioCopy = JSON.parse(JSON.stringify(state.portfolioData))
 
@@ -170,6 +189,7 @@ const mutations = {
     fs.writeFileSync(state.dataFileName, JSON.stringify(portfolioCopy, null, 2))
   },
 
+  // Creates a new portfolio and pushes it to the app's state
   newPortfolio(state, portfolioName) {
     state.finalResult = 0
     state.finalDividends = 0
@@ -183,11 +203,14 @@ const mutations = {
     })
   },
 
+  // Edits the name of an existing portfolio
   editPortfolio(state, payload) {
     let currPortfolio = findPortfolio(state, payload.id)
     currPortfolio.name = payload.name
   },
 
+  // Deletes an existing portfolio from the portfolios data and updates the last portfolio
+  // indicator
   deletePortfolio(state, portfolioId) {
     state.portfolioData.portfolios = state.portfolioData.portfolios.filter(portfolio => portfolio.id !== portfolioId)
     
@@ -198,6 +221,7 @@ const mutations = {
     }
   },
 
+  // Creates a new position and pushes it to the current portfolio positions
   addPosition(state, positionData) {
     let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
     lastPortfolio.positions.push({
@@ -212,6 +236,7 @@ const mutations = {
     })
   },
 
+  // Closes (partially or completelly) an existing position in the current portfolio
   closePosition(state, closeObj) {
     let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
 
@@ -253,11 +278,14 @@ const mutations = {
     }
   },
 
+  // Deletes an existing position from the current portfolio
   deletePosition(state, positions) {
     let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
     lastPortfolio.positions = lastPortfolio.positions.filter(position => !positions.includes(position))
   },
 
+  // Moves an existing position from the current portfolio by pushing it to a new portfolio, and
+  // then deleting it from the current one
   movePosition(state, moveObj) {
     let lastPortfolio = findPortfolio(state, state.portfolioData.last_portfolio)
     let newPortfolio = findPortfolio(state, moveObj.portfolio)
@@ -265,6 +293,7 @@ const mutations = {
     lastPortfolio.positions = lastPortfolio.positions.filter(position => ![moveObj.position].includes(position))
   },
 
+  // Sets a dictionary of the latest stock prices in the state
   setStocksData(state, stocksData) {
     stocksData.forEach(s => {
       state.stocksData[s.quoteSummary.result[0].price.symbol] = {
@@ -275,6 +304,7 @@ const mutations = {
     })
   },
 
+  // Sets the latest stock prices for each position of all portfolios 
   setStockPrices(state) {
     state.portfolioData.portfolios.forEach(portfolio => {
       let sum = 0
@@ -298,6 +328,7 @@ const mutations = {
     })
   },
 
+  // Sets a dictionary of the dividends history of stocks in the state
   setDividendData(state, dividendsData) {
     dividendsData.forEach(d => {
       let parser = new DOMParser()
@@ -316,6 +347,8 @@ const mutations = {
     })
   },
 
+  // Sets the latest dividends received for each position of all portfolios. A dividend is
+  // received if a position's time interval contains the ex-dividends date
   setReceivedDividends(state) {
     state.finalDividends = 0
     state.portfolioData.portfolios.forEach(portfolio => {
@@ -328,7 +361,7 @@ const mutations = {
           // Finds all the dividends received for the current position
           dividendData.forEach(d => {
             let finalDate = p.closed ? p.closed_at : Date.now()
-            let key = d.ed.toString().concat(d.pd.toString(), p.stock, d.type.split(' ')[0]) // This combination represents a single dividend
+            let key = d.ed.toString().concat(d.pd.toString(), p.stock, d.type.split(' ')[0])
             if (utils.isInInterval(d.ed, p.created_at, finalDate)) {
               p.dividends += p.amount * d.value
               portfolio.dividendsReceived.push({
@@ -373,8 +406,7 @@ function groupBy(xs, key) {
   }, {})
 }
 
-// Finds a portfolio of a given ID on the list of portfolios stored
-// in the Vuex state
+// Finds a portfolio of a given ID on the list of portfolios stored in the state
 function findPortfolio(state, id) {
   return state.portfolioData.portfolios.find(portfolio => {
     return portfolio.id == id
