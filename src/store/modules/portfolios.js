@@ -273,7 +273,8 @@ const mutations = {
         created_at: closeObj.old_position.created_at,
         closed_at: Date.now(),
         close_price: closeObj.close_price,
-        current_price: closeObj.close_price
+        current_price: closeObj.close_price,
+        asset: closeObj.old_position.asset
       })
     }
   },
