@@ -243,9 +243,9 @@ const mutations = {
 
     // Checks if a new position must be created and closed (partial closing), or just close
     // the existing one
-    if (closeObj.new_amount === closeObj.old_position.amount) {
+    if (closeObj.newAmount === closeObj.oldPosition.amount) {
       lastPortfolio.positions.forEach(position => {
-        if (position.id === closeObj.old_position.id) {
+        if (position.id === closeObj.oldPosition.id) {
           position.closed = true
           position.closePrice = closeObj.closePrice
           position.closedAt = Date.now()
@@ -253,11 +253,11 @@ const mutations = {
         }
       })
     } else {
-      let diff = closeObj.old_position.amount - closeObj.new_amount
+      let diff = closeObj.oldPosition.amount - closeObj.newAmount
 
       // Updates the remaining amount
       lastPortfolio.positions.forEach(position => {
-        if (position.id === closeObj.old_position.id) {
+        if (position.id === closeObj.oldPosition.id) {
           position.amount = diff
           return
         }
@@ -266,13 +266,13 @@ const mutations = {
       // Adds a new position to partially close
       lastPortfolio.positions.push({
         id: nanoid(),
-        asset: closeObj.old_position.asset,
-        assetType: closeObj.old_position.assetType,
-        initialPrice: closeObj.old_position.initialPrice,
-        amount: closeObj.new_amount,
-        direction: closeObj.old_position.direction,
+        asset: closeObj.oldPosition.asset,
+        assetType: closeObj.oldPosition.assetType,
+        initialPrice: closeObj.oldPosition.initialPrice,
+        amount: closeObj.newAmount,
+        direction: closeObj.oldPosition.direction,
         closed: true,
-        createdAt: closeObj.old_position.createdAt,
+        createdAt: closeObj.oldPosition.createdAt,
         closedAt: Date.now(),
         closePrice: closeObj.closePrice,
         currentPrice: closeObj.closePrice

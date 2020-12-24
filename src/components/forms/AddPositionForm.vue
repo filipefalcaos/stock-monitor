@@ -115,8 +115,8 @@ export default {
     submitPosition() {
       let newPosition = {
         asset: this.asset.toUpperCase(),
-        amount: this.amount,
-        initialPrice: this.initialPrice,
+        amount: parseInt(this.amount),
+        initialPrice: parseFloat(this.initialPrice),
         assetType: this.assetType,
         direction: this.direction
       }

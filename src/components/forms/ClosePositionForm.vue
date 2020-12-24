@@ -72,12 +72,14 @@ export default {
     // Triggers the "update-position" event to the parent component when the form is submitted,
     // with the old position and the operation details as payload
     closePosition() {
+      let payload = {
+        newAmount: parseInt(this.amount),
+        closePrice: parseFloat(this.closePrice),
+        oldPosition: JSON.parse(JSON.stringify(this.position))
+      }
+
       this.$parent.close()
-      this.$emit('update-position', {
-        new_amount: this.amount,
-        closePrice: this.closePrice,
-        old_position: JSON.parse(JSON.stringify(this.position))
-      })
+      this.$emit('update-position', payload)
     }
   }
 }
