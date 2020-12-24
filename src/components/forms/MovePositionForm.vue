@@ -6,9 +6,9 @@
     >
       <section class="modal-card-body modal-border-top">
         <label class="label">Detalhes</label>
-        <p><b>Ação:</b> {{ position.stock }}</p>
+        <p><b>Ação:</b> {{ position.asset }}</p>
         <p><b>Quantidade:</b> {{ position.amount }}</p>
-        <p><b>Preço Inicial:</b> {{ $utils.formatCurrency(position.initial_price) }}</p>
+        <p><b>Preço Inicial:</b> {{ $utils.formatCurrency(position.initialPrice) }}</p>
         <p style="margin-bottom: 1em">
           <b>Carteira:</b> {{ lastPortfolio.name }}
         </p>

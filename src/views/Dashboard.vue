@@ -12,7 +12,7 @@
         <CWidgetSimple
           class="no-pb"
           header="Resultados - Carteiras de Ativos"
-          :text="$utils.formatCurrency(displayText(overallResults.stocks))"
+          :text="$utils.formatCurrency(displayText(overallResults.assets))"
         />
       </CCol>
       <CCol lg="3">
@@ -60,7 +60,7 @@
             </h4>
             
             <dist-chart
-              :dist="operationsPerStock"
+              :dist="operationsPerAsset"
               style="margin-top: 20px;"
             />
           </CCardBody>
@@ -78,7 +78,7 @@
             </h4>
             
             <dist-chart
-              :dist="investmentPerStock"
+              :dist="investmentPerAsset"
               :is-currency="true"
               style="margin-top: 20px;"
             />
@@ -97,7 +97,7 @@
             </h4>
             
             <dist-chart
-              :dist="investmentPerAsset"
+              :dist="investmentPerAssetType"
               :is-currency="true"
               style="margin-top: 20px;"
             />
@@ -131,9 +131,9 @@ export default {
       operationsCount: state => state.stats.operationsCount,
       overallResults: state => state.stats.overallResults,
       chartLabels: state => state.stats.chartLabels,
-      operationsPerStock: state => state.stats.operationsPerStock,
-      investmentPerStock: state => state.stats.investmentPerStock,
+      operationsPerAsset: state => state.stats.operationsPerAsset,
       investmentPerAsset: state => state.stats.investmentPerAsset,
+      investmentPerAssetType: state => state.stats.investmentPerAssetType,
       portfolioData: state => state.portfolios.portfolioData,
       hasNewData: state => state.hasNewData,
       isLoading: state => state.isLoading,
@@ -143,14 +143,14 @@ export default {
     ...mapGetters({
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
-      allStocks: 'allStocks'
+      allAssets: 'allAssets'
     })
   },
 
   // Gets the latest data on all assets when the Dashboard is created. Then, computes the
   // statistics on the portfolios/options data
   async created() {
-    await this.$store.dispatch('getStocksData', this.allStocks)
+    await this.$store.dispatch('getAssetsData', this.allAssets)
     this.$store.dispatch('computeStats', this.portfolioData)
   },
 

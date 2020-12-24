@@ -6,7 +6,7 @@
     >
       <section class="modal-card-body modal-border-top">
         <b-field label="Ação">
-          {{ position.stock }}
+          {{ position.asset }}
         </b-field>
 
         <b-field label="Quantidade">
@@ -22,7 +22,7 @@
 
         <b-field label="Preço de Encerramento">
           <b-input
-            v-model="close_price"
+            v-model="closePrice"
             placeholder="20,00"
             type="number"
             step="0.01"
@@ -64,7 +64,7 @@ export default {
   data() {
     return {
       amount: null,
-      close_price: null
+      closePrice: null
     }
   },
   
@@ -75,7 +75,7 @@ export default {
       this.$parent.close()
       this.$emit('update-position', {
         new_amount: this.amount,
-        close_price: this.close_price,
+        closePrice: this.closePrice,
         old_position: JSON.parse(JSON.stringify(this.position))
       })
     }

@@ -1,13 +1,13 @@
 import { utils } from '../../utils'
 
 const state = () => ({
-  cumulativeSum: [],      // The cumulative sum of the results (all portfolios)
-  chartLabels: [],        // The chart labels for cumulative sums
-  operationsCount: 0,     // The count of operations performed (all portfolios)
-  overallResults: {},     // The cumulative result of all portfolios
-  operationsPerStock: {}, // The number of operations per stock (all portfolios)
-  investmentPerStock: {}, // The amount of money invested per stock (all portfolios)
-  investmentPerAsset: {}  // The amount of money invested per type of asset (all portfolios)
+  cumulativeSum: [],         // The cumulative sum of the results (all portfolios)
+  chartLabels: [],           // The chart labels for cumulative sums
+  operationsCount: 0,        // The count of operations performed (all portfolios)
+  overallResults: {},        // The cumulative result of all portfolios
+  operationsPerAsset: {},    // The number of operations per asset (all portfolios)
+  investmentPerAsset: {},    // The amount of money invested per asset (all portfolios)
+  investmentPerAssetType: {} // The amount of money invested per type of asset (all portfolios)
 })
 
 const getters = {}
@@ -32,12 +32,12 @@ const mutations = {
 
     portfolioData.portfolios.forEach(portfolio => {
       let currentPositions = portfolio.positions
-      currentPositions.forEach(p => p.closed ? null : p.closed_at = Date.now())
-      currentPositions.sort((a, b) => a.closed_at - b.closed_at)
+      currentPositions.forEach(p => p.closed ? null : p.closedAt = Date.now())
+      currentPositions.sort((a, b) => a.closedAt - b.closedAt)
 
       // Computes the monthly cumulative sum
       let results = currentPositions.map(a => a.result).map(cumulativeSum(0))
-      let dates = currentPositions.map(a => a.closed_at).map((x) => utils.formatDate(x, 'month-year'))
+      let dates = currentPositions.map(a => a.closedAt).map((x) => utils.formatDate(x, 'month-year'))
       let data = results.map((x, i) => [x, dates[i]])
       
       // Groups results by date
@@ -90,7 +90,7 @@ const mutations = {
       })
       
       currentPositions.forEach(p => {
-        if (!p.closed) delete p.closed_at
+        if (!p.closed) delete p.closedAt
       })
     })
 
@@ -121,17 +121,17 @@ const mutations = {
 
   // Gets the sum of the ressults of all portfolios
   getOverallResults(state, portfolioData) {
-    let resStocks = 0
+    let resAssets = 0
     let resDividends = 0
     
     portfolioData.portfolios.forEach(portfolio => {
       portfolio.positions.forEach(position => {
-        resStocks += position.result
+        resAssets += position.result
         resDividends += position.dividends
       })
     })
 
-    state.overallResults.stocks = resStocks.toFixed(2)
+    state.overallResults.assets = resAssets.toFixed(2)
     state.overallResults.dividends = resDividends.toFixed(2)
   },
 
@@ -139,17 +139,17 @@ const mutations = {
   // (ii) value of opened positions by asset; and (iii) value of opened positions by the type of
   // the assets
   getDistData(state, portfolioData) {
-    let stockCount = {}, stockValues = {}
+    let assetCount = {}, assetValues = {}
     let typeValues = {}
     
     portfolioData.portfolios.forEach(portfolio => {
       portfolio.positions.forEach(position => {
-        stockCount[position.stock] = stockCount[position.stock] + 1 || 1
+        assetCount[position.asset] = assetCount[position.asset] + 1 || 1
         if (!position.closed) {
-          let value = position.amount * position.initial_price
-          stockValues[position.stock] = stockValues[position.stock] + value || value
+          let value = position.amount * position.initialPrice
+          assetValues[position.asset] = assetValues[position.asset] + value || value
           
-          if (position.asset === 'fii') {
+          if (position.assetType === 'fii') {
             typeValues['FIIs'] = typeValues['FIIs'] + value || value
           } else {
             typeValues['Ações'] = typeValues['Ações'] + value || value
@@ -158,9 +158,9 @@ const mutations = {
       })
     })
 
-    state.operationsPerStock = stockCount
-    state.investmentPerStock = stockValues
-    state.investmentPerAsset = typeValues
+    state.operationsPerAsset = assetCount
+    state.investmentPerAsset = assetValues
+    state.investmentPerAssetType = typeValues
   }
 }
 

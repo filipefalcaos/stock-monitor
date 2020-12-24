@@ -20,45 +20,45 @@
     >
       <b-table-column
         v-slot="props"
-        field="created_at"
+        field="createdAt"
         label="Abertura"
         sortable
       >
-        <span v-if="props.row.created_at">
-          {{ $utils.formatDate(props.row.created_at) }}
+        <span v-if="props.row.createdAt">
+          {{ $utils.formatDate(props.row.createdAt) }}
         </span>
         <span v-else>--</span>
       </b-table-column>
 
       <b-table-column
         v-slot="props"
-        field="closed_at"
+        field="closedAt"
         label="Encerramento"
         sortable
       >
-        <span v-if="props.row.closed_at">
-          {{ $utils.formatDate(props.row.closed_at) }}
+        <span v-if="props.row.closedAt">
+          {{ $utils.formatDate(props.row.closedAt) }}
         </span>
         <span v-else>--</span>
       </b-table-column>
 
       <b-table-column
         v-slot="props"
-        field="stock"
+        field="asset"
         label="Ativo"
         sortable
       >
-        {{ props.row.stock }}
+        {{ props.row.asset }}
       </b-table-column>
 
       <b-table-column
         v-slot="props"
-        field="initial_price"
+        field="initialPrice"
         label="Preço Inicial"
         sortable
         numeric
       >
-        {{ $utils.formatCurrency(props.row.initial_price) }}
+        {{ $utils.formatCurrency(props.row.initialPrice) }}
       </b-table-column>
 
       <b-table-column
@@ -73,14 +73,14 @@
 
       <b-table-column
         v-slot="props"
-        field="current_price"
+        field="currentPrice"
         label="Último Preço"
         sortable
         numeric
       >
         <span
-          v-if="props.row.current_price"
-        >{{ $utils.formatCurrency(props.row.current_price) }}</span>
+          v-if="props.row.currentPrice"
+        >{{ $utils.formatCurrency(props.row.currentPrice) }}</span>
         <span v-else>--</span>
       </b-table-column>
 
@@ -118,13 +118,13 @@
 
       <b-table-column
         v-slot="props"
-        field="type"
+        field="direction"
         label="Posição"
         sortable
         numeric
       >
         <span
-          v-if="props.row.type === 'long'"
+          v-if="props.row.direction === 'long'"
           class="tag is-success"
         >
           Comprado
@@ -202,7 +202,7 @@ export default {
     },
     sortParams: {
       type: Array,
-      default: () => ['created_at', 'desc']
+      default: () => ['createdAt', 'desc']
     }
   },
 
@@ -227,7 +227,7 @@ export default {
   // ordering works properly
   created() {
     this.positionData.forEach(position => {
-      position.initial_price = parseFloat(position.initial_price)
+      position.initialPrice = parseFloat(position.initialPrice)
     })
   },
   

@@ -3,7 +3,7 @@
     <CRow align-vertical="center">
       <CCol sm="2">
         <b-select
-          v-model="portfolioData.last_portfolio"
+          v-model="portfolioData.lastPortfolio"
           placeholder="Carteira"
           expanded
           @input="loadPortfolio"
@@ -137,7 +137,7 @@
           class="mt-3"
           :position-data="closedPositions"
           :has-new-data="hasNewData"
-          :sort-params="['closed_at', 'desc']"
+          :sort-params="['closedAt', 'desc']"
           @move-position="modalMoveActive = true"
           @delete-positions="deletePositions"
         />
@@ -254,7 +254,7 @@ export default {
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
       openPositions: 'openPositions',
-      currentStocks: 'currentStocks',
+      currentAssets: 'currentAssets',
       receivedDividends: 'receivedDividends'
     })
   },
@@ -359,7 +359,7 @@ export default {
 
     // Gets the latest data on the assets of the current portfolio
     async getLastData() {
-      await this.$store.dispatch('getStocksData', this.currentStocks)
+      await this.$store.dispatch('getAssetsData', this.currentAssets)
     }
   }
 }

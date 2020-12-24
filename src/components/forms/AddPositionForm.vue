@@ -7,7 +7,7 @@
       <section class="modal-card-body modal-border-top">
         <b-field label="Ativo">
           <b-input
-            v-model="stock"
+            v-model="asset"
             placeholder="PETR4.SA"
             required
           />
@@ -25,7 +25,7 @@
 
         <b-field label="Preço Comprado">
           <b-input
-            v-model="initial_price"
+            v-model="initialPrice"
             placeholder="20,00"
             type="number"
             step="0.01"
@@ -37,16 +37,16 @@
         <b-field label="Tipo de Ativo">
           <div class="block">
             <b-radio
-              v-model="asset"
-              name="asset"
+              v-model="assetType"
+              name="assetType"
               native-value="stock"
               required
             >
               Ação
             </b-radio>
             <b-radio
-              v-model="asset"
-              name="asset"
+              v-model="assetType"
+              name="assetType"
               native-value="fii"
               required
             >
@@ -58,16 +58,16 @@
         <b-field label="Posição">
           <div class="block">
             <b-radio
-              v-model="type"
-              name="type"
+              v-model="direction"
+              name="direction"
               native-value="long"
               required
             >
               Comprado
             </b-radio>
             <b-radio
-              v-model="type"
-              name="type"
+              v-model="direction"
+              name="direction"
               native-value="short"
               required
             >
@@ -101,11 +101,11 @@ export default {
   name: 'AddPositionForm',
   data() {
     return {
-      stock: '',
+      asset: '',
       amount: null,
-      initial_price: null,
-      asset: null,
-      type: null
+      initialPrice: null,
+      assetType: null,
+      direction: null
     }
   },
   
@@ -114,11 +114,11 @@ export default {
     // with the new position as payload
     submitPosition() {
       let newPosition = {
-        stock: this.stock.toUpperCase(),
+        asset: this.asset.toUpperCase(),
         amount: this.amount,
-        initial_price: this.initial_price,
-        asset: this.asset,
-        type: this.type
+        initialPrice: this.initialPrice,
+        assetType: this.assetType,
+        direction: this.direction
       }
       
       this.$parent.close()

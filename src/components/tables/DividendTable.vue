@@ -36,11 +36,11 @@
 
       <b-table-column
         v-slot="props"
-        field="stock"
+        field="asset"
         label="Ativo"
         sortable
       >
-        {{ props.row.stock }}
+        {{ props.row.asset }}
       </b-table-column>
 
       <b-table-column
@@ -85,19 +85,19 @@
 
       <b-table-column
         v-slot="props"
-        field="type"
+        field="typeTxt"
         label="Tipo"
         sortable
         numeric
       >
         <span
-          v-if="props.row.type === 'Dividendo'"
+          v-if="props.row.typeTxt === 'Dividendo'"
           class="tag is-success"
         >
           Dividendo
         </span>
         <span
-          v-else-if="props.row.type === 'Juros Sobre Capital Próprio'"
+          v-else-if="props.row.typeTxt === 'Juros Sobre Capital Próprio'"
           class="tag is-warning"
         >
           Juros (JCP)
@@ -106,7 +106,7 @@
           v-else
           class="tag is-light"
         >
-          {{ props.row.type }}
+          {{ props.row.typeTxt }}
         </span>
       </b-table-column>
     </b-table>
