@@ -320,13 +320,13 @@ const mutations = {
           let diff = p.currentPrice - p.initialPrice
           p.result = (p.direction === 'long') ? diff * p.amount : -diff * p.amount
           p.resultpct = p.result / (p.initialPrice * p.amount)
-          sum += parseFloat(p.result)
+          sum += p.result
         }
       })
 
       // Sets the final result only for the current portfolio
       if (portfolio.id === state.portfolioData.lastPortfolio)
-        state.finalResult = parseFloat(sum)
+        state.finalResult = sum
     })
   },
 
@@ -399,7 +399,7 @@ const mutations = {
       
       for (const value of Object.entries(groupedDividends)) {
         let [amount, result, dividend] = [0, 0, null]
-        value[1].forEach(v => { amount += parseInt(v.amount); result += v.result })
+        value[1].forEach(v => { amount += v.amount; result += v.result })
         dividend = JSON.parse(JSON.stringify(value[1][0]))
         dividend.amount = amount
         dividend.result = result

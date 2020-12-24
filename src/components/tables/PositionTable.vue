@@ -223,14 +223,6 @@ export default {
     }
   },
   
-  // Converts all initial prices to float when the table is created, ensuring that the table
-  // ordering works properly
-  created() {
-    this.positionData.forEach(position => {
-      position.initialPrice = parseFloat(position.initialPrice)
-    })
-  },
-  
   methods: {
     // Triggers the "close-position" event to the parent component with the only checked row as
     // payload
