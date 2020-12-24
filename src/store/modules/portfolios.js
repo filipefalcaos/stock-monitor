@@ -338,12 +338,24 @@ const mutations = {
       let results = JSON.parse(doc.getElementById('results').value)
       
       let dividends = []
-      results.forEach(r => dividends.push({
-        ed: utils.toTimestamp(r.ed),
-        pd: utils.toTimestamp(r.pd),
-        value: r.v,
-        typeTxt: r.etd
-      }))
+      results.forEach(r => {
+        let divType = ''
+        if (r.etd === 'Dividendo') {
+          divType = 'div'
+        } else if (r.etd === 'Juros Sobre Capital Próprio') {
+          divType = 'jcp'
+        } else {
+          divType = 'other'
+        }
+
+        dividends.push({
+          ed: utils.toTimestamp(r.ed),
+          pd: utils.toTimestamp(r.pd),
+          value: r.v,
+          type: divType,
+          typeTxt: r.etd
+        })
+      })
       
       state.dividendsData[d.asset] = dividends
     })

@@ -91,13 +91,13 @@
         numeric
       >
         <span
-          v-if="props.row.typeTxt === 'Dividendo'"
+          v-if="props.row.type === 'div'"
           class="tag is-success"
         >
           Dividendo
         </span>
         <span
-          v-else-if="props.row.typeTxt === 'Juros Sobre Capital Próprio'"
+          v-else-if="props.row.type === 'jcp'"
           class="tag is-warning"
         >
           Juros (JCP)
