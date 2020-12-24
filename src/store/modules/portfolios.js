@@ -171,9 +171,6 @@ const mutations = {
     // Also, if there is no "asset" defined on the position, set it to "stock"
     portfolioCopy.portfolios.forEach(portfolio => {
       portfolio.positions.forEach(position => {
-        delete position.aux_price
-        delete position.aux_var
-        delete position.aux_varpct
         delete position.var
         delete position.varpct
 

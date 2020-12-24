@@ -15,7 +15,7 @@
 
         <b-field label="Nova Carteira">
           <b-select
-            v-model="selected_portfolio"
+            v-model="selectedPortfolio"
             placeholder="Carteira"
             expanded
           >
@@ -63,7 +63,7 @@ export default {
   
   data() {
     return {
-      selected_portfolio: null
+      selectedPortfolio: null
     }
   },
 
@@ -78,7 +78,7 @@ export default {
     movePosition() {
       this.$parent.close()
       this.$emit('move-position', {
-        portfolio: this.selected_portfolio,
+        portfolio: this.selectedPortfolio,
         position: this.position
       })
     }
