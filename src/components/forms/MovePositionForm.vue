@@ -20,7 +20,7 @@
             expanded
           >
             <option
-              v-for="option in portfolioData.portfolios"
+              v-for="option in otherPortfolios"
               :key="option.id"
               :value="option.id"
             >
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'MovePositionForm',
@@ -68,8 +68,10 @@ export default {
   },
 
   computed: {
-    ...mapState({ portfolioData: state => state.portfolios.portfolioData }),
-    ...mapGetters({ lastPortfolio: 'lastPortfolio' })
+    ...mapGetters({
+      lastPortfolio: 'lastPortfolio',
+      otherPortfolios: 'otherPortfolios'
+    })
   },
   
   methods: {

@@ -38,7 +38,10 @@ const getters = {
   },
 
   // Gets the last portfolio used in the app
-  lastPortfolio: (state) => findPortfolio(state, state.portfolioData.lastPortfolio),
+  lastPortfolio: (state) => findPortfolios(state, state.portfolioData.lastPortfolio)[0],
+
+  // Gets all the portfolios except for the last acessed one
+  otherPortfolios: (state) => findPortfolios(state, state.portfolioData.lastPortfolio, diffFn),
 
   // Gets the positions of the current portfolio
   currentPositions: (state, getters) => getters.lastPortfolio.positions,
@@ -203,7 +206,7 @@ const mutations = {
 
   // Edits the name of an existing portfolio
   editPortfolio(state, payload) {
-    let currPortfolio = findPortfolio(state, payload.id)
+    let currPortfolio = findPortfolios(state, payload.id)[0]
     currPortfolio.name = payload.name
   },
 
@@ -221,7 +224,7 @@ const mutations = {
 
   // Creates a new position and pushes it to the current portfolio positions
   addPosition(state, positionData) {
-    let lastPortfolio = findPortfolio(state, state.portfolioData.lastPortfolio)
+    let lastPortfolio = findPortfolios(state, state.portfolioData.lastPortfolio)[0]
     lastPortfolio.positions.push({
       id: nanoid(),
       asset: positionData.asset,
@@ -236,7 +239,7 @@ const mutations = {
 
   // Closes (partially or completelly) an existing position in the current portfolio
   closePosition(state, closeObj) {
-    let lastPortfolio = findPortfolio(state, state.portfolioData.lastPortfolio)
+    let lastPortfolio = findPortfolios(state, state.portfolioData.lastPortfolio)[0]
 
     // Checks if a new position must be created and closed (partial closing), or just close
     // the existing one
@@ -279,15 +282,15 @@ const mutations = {
 
   // Deletes an existing position from the current portfolio
   deletePosition(state, positions) {
-    let lastPortfolio = findPortfolio(state, state.portfolioData.lastPortfolio)
+    let lastPortfolio = findPortfolios(state, state.portfolioData.lastPortfolio)[0]
     lastPortfolio.positions = lastPortfolio.positions.filter(position => !positions.includes(position))
   },
 
   // Moves an existing position from the current portfolio by pushing it to a new portfolio, and
   // then deleting it from the current one
   movePosition(state, moveObj) {
-    let lastPortfolio = findPortfolio(state, state.portfolioData.lastPortfolio)
-    let newPortfolio = findPortfolio(state, moveObj.portfolio)
+    let lastPortfolio = findPortfolios(state, state.portfolioData.lastPortfolio)[0]
+    let newPortfolio = findPortfolios(state, moveObj.portfolio)[0]
     newPortfolio.positions.push(moveObj.position)
     lastPortfolio.positions = lastPortfolio.positions.filter(position => ![moveObj.position].includes(position))
   },
@@ -409,6 +412,9 @@ const mutations = {
   }
 }
 
+const equalsFn = (a, b) => a === b
+const diffFn = (a, b) => a !== b
+
 // Groups an array of objects by a given key
 function groupBy(xs, key) {
   return xs.reduce(function(rv, x) {
@@ -418,10 +424,8 @@ function groupBy(xs, key) {
 }
 
 // Finds a portfolio of a given ID on the list of portfolios stored in the state
-function findPortfolio(state, id) {
-  return state.portfolioData.portfolios.find(portfolio => {
-    return portfolio.id == id
-  })
+function findPortfolios(state, id, matchFn = equalsFn) {
+  return state.portfolioData.portfolios.filter(portfolio => matchFn(portfolio.id, id))
 }
 
 export default {
