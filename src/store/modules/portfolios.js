@@ -116,7 +116,6 @@ const actions = {
       commit('setReceivedDividends')
       dispatch('updateUI') // Updates the UI
     } catch (err) {
-      console.log(err)
       commit('set', ['hasError', true])
       commit('set', ['isLoading', false])
       
