@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 // Containers
-const Container = () => import('@/containers/Container')
+const AppContainer = () => import('@/components/containers/AppContainer')
 
 // Views
 const Dashboard = () => import('@/views/Dashboard')
@@ -17,7 +17,7 @@ export default new Router({
       path: '/',
       redirect: '/dashboard',
       name: 'Home',
-      component: Container,
+      component: AppContainer,
       children: [
         {
           path: 'dashboard',

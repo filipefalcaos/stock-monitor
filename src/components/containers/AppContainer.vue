@@ -24,7 +24,7 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 
 export default {
-  name: 'Container',
+  name: 'AppContainer',
   components: {
     Sidebar,
     Header
