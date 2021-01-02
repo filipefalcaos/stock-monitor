@@ -1,10 +1,12 @@
+import axios from 'axios'
+import fs from 'fs'
+import path from 'path'
+
 import { remote } from 'electron'
 import { nanoid } from 'nanoid'
 import { NotificationProgrammatic } from 'buefy'
-import { utils } from '../../utils'
-import axios from 'axios'
-import path from 'path'
-const fs = require('fs')
+import { dateUtils } from '../../utils/date'
+import { utils } from '../../utils/common'
 
 const state = () => ({
   dataFileName: '',  // The data filename
@@ -348,8 +350,8 @@ const mutations = {
         }
 
         dividends.push({
-          ed: utils.toTimestamp(r.ed),
-          pd: utils.toTimestamp(r.pd),
+          ed: dateUtils.toTimestamp(r.ed),
+          pd: dateUtils.toTimestamp(r.pd),
           value: r.v,
           type: divType,
           typeTxt: r.etd
@@ -375,13 +377,15 @@ const mutations = {
           dividendData.forEach(d => {
             let finalDate = p.closed ? p.closedAt : Date.now()
             let key = d.ed.toString().concat(d.pd.toString(), p.asset, d.typeTxt.split(' ')[0])
-            if (utils.isInInterval(d.ed, p.createdAt, finalDate)) {
+            let hashed = utils.hashString(key)
+
+            if (dateUtils.isInInterval(d.ed, p.createdAt, finalDate)) {
               p.dividends += p.amount * d.value
               portfolio.dividendsReceived.push({
                 asset: p.asset,
                 amount: p.amount,
                 result: p.amount * d.value,
-                key: key,
+                key: hashed,
                 ...d
               })
             }

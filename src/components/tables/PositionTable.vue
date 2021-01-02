@@ -25,7 +25,7 @@
         sortable
       >
         <span v-if="props.row.createdAt">
-          {{ $utils.formatDate(props.row.createdAt) }}
+          {{ $dateUtils.formatDate(props.row.createdAt) }}
         </span>
         <span v-else>--</span>
       </b-table-column>
@@ -37,7 +37,7 @@
         sortable
       >
         <span v-if="props.row.closedAt">
-          {{ $utils.formatDate(props.row.closedAt) }}
+          {{ $dateUtils.formatDate(props.row.closedAt) }}
         </span>
         <span v-else>--</span>
       </b-table-column>

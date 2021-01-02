@@ -22,7 +22,7 @@
         label="Ex-dividendos"
         sortable
       >
-        {{ $utils.formatDate(props.row.ed) }}
+        {{ $dateUtils.formatDate(props.row.ed) }}
       </b-table-column>
 
       <b-table-column
@@ -31,7 +31,7 @@
         label="Pagamento"
         sortable
       >
-        {{ $utils.formatDate(props.row.pd) }}
+        {{ $dateUtils.formatDate(props.row.pd) }}
       </b-table-column>
 
       <b-table-column

@@ -1,4 +1,4 @@
-import { utils } from '../../utils'
+import { dateUtils } from '../../utils/date'
 
 const state = () => ({
   cumulativeSum: [],         // The cumulative sum of the results (all portfolios)
@@ -37,7 +37,7 @@ const mutations = {
 
       // Computes the monthly cumulative sum
       let results = currentPositions.map(a => a.result).map(cumulativeSum(0))
-      let dates = currentPositions.map(a => a.closedAt).map((x) => utils.formatDate(x, 'month-year'))
+      let dates = currentPositions.map(a => a.closedAt).map((x) => dateUtils.formatDate(x, 'month-year'))
       let data = results.map((x, i) => [x, dates[i]])
       
       // Groups results by date
@@ -68,7 +68,7 @@ const mutations = {
         
         if (index !== (finalDates.length - 1)) {
           finalDatesAux.push(finalDates[index])
-          let newDates = utils.monthsInInterval(date, finalDates[index + 1]) // Looks for time gaps
+          let newDates = dateUtils.monthsInInterval(date, finalDates[index + 1]) // Looks for time gaps
           
           if (newDates.length > 0) {
             newDates.forEach(newDate => {

@@ -1,47 +1,17 @@
 import { eachMonthOfInterval, format, getTime, isWithinInterval, parse } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
-// Formats a given number to a currency
-function formatCurrency(num, precision = 2) {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-    minimumFractionDigits: precision,
-    maximumFractionDigits: precision
-  }).format(num)
-}
-
-// Formats a given number to percentage
-function formatPercent(num) {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'percent',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(num)
-}
-
-// Formats a given timestamp (in milliseconds) to the format 'dd/MM/yyyy HH:mm'
-function defaulFormat(timestamp) {
-  let date = new Date(timestamp)
-  return format(date, 'dd/MM/yyyy HH:mm')
-}
-
-// Formats a given timestamp (in milliseconds) to the format 'MMM/yyyy'
-function monthYearFormat(timestamp) {
-  let date = new Date(timestamp)
-  return format(date, 'MMM/yyyy', {locale: ptBR})
-}
-
 // Formats a given timestamp (in milliseconds) to a format specified by each available 
 // formatting mode. Available modes: 'default', 'month-year'
 function formatDate(timestamp, mode = 'default') {
+  let date = new Date(timestamp)
   switch (mode) {
     case 'month-year':
-      return monthYearFormat(timestamp)
+      return format(date, 'MMM/yyyy', {locale: ptBR})
     case 'default':
-      return defaulFormat(timestamp)
+      return format(date, 'dd/MM/yyyy HH:mm')
     default:
-      return defaulFormat(timestamp)
+      return format(date, 'dd/MM/yyyy HH:mm')
   }
 }
 
@@ -72,23 +42,9 @@ function isInInterval(date, date1, date2) {
   return isWithinInterval(toTest, { start: initialDate, end: finalDate })
 }
 
-// Suffles the items on a given array by using the Durstenfeld shuffle
-// Reference: https://stackoverflow.com/a/12646864
-function shuffleArray(array) {
-  for (var i = array.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1))
-    var temp = array[i]
-    array[i] = array[j]
-    array[j] = temp
-  }
-}
-
-export const utils = {
-  formatCurrency: formatCurrency,
-  formatPercent: formatPercent,
+export const dateUtils = {
   formatDate: formatDate,
   toTimestamp: toTimestamp,
   monthsInInterval: monthsInInterval,
-  isInInterval: isInInterval,
-  shuffleArray: shuffleArray
+  isInInterval: isInInterval
 }

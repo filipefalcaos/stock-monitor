@@ -7,7 +7,7 @@
 <script>
 import Chart from 'chart.js'
 import { nanoid } from 'nanoid'
-import { utils } from '../../utils'
+import { utils } from '../../utils/common'
 
 import 'chartjs-plugin-colorschemes/src/plugins/plugin.colorschemes'
 import { Classic20 } from 'chartjs-plugin-colorschemes/src/colorschemes/colorschemes.tableau'
