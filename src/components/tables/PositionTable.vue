@@ -147,11 +147,10 @@
         >
           <CButtonToolbar>
             <CButtonGroup
-              v-if="showAllOptions"
+              v-if="singlePos"
               class="mx-1 d-sm-down-none"
             >
               <CButton
-                v-if="showAllOptions"
                 color="info"
                 @click="movePosition"
               >
@@ -159,7 +158,7 @@
               </CButton>
             </CButtonGroup>
             <CButtonGroup
-              v-if="showAllOptions"
+              v-if="singlePosNotClosed"
               class="mx-1 d-sm-down-none"
             >
               <CButton
@@ -218,9 +217,13 @@ export default {
       return this.positionData.length > this.pages
     },
 
-    showAllOptions() {
+    singlePos() {
+      return this.checkedRows.length === 1
+    },
+
+    singlePosNotClosed() {
       return this.checkedRows.length === 1 && !this.checkedRows[0].closed
-    }
+    },
   },
   
   methods: {
