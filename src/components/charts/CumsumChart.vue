@@ -15,7 +15,7 @@ import { Classic20 } from 'chartjs-plugin-colorschemes/src/colorschemes/colorsch
 export default {
   name: 'CumsumChart',
   props: {
-    datasets: {
+    dataset: {
       type: Array,
       default: () => []
     },
@@ -28,8 +28,7 @@ export default {
   data() {
     return {
       chart: null,
-      chartId: '',
-      parsedDatasets: []
+      chartId: ''
     }
   },
 
@@ -37,10 +36,9 @@ export default {
     // Watches for changes on the datasets
     // When changes are detected, the new datasets are parsed and then set in the existing chart
     // to be updated
-    datasets: function(val) {
-      this.parseDatasets(val)
+    dataset: function(val) {
       this.chart.data.labels = this.labels
-      this.chart.data.datasets = this.parsedDatasets
+      this.chart.data.datasets[0].data = val
       this.chart.update()
     }
   },
@@ -48,7 +46,6 @@ export default {
   // Sets up an unique chart id and parses the datasets when the chart component is created
   created() {
     this.chartId = nanoid()
-    this.parseDatasets(this.datasets)
   },
 
   // Creates the chart when the canvas element is already loaded
@@ -57,19 +54,6 @@ export default {
   },
 
   methods: {
-    // Parses the timeseries datasets to the format expect by ChartJS
-    parseDatasets(datasets) {
-      this.parsedDatasets = []
-      datasets.forEach(d => {
-        this.parsedDatasets.push({
-          label: d.title,
-          cubicInterpolationMode: 'monotone',
-          data: d.results,
-          fill: false
-        })
-      })
-    },
-
     // Creates the ChartJS line chart for timeseries plotting with the specified options and
     // parsed data
     createChart() {
@@ -78,7 +62,13 @@ export default {
         type: 'line',
         data: {
           labels: this.labels,
-          datasets: this.parsedDatasets
+          datasets: [{
+            borderColor: '#20A8D8',
+            backgroundColor: '#20A8D8',
+            cubicInterpolationMode: 'monotone',
+            data: this.dataset,
+            fill: false
+          }]
         },
         options: {
           responsive: true,
@@ -109,9 +99,7 @@ export default {
             }]
           },
           legend: {
-            labels: {
-              boxWidth: 20
-            }
+            display: false
           },
           tooltips: {
             enabled: true,

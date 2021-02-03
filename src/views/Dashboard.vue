@@ -33,16 +33,34 @@
 
     <CCard>
       <CCardBody>
-        <h4
-          class="mb-0"
-          style="text-align: center;"
-        >
-          P&L - Carteiras de ativos
-        </h4>
+        <CRow align-vertical="center">
+          <CCol lg="10">
+            <h4 class="mb-0 ml-1">
+              P&L - Carteiras de ativos
+            </h4>
+          </CCol>
+          
+          <CCol lg="2">
+            <b-select
+              v-model="selectedPortfolio"
+              placeholder="Agregado"
+              expanded
+              @input="loadNewStats"
+            >
+              <option
+                v-for="option in portfolioOptions"
+                :key="option.id"
+                :value="option.id"
+              >
+                {{ option.name }}
+              </option>
+            </b-select>
+          </CCol>
+        </CRow>
         
         <cumsum-chart
-          :datasets="cumulativeSum"
-          :labels="chartLabels"
+          :dataset="cumulativeSum"
+          :labels="cumulativeSumLabels"
           style="height: 300px; margin-top: 20px;"
         />
       </CCardBody>
@@ -125,12 +143,19 @@ export default {
     EmptyApp
   },
 
+  data() {
+    return {
+      selectedPortfolio: 'allportfolios',
+      portfolioOptions: []
+    }
+  },
+
   computed: {
     ...mapState({
       cumulativeSum: state => state.stats.cumulativeSum,
+      cumulativeSumLabels: state => state.stats.cumulativeSumLabels,
       operationsCount: state => state.stats.operationsCount,
       overallResults: state => state.stats.overallResults,
-      chartLabels: state => state.stats.chartLabels,
       operationsPerAsset: state => state.stats.operationsPerAsset,
       investmentPerAsset: state => state.stats.investmentPerAsset,
       investmentPerAssetType: state => state.stats.investmentPerAssetType,
@@ -143,20 +168,41 @@ export default {
     ...mapGetters({
       isEmpty: 'isEmpty',
       lastPortfolio: 'lastPortfolio',
-      allAssets: 'allAssets'
+      allAssets: 'allAssets',
+      allPositions: 'allPositions'
     })
   },
 
   // Gets the latest data on all assets when the Dashboard is created. Then, computes the
   // statistics on the portfolios/options data
   async created() {
+    this.makePortfolioOptions()
     await this.$store.dispatch('getAssetsData', this.allAssets)
-    this.$store.dispatch('computeStats', this.portfolioData)
+    let payload = {portfolioData: this.portfolioData, positions: this.allPositions}
+    this.$store.dispatch('computeStats', payload)
   },
 
   methods: {
     displayText(num) {
       return (!num) ? 0 : num
+    },
+
+    // Loads the selected portfolio and compute its P&L stats. If the selected portfolio is
+    // 'allportfolios', compute the aggregate P&L of all portfolios
+    loadNewStats() {
+      if (this.selectedPortfolio === 'allportfolios') {
+        this.$store.commit('computeCumSum', this.allPositions)
+      } else {
+        let selPortfolio = this.portfolioData.portfolios.filter(p => p.id === this.selectedPortfolio)
+        let positions = selPortfolio[0].positions
+        this.$store.commit('computeCumSum', positions)
+      }
+    },
+
+    // Sets the options of portfolios to select for P&L stats
+    makePortfolioOptions() {
+      this.portfolioOptions.push({id: 'allportfolios', name: 'AGREGADO'})
+      this.portfolioData.portfolios.forEach(p => this.portfolioOptions.push({id: p.id, name: p.name}))
     }
   }
 }

@@ -45,6 +45,9 @@ const getters = {
   // Gets all the portfolios except for the last acessed one
   otherPortfolios: (state) => findPortfolios(state, state.portfolioData.lastPortfolio, diffFn),
 
+  // Gets the positions of all portfolios
+  allPositions: (state) => [...state.portfolioData.portfolios.map(p => p.positions)].flat(),
+
   // Gets the positions of the current portfolio
   currentPositions: (state, getters) => getters.lastPortfolio.positions,
 
