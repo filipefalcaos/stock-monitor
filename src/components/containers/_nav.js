@@ -16,7 +16,7 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Operação em Opções',
+        name: 'Operações em Opções',
         to: '/options',
         icon: 'cil-cash'
       },

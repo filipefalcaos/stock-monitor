@@ -26,12 +26,12 @@ export default new Router({
         },
         {
           path: 'portfolios',
-          name: 'Carteiras',
+          name: 'Carteiras de Ativos',
           component: Portfolios
         },
         {
           path: 'options',
-          name: 'Opções',
+          name: 'Operações em Opções',
           component: UnderConstruction
         },
         {
